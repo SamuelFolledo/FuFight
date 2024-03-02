@@ -18,15 +18,15 @@ enum ViewType {
     var color: UIColor {
         switch self {
         case .primary:
-            return .label
+            return primaryUiColor
         case .secondary:
-            return .systemGreen
+            return secondaryUiColor
         case .tertiary:
             return .clear
         case .system:
-            return .systemBlue
+            return systemUiColor
         case .destructive:
-            return .systemRed
+            return destructiveUiColor
         }
     }
 }

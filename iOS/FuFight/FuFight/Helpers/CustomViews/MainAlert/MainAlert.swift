@@ -109,7 +109,7 @@ struct MainAlert: View {
         } else if !message.isEmpty {
             Text(message)
                 .font(.system(size: title.isEmpty ? 18 : 16))
-                .foregroundColor(title.isEmpty ? .black : .gray)
+                .foregroundColor(title.isEmpty ? primaryColor : disabledColor)
                 .lineSpacing(24 - UIFont.systemFont(ofSize: title.isEmpty ? 18 : 16).lineHeight)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)

@@ -210,7 +210,7 @@ struct UnderlinedTextField: View {
 
             Rectangle()
                 .frame(height: 1.5)
-                .foregroundStyle(hasError ? Color.red : (isDisabled ? Color.systemGray2 : Color.label))
+                .foregroundStyle(hasError ? destructiveColor : (isDisabled ? disabledColor : primaryColor))
         }
     }
 
