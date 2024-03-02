@@ -10,7 +10,6 @@ import SwiftUI
 struct AccountImage: View {
     let url: URL?
     let radius: CGFloat
-    let circleColor: Color = .gray
     var squareSide: CGFloat {
         2.0.squareRoot() * radius
     }
@@ -18,7 +17,7 @@ struct AccountImage: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(circleColor)
+                .fill(disabledColor)
 //                .frame(width: radius * 2, height: radius * 2)
                 .frame(width: squareSide, height: squareSide)
 

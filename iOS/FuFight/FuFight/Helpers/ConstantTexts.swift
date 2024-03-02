@@ -16,6 +16,7 @@ struct Str {
     static let phoneTitle = "Phone"
     static let phoneCodeTitle = "Phone Code"
     static let finishSignUpTitle = "Finish Signing Up"
+    static let passswordlessLogInTitle = "Passwordless Log In"
     static let emailTitle = "Email"
     static let enterEmail = "Enter email"
     static let usernameTitle = "Username"

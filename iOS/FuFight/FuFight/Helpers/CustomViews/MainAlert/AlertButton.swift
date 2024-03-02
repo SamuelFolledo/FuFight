@@ -26,11 +26,11 @@ enum AlertButtonType {
     var bgColor: UIColor {
         switch self {
         case .cancel, .secondaryCancel:
-            return .systemBackground
+            return backgroundUiColor
         case .delete:
-            return .systemRed
+            return destructiveUiColor
         case .ok, .secondaryOk:
-            return .systemBackground
+            return backgroundUiColor
         case .custom:
             return .clear
         }
@@ -43,11 +43,11 @@ enum AlertButtonType {
         case .delete:
             return .systemBackground
         case .ok:
-            return .systemBlue
+            return systemUiColor
         case .secondaryCancel, .secondaryOk:
             return .label
         case .custom:
-            return .systemBlue
+            return systemUiColor
         }
     }
 }

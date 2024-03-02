@@ -32,6 +32,20 @@ let boldedTextFont = textFont.weight(.bold)
 let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
 let boldedButtonFont = buttonFont.weight(.bold)
 
+//Colors
+let systemUiColor = UIColor.systemCyan
+let systemColor = Color(uiColor: systemUiColor)
+let backgroundUiColor = UIColor.systemBackground
+let backgroundColor = Color(uiColor: backgroundUiColor)
+let primaryUiColor = UIColor.label
+let primaryColor = Color(uiColor: primaryUiColor)
+let secondaryUiColor = UIColor.systemMint
+let secondaryColor = Color(uiColor: secondaryUiColor)
+let disabledUiColor = UIColor.systemGray2
+let disabledColor = Color(uiColor: disabledUiColor)
+let destructiveUiColor = UIColor.systemRed
+let destructiveColor = Color(uiColor: destructiveUiColor)
+
 //Constant images
 let defaultProfilePhoto: UIImage = UIImage(systemName: "person.crop.circle")!
 let checkedImage: UIImage = UIImage(systemName: "checkmark.square.fill")!

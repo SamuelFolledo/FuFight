@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AuthenticationView: View {
     @State var vm: AuthenticationViewModel
-
+    private let dividerWidth: CGFloat = 70
     var body: some View {
         NavigationView {
             ScrollView {
@@ -28,6 +28,10 @@ struct AuthenticationView: View {
                         }
 
                         authButtons
+
+                        spacerView
+
+                        passwordlessLogInButton
                     }
                 }
                 .padding(.horizontal, horizontalPadding)
@@ -37,11 +41,6 @@ struct AuthenticationView: View {
                 hideKeyboard()
             }
             .navigationBarTitle(vm.step.title, displayMode: .large)
-            .safeAreaInset(edge: .bottom) {
-                if vm.step == .logIn || vm.step == .signUp {
-                    bottomButton
-                }
-            }
             .overlay {
                 if let message = vm.loadingMessage {
                     ProgressView(message)
@@ -111,7 +110,7 @@ struct AuthenticationView: View {
             }) {
                 Text(Str.forgotPasswordTitleQuestion)
                     .background(.clear)
-                    .foregroundColor(Color.systemBlue)
+                    .foregroundColor(systemColor)
                     .font(buttonFont)
             }
             .padding(.vertical)
@@ -120,13 +119,13 @@ struct AuthenticationView: View {
 
     var authButtons: some View {
         VStack {
-            switch vm.step {
-            case .logIn:
-                topButton
+            topButton
 
-                //TODO: Add Google, Facebook, Apple buttons
-            case .phone, .phoneVerification, .signUp, .onboard:
-                topButton
+            switch vm.step {
+            case .logIn, .signUp:
+                bottomButton
+            case .phone, .phoneVerification, .onboard:
+                EmptyView()
             }
         }
     }
@@ -160,9 +159,7 @@ struct AuthenticationView: View {
     }
 
     var topButton: some View {
-        Button(action: {
-            vm.topButtonTapped()
-        }) {
+        Button(action: vm.topButtonTapped) {
             Text(vm.step.topButtonTitle)
                 .frame(maxWidth: .infinity)
                 .font(boldedButtonFont)
@@ -171,19 +168,50 @@ struct AuthenticationView: View {
         .disabled(!vm.topButtonIsEnabled)
     }
 
-    var bottomButton: some View {
-        Button(action: {
-            vm.bottomButtonTapped()
-        }) {
-            Text(vm.step.bottomButtonTitle)
+    @ViewBuilder var bottomButton: some View {
+        if vm.step == .logIn || vm.step == .signUp {
+            Button(action: vm.bottomButtonTapped) {
+                Text(vm.step.bottomButtonTitle)
+                    .frame(maxWidth: .infinity)
+                    .font(boldedButtonFont)
+            }
+            .appButton(.tertiary)
+        }
+    }
+
+    @ViewBuilder var spacerView: some View {
+        if vm.step == .logIn {
+            Spacer()
+                .frame(height: 50)
+
+            HStack {
+                Rectangle()
+                    .frame(width: dividerWidth, height: 1)
+
+                Text("or")
+                    .padding(.horizontal, 20)
+
+                Rectangle()
+                    .frame(width: dividerWidth, height: 1)
+            }
+
+            Spacer()
+                .frame(height: 50)
+        }
+    }
+
+    var passwordlessLogInButton: some View {
+        NavigationLink {
+        } label: {
+            Text(Str.passswordlessLogInTitle)
                 .frame(maxWidth: .infinity)
                 .font(boldedButtonFont)
         }
-        .appButton(.tertiary)
+        .appButton(.secondary)
     }
 }
 
 
 #Preview {
-    AuthenticationView(vm: AuthenticationViewModel(step: .onboard, account: Account()))
+    AuthenticationView(vm: AuthenticationViewModel(step: .logIn, account: Account()))
 }
