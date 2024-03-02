@@ -9,30 +9,15 @@ import SwiftUI
 import FirebaseAuth
 
 @Observable
-class HomeViewModel: BaseViewModel {
-    var account: Account
-    var authChangesListener: AuthStateDidChangeListenerHandle?
+class HomeViewModel: BaseAccountViewModel {
     var isAccountVerified = false
-
-    //MARK: - Initializer
-    init(account: Account) {
-        self.account = account
-    }
 
     //MARK: - ViewModel Overrides
 
     override func onAppear() {
         super.onAppear()
-        observeAuthChanges()
         if !isAccountVerified {
             verifyAccount()
-        }
-    }
-
-    override func onDisappear() {
-        super.onDisappear()
-        if let authChangesListener {
-            auth.removeStateDidChangeListener(authChangesListener)
         }
     }
 
@@ -40,22 +25,7 @@ class HomeViewModel: BaseViewModel {
 }
 
 //MARK: - Private Methods
-private extension HomeViewModel { }
-
-//MARK: Reusable methods for all ViewModel
 private extension HomeViewModel {
-    func observeAuthChanges() {
-        auth.addStateDidChangeListener { (authDataResult, user) in
-            if let user {
-                let updatedAccount = Account(user)
-                LOGD("Auth ACCOUNT changes handler for \(user.displayName ?? "")")
-                updatedAccount.status = self.account.status
-                self.account.update(with: updatedAccount)
-                AccountManager.saveCurrent(self.account)
-            }
-        }
-    }
-
     ///Make sure account is valid at least once
     func verifyAccount() {
         Task {

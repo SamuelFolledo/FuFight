@@ -89,7 +89,7 @@ struct AccountView: View {
     var emailField: some View {
         UnderlinedTextField(
             type: .constant(.email),
-            text: .constant(Account.current?.email ?? ""),
+            text: .constant(vm.account.email ?? ""),
             isDisabled: .constant(true))
     }
     var changePasswordButton: some View {

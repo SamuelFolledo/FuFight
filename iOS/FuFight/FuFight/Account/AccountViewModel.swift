@@ -13,9 +13,7 @@ enum ReauthenticateReasonType {
 }
 
 @Observable
-class AccountViewModel: BaseViewModel {
-    var account: Account
-
+class AccountViewModel: BaseAccountViewModel {
     var isViewingMode: Bool = true
     var selectedImage: UIImage? = nil {
         didSet {
@@ -34,16 +32,11 @@ class AccountViewModel: BaseViewModel {
     var password = ""
     private var reauthenticationReasonType: ReauthenticateReasonType = .editAccount
 
-    //MARK: - Initializer
-    init(account: Account) {
-        self.account = account
-    }
-
     override func onAppear() {
         super.onAppear()
         selectedImage = nil
         isViewingMode = true
-        usernameFieldText = Account.current?.username ?? ""
+        usernameFieldText = account.username ?? ""
     }
 
     //MARK: - Public Methods
