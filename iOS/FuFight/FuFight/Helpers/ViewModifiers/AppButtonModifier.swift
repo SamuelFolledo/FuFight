@@ -68,17 +68,19 @@ struct AppButtonModifier: ViewModifier {
     }
 
     var background: some View {
-        if isEnabled {
-            Color(uiColor: isBordered ? .clear : viewType.color)
-        } else {
-            Color(uiColor: isBordered ? .clear : disabledColor)
+        Group {
+            if isEnabled {
+                Color(uiColor: isBordered ? .clear : viewType.color)
+            } else {
+                Color(uiColor: isBordered ? .clear : disabledColor)
+            }
         }
     }
     var foregroundColor: UIColor {
         if viewType == .tertiary {
-            return .label
+            return primaryUiColor
         } else {
-            return isEnabled ? (isBordered ? viewType.color : .systemBackground) : (isBordered ? .clear : .label)
+            return isEnabled ? (isBordered ? viewType.color : backgroundUiColor) : (isBordered ? .clear : backgroundUiColor)
         }
     }
 }
