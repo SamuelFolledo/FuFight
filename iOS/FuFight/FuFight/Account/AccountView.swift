@@ -38,7 +38,7 @@ struct AccountView: View {
                    isPresented: $vm.isDeleteAccountAlertPresented)
             .alert(withText: $vm.password,
                    fieldType: .password(.current),
-                   title: Str.logInAgainToMakeChanges,
+                   title: Str.recentReauthenticationIsRequiredToMakeChanges,
                    primaryButton: AlertButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
             .padding(.horizontal, horizontalPadding)
@@ -89,7 +89,7 @@ struct AccountView: View {
     var emailField: some View {
         UnderlinedTextField(
             type: .constant(.email),
-            text: .constant(Account.current?.email ?? ""),
+            text: .constant(vm.account.email ?? ""),
             isDisabled: .constant(true))
     }
     var changePasswordButton: some View {

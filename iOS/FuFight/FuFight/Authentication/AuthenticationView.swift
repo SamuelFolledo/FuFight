@@ -28,10 +28,6 @@ struct AuthenticationView: View {
                         }
 
                         authButtons
-
-                        spacerView
-
-                        passwordlessLogInButton
                     }
                 }
                 .padding(.horizontal, horizontalPadding)
@@ -118,7 +114,7 @@ struct AuthenticationView: View {
     }
 
     var authButtons: some View {
-        VStack {
+        VStack(spacing: 30) {
             topButton
 
             switch vm.step {
@@ -177,38 +173,6 @@ struct AuthenticationView: View {
             }
             .appButton(.tertiary)
         }
-    }
-
-    @ViewBuilder var spacerView: some View {
-        if vm.step == .logIn {
-            Spacer()
-                .frame(height: 50)
-
-            HStack {
-                Rectangle()
-                    .frame(width: dividerWidth, height: 1)
-
-                Text("or")
-                    .padding(.horizontal, 20)
-
-                Rectangle()
-                    .frame(width: dividerWidth, height: 1)
-            }
-
-            Spacer()
-                .frame(height: 50)
-        }
-    }
-
-    var passwordlessLogInButton: some View {
-        NavigationLink {
-            PasswordlessLogInView(vm: PasswordlessLogInViewModel(account: vm.account))
-        } label: {
-            Text(Str.passswordlessLogInTitle)
-                .frame(maxWidth: .infinity)
-                .font(boldedButtonFont)
-        }
-        .appButton(.secondary)
     }
 }
 

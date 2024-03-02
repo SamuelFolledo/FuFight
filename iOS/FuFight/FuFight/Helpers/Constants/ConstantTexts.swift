@@ -58,7 +58,7 @@ struct Str {
     static let dontHaveAnAccount = "Don't have an account? Sign up."
     static let alreadyHaveAnAccount = "Already have an account? Log in."
     static let enterYourEmail = "Enter your email"
-    static let logInAgainToMakeChanges = "To make account changes, log in and try again"
+    static let recentReauthenticationIsRequiredToMakeChanges = "Recent reauthentication is required to make account changes"
     static let sendingEmail = "Sending an email"
 
     //MARK: - Logs

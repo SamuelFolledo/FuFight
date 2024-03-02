@@ -38,7 +38,7 @@ struct AccountImagePicker: View {
                         }
                     }
                 }
-                .aspectRatio(1.0, contentMode: .fill)
+                .aspectRatio(contentMode: .fill)
                 .clipShape(Circle())
             }
         }

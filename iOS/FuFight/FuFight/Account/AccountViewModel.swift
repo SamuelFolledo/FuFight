@@ -10,12 +10,11 @@ import SwiftUI
 enum ReauthenticateReasonType {
     case deleteAccount
     case editAccount
+    case saveAccount
 }
 
 @Observable
-class AccountViewModel: BaseViewModel {
-    var account: Account
-
+class AccountViewModel: BaseAccountViewModel {
     var isViewingMode: Bool = true
     var selectedImage: UIImage? = nil {
         didSet {
@@ -34,16 +33,11 @@ class AccountViewModel: BaseViewModel {
     var password = ""
     private var reauthenticationReasonType: ReauthenticateReasonType = .editAccount
 
-    //MARK: - Initializer
-    init(account: Account) {
-        self.account = account
-    }
-
     override func onAppear() {
         super.onAppear()
         selectedImage = nil
         isViewingMode = true
-        usernameFieldText = Account.current?.username ?? ""
+        usernameFieldText = account.username ?? ""
     }
 
     //MARK: - Public Methods
@@ -107,7 +101,11 @@ class AccountViewModel: BaseViewModel {
                 showReauthenticateAlert(reasonType: .editAccount)
             }
         } else {
-            saveUser()
+            if isRecentlyAuthenticated {
+                saveAccount()
+            } else {
+                showReauthenticateAlert(reasonType: .saveAccount)
+            }
         }
     }
 
@@ -125,6 +123,8 @@ class AccountViewModel: BaseViewModel {
                     deleteButtonTapped()
                 case .editAccount:
                     editSaveButtonTapped()
+                case .saveAccount:
+                    saveAccount()
                 }
             } catch {
                 updateError(MainError(type: .reauthenticatingUser, message: error.localizedDescription))
@@ -140,7 +140,7 @@ private extension AccountViewModel {
         AccountManager.saveCurrent(account)
     }
 
-    func saveUser() {
+    func saveAccount() {
         let username = usernameFieldText.trimmed
         usernameFieldHasError = !username.isValidUsername
         guard !username.isEmpty,

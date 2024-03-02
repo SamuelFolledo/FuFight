@@ -93,13 +93,16 @@ class Account: ObservableObject, Codable {
     //MARK: Public Methods
 
     func update(with user: Account) {
-        if let id = user.id {
+        if let id = user.id,
+           self.id != id {
             self.id = id
         }
-        if let username = user.username {
+        if let username = user.username,
+           self.username != username {
             self.username = username
         }
-        if let photoUrl = user.photoUrl {
+        if let photoUrl = user.photoUrl,
+           self.photoUrl != photoUrl {
             self.photoUrl = photoUrl
         }
         if let email = user.email {

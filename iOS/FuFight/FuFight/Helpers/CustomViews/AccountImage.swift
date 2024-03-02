@@ -24,7 +24,7 @@ struct AccountImage: View {
             CachedAsyncImage(url: url) { image in
                 image
                     .resizable()
-                    .aspectRatio(1.0, contentMode: .fill)
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: squareSide, height: squareSide)
                     .clipShape(Circle())
             } placeholder: {
