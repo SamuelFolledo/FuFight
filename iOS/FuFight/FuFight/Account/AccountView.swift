@@ -38,7 +38,7 @@ struct AccountView: View {
                    isPresented: $vm.isDeleteAccountAlertPresented)
             .alert(withText: $vm.password,
                    fieldType: .password(.current),
-                   title: Str.logInAgainToMakeChanges,
+                   title: Str.recentReauthenticationIsRequiredToMakeChanges,
                    primaryButton: AlertButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
             .padding(.horizontal, horizontalPadding)

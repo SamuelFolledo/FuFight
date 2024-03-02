@@ -10,6 +10,7 @@ import SwiftUI
 enum ReauthenticateReasonType {
     case deleteAccount
     case editAccount
+    case saveAccount
 }
 
 @Observable
@@ -100,7 +101,11 @@ class AccountViewModel: BaseAccountViewModel {
                 showReauthenticateAlert(reasonType: .editAccount)
             }
         } else {
-            saveUser()
+            if isRecentlyAuthenticated {
+                saveAccount()
+            } else {
+                showReauthenticateAlert(reasonType: .saveAccount)
+            }
         }
     }
 
@@ -118,6 +123,8 @@ class AccountViewModel: BaseAccountViewModel {
                     deleteButtonTapped()
                 case .editAccount:
                     editSaveButtonTapped()
+                case .saveAccount:
+                    saveAccount()
                 }
             } catch {
                 updateError(MainError(type: .reauthenticatingUser, message: error.localizedDescription))
@@ -133,7 +140,7 @@ private extension AccountViewModel {
         AccountManager.saveCurrent(account)
     }
 
-    func saveUser() {
+    func saveAccount() {
         let username = usernameFieldText.trimmed
         usernameFieldHasError = !username.isValidUsername
         guard !username.isEmpty,
