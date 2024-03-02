@@ -49,6 +49,8 @@ struct Str {
     static let deleteTitle = "Delete"
     static let editTitle = "Edit"
     static let finishTitle = "Finish"
+    static let sendLogInLinkTitle = "Send Log In Link"
+    static let passwordlessLogInTitle = "Passwordless Log In"
 
     //Non- titles
     static let sendCode = "Send code"

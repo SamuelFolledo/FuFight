@@ -202,6 +202,7 @@ struct AuthenticationView: View {
 
     var passwordlessLogInButton: some View {
         NavigationLink {
+            PasswordlessLogInView(vm: PasswordlessLogInViewModel(account: vm.account))
         } label: {
             Text(Str.passswordlessLogInTitle)
                 .frame(maxWidth: .infinity)
