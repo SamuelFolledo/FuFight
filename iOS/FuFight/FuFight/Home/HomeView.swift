@@ -11,17 +11,14 @@ struct HomeView: View {
     @State var vm: HomeViewModel
 
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $vm.path) {
             ScrollView {
                 VStack {
-
                     Text("Welcome \(vm.account.displayName)")
 
                     Spacer()
 
-                    Button("Play") {
-                        TODO("Play")
-                    }
+                    playButton
                 }
                 .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                 .padding()
@@ -34,6 +31,14 @@ struct HomeView: View {
             .overlay {
                 if let message = vm.loadingMessage {
                     ProgressView(message)
+                }
+            }
+            .navigationDestination(for: GameRoute.self) { route in
+                switch route {
+                case .game:
+                    GameView(path: $vm.path)
+                case .gameOver:
+                    GameOverView(path: $vm.path)
                 }
             }
         }
@@ -50,6 +55,14 @@ struct HomeView: View {
     var accountImage: some View {
         NavigationLink(destination: AccountView(vm: AccountViewModel(account: vm.account))) {
             AccountImage(url: vm.account.photoUrl, radius: 30)
+        }
+    }
+
+    var playButton: some View {
+        Button {
+            vm.path.append(GameRoute.game)
+        } label: {
+            Text("Start game")
         }
     }
 }

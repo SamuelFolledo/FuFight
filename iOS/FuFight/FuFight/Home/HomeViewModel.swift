@@ -11,6 +11,7 @@ import FirebaseAuth
 @Observable
 class HomeViewModel: BaseAccountViewModel {
     var isAccountVerified = false
+    var path = NavigationPath()
 
     //MARK: - ViewModel Overrides
 
