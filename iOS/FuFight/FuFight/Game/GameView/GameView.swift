@@ -9,8 +9,9 @@ import SwiftUI
 
 struct GameView: View {
     @Binding var path: NavigationPath
+
     @State var vm = GameViewModel()
-    
+
     var body: some View {
         VStack(spacing: 0) {
             AccountHpView(player: vm.enemyPlayer, isEnemy: true)
@@ -37,6 +38,9 @@ struct GameView: View {
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
         .overlay {
+            CountdownTimerView(timeRemaining: $vm.timeRemaining)
+        }
+        .overlay {
             if let message = vm.loadingMessage {
                 ProgressView(message)
             }
@@ -49,8 +53,8 @@ struct GameView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .navigationBarBackButtonHidden()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onChange(of: vm.isGameOver) {
+            TODO("Show results in an alert with buttons to go back home")
             if vm.isGameOver {
                 path.append(GameRoute.gameOver)
             }

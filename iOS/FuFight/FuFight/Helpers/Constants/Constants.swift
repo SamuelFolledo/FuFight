@@ -31,6 +31,7 @@ let mediumTextFont = textFont.weight(.medium)
 let boldedTextFont = textFont.weight(.bold)
 let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
 let boldedButtonFont = buttonFont.weight(.bold)
+let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
 
 //Colors
 let systemUiColor = UIColor.systemCyan
@@ -61,3 +62,5 @@ let validImage: some View = Image(systemName: "checkmark.circle.fill")
 let accountPhotoCompressionQuality: Double = 0.3
 let horizontalPadding: CGFloat = 36
 let accountImagePickerHeight: CGFloat = 160
+let defaultMaxTime = 5
+

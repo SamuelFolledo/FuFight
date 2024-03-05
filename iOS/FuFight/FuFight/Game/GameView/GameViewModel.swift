@@ -17,9 +17,10 @@ struct Player {
 @Observable
 class GameViewModel: BaseViewModel {
 
-    var accountPlayer: Player!
-    var enemyPlayer: Player!
+    var accountPlayer: Player
+    var enemyPlayer: Player
     var isGameOver: Bool = false
+    var timeRemaining = defaultMaxTime
 
     ///Initializer for testing purposes
     override init() {
