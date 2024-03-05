@@ -13,19 +13,29 @@ struct GameView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            AccountHpView(player: vm.enemyPlayer, isEnemy: true)
+                .padding(.horizontal)
 
-            VStack(spacing: 12) {
-                Button {
-                    path.append(GameRoute.gameOver)
-                } label: {
-                    Text("Game over")
-                }
+            Spacer()
+
+            Button("Attack player") {
+                vm.attack(damage: 10, toEnemy: false)
             }
+
+            Spacer()
+            
+            Button("Attack enemy") {
+                vm.attack(damage: 10, toEnemy: true)
+            }
+
+            Spacer()
+
+            AccountHpView(player: vm.accountPlayer)
+                .padding(.horizontal)
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
-        .padding(.horizontal, horizontalPadding)
         .overlay {
             if let message = vm.loadingMessage {
                 ProgressView(message)
@@ -38,7 +48,13 @@ struct GameView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-        .navigationTitle("Game View")
+        .navigationBarBackButtonHidden()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onChange(of: vm.isGameOver) {
+            if vm.isGameOver {
+                path.append(GameRoute.gameOver)
+            }
+        }
     }
 }
 
