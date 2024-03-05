@@ -36,6 +36,7 @@ struct GameOverView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .navigationBarBackButtonHidden()
         .navigationTitle("Game Over")
     }
 }
