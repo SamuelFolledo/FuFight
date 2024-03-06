@@ -12,21 +12,34 @@ struct AccountHpView: View {
     var isEnemy = false
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             if !isEnemy {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
 
             VStack(alignment: isEnemy ? .trailing : .leading, spacing: 0) {
+                if !isEnemy {
+                    nameText
+                }
+
                 hpBarView
 
-                Text(player.username)
+                if isEnemy {
+                    nameText
+                }
             }
 
             if isEnemy {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
         }
+        .padding(8)
+        .background(
+            Color.systemGray
+                .ignoresSafeArea()
+                .cornerRadius(16)
+                .opacity(0.5)
+        )
     }
 
     var hpBarView: some View {
@@ -35,7 +48,7 @@ struct AccountHpView: View {
                 ZStack(alignment: .leading) {
                     Rectangle()
                         .frame(width: geometry.size.width, height: 20)
-                        .opacity(0.3)
+                        .opacity(0.7)
                         .foregroundColor(.gray)
 
                     Rectangle()
@@ -44,6 +57,8 @@ struct AccountHpView: View {
                 }
                 .overlay(
                     Text("\(Int(player.hp)) / \(Int(player.maxHp))")
+                        .font(mediumTextFont)
+                        .foregroundStyle(.white)
                         .padding()
                 )
             }
@@ -67,6 +82,12 @@ struct AccountHpView: View {
         } else {
             return .red
         }
+    }
+
+    var nameText: some View {
+        Text(player.username)
+            .font(mediumTextFont)
+            .foregroundStyle(.white)
     }
 }
 

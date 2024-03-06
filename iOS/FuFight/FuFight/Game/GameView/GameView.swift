@@ -72,7 +72,7 @@ struct GameView: View {
 
             CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive)
         }
-        .padding(.bottom, 200)
+        .padding(.bottom, 300)
     }
 }
 
