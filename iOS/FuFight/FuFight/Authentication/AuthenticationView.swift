@@ -49,10 +49,7 @@ struct AuthenticationView: View {
                    primaryButton: AlertButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
                    isPresented: $vm.showForgotPassword)
             .background(
-                Image("homeBackground")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .ignoresSafeArea()
+                backgroundImage
                     .padding(.leading, 600)
             )
         }

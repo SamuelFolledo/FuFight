@@ -51,10 +51,7 @@ struct UpdatePasswordView: View {
             updatePasswordButton
         }
         .background(
-            Image("homeBackground")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
+            backgroundImage
                 .padding(.trailing, 800)
         )
     }

@@ -42,10 +42,7 @@ struct HomeView: View {
                 }
             }
             .background(
-                Image("homeBackground")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .ignoresSafeArea()
+                backgroundImage
                     .padding(.leading, 30)
 
             )

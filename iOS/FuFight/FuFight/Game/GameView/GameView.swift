@@ -44,10 +44,7 @@ struct GameView: View {
             }
         }
         .background(
-            Image("gameBackground")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
+            gameBackgroundImage
                 .padding(vm.isBackgroundLeadingPadding ? .leading : .trailing, vm.backgroundPadding)
 
         )

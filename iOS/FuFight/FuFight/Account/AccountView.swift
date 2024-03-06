@@ -61,10 +61,7 @@ struct AccountView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .background(
-            Image("homeBackground")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .ignoresSafeArea()
+            backgroundImage
                 .padding(.trailing, 600)
         )
     }

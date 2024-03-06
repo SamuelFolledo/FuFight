@@ -27,6 +27,12 @@ let usernamesDb = db.collection(kUSERNAMES)
 let storage = Storage.storage().reference()
 let accountPhotoStorage = storage.child(kACCOUNTS).child(kPHOTOS)
 
+//Constant values
+let accountPhotoCompressionQuality: Double = 0.3
+let horizontalPadding: CGFloat = 36
+let accountImagePickerHeight: CGFloat = 160
+let defaultMaxTime: Int = 5
+
 //Fonts
 let defaultFontSize: CGFloat = 16
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
@@ -52,7 +58,58 @@ let disabledColor = Color(uiColor: disabledUiColor)
 let destructiveUiColor = UIColor.systemRed
 let destructiveColor = Color(uiColor: destructiveUiColor)
 
-//Constant images
+//MARK: - Constant Assets
+//Backgrounds
+let backgroundUiImage = UIImage(named: "homeBackground")!
+let backgroundImage: some View = Image(uiImage: backgroundUiImage).backgroundImageModifier()
+let gameBackgroundUiImage = UIImage(named: "gameBackground")!
+let gameBackgroundImage: some View = Image(uiImage: gameBackgroundUiImage).backgroundImageModifier()
+let accountBackgroundImage: some View = Image("accountImageBackground").defaultImageModifier()
+let currencyBackgroundImage: some View = Image("currencyBackground").defaultImageModifier()
+let navBarBackgroundImage: some View = Image("navBarBackground").defaultImageModifier()
+let cityBackgroundImage: some View = Image("cityBackground").defaultImageModifier()
+let timerBackgroundImage: some View = Image("timerBackground").defaultImageModifier()
+
+//Buttons Folder
+let backButtonImage: some View = Image("backButton").defaultImageModifier()
+let homeButtonImage: some View = Image("homeButton").defaultImageModifier()
+let homeButtonSelectedImage: some View = Image("homeButtonSelected").defaultImageModifier()
+let noButtonImage: some View = Image("noButton").defaultImageModifier()
+let playButtonImage: some View = Image("playButton").defaultImageModifier()
+let plusImage: some View = Image("plus").defaultImageModifier()
+let plusButtonImage: some View = Image("plusButton").defaultImageModifier()
+let restartButtonImage: some View = Image("restartButton").defaultImageModifier()
+let resumeButtonImage: some View = Image("resumeButton").defaultImageModifier()
+let yesButtonButtonImage: some View = Image("yesButton").defaultImageModifier()
+
+//Icons
+let coinImage: some View = Image("coin").defaultImageModifier()
+let diamondImage: some View = Image("diamond").defaultImageModifier()
+
+//Move
+let defendBackImage: some View = Image("defendBack").defaultImageModifier()
+let defendForwardImage: some View = Image("defendForward").defaultImageModifier()
+let defendLeftImage: some View = Image("defendLeft").defaultImageModifier()
+let defendRightImage: some View = Image("defendRight").defaultImageModifier()
+
+let kickDownLightImage: some View = Image("kickDownLight").defaultImageModifier()
+let kickDownMediumImage: some View = Image("kickDownMedium").defaultImageModifier()
+let kickDownHardImage: some View = Image("kickDownHard").defaultImageModifier()
+let kickUpLightImage: some View = Image("kickUpLight").defaultImageModifier()
+let kickUpMediumImage: some View = Image("kickUpMedium").defaultImageModifier()
+let kickUpHardImage: some View = Image("kickUpHard").defaultImageModifier()
+
+let defendBackgroundImage: some View = Image("moveBackgroundBlue").defaultImageModifier()
+let attackBackgroundImage: some View = Image("moveBackgroundRed").defaultImageModifier()
+
+let punchDownLightImage: some View = Image("punchDownLight").defaultImageModifier()
+let punchDownMediumImage: some View = Image("punchDownMedium").defaultImageModifier()
+let punchDownHardImage: some View = Image("punchDownHard").defaultImageModifier()
+let punchUpLightImage: some View = Image("punchUpLight").defaultImageModifier()
+let punchUpMediumImage: some View = Image("punchUpMedium").defaultImageModifier()
+let punchUpHardImage: some View = Image("punchUpHard").defaultImageModifier()
+
+//System Images
 let defaultProfilePhoto: UIImage = UIImage(systemName: "person.crop.circle")!
 let checkedImage: UIImage = UIImage(systemName: "checkmark.square.fill")!
 let uncheckedImage: UIImage = UIImage(systemName: "square")!
@@ -64,8 +121,3 @@ let invalidImage: some View = Image(systemName: "xmark.circle.fill")
     .foregroundColor(Color.systemRed)
 let validImage: some View = Image(systemName: "checkmark.circle.fill")
     .foregroundColor(Color.systemGreen)
-let accountPhotoCompressionQuality: Double = 0.3
-let horizontalPadding: CGFloat = 36
-let accountImagePickerHeight: CGFloat = 160
-let defaultMaxTime: Int = 5
-
