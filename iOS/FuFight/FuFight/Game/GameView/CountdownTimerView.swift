@@ -10,7 +10,7 @@ import SwiftUI
 struct CountdownTimerView: View {
     @Binding var timeRemaining: Int
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    @State var isTimerActive = true
+    @Binding var isTimerActive: Bool
     @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
@@ -53,6 +53,6 @@ struct CountdownTimerView: View {
 #Preview {
     @State var remain = 5
     return NavigationView {
-        CountdownTimerView(timeRemaining: $remain)
+        CountdownTimerView(timeRemaining: $remain, isTimerActive: .constant(true))
     }
 }

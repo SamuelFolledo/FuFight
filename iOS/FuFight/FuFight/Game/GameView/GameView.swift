@@ -16,29 +16,27 @@ struct GameView: View {
         VStack(spacing: 0) {
             AccountHpView(player: vm.enemyPlayer, isEnemy: true)
                 .padding(.horizontal)
-
-            Spacer()
+                .padding(.bottom, 30)
 
             Button("Attack player") {
                 vm.attack(damage: 10, toEnemy: false)
             }
 
             Spacer()
-            
+
             Button("Attack enemy") {
                 vm.attack(damage: 10, toEnemy: true)
             }
 
-            Spacer()
-
             AccountHpView(player: vm.accountPlayer)
                 .padding(.horizontal)
+                .padding(.top, 30)
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
         .overlay {
-            CountdownTimerView(timeRemaining: $vm.timeRemaining)
+            timerView
         }
         .overlay {
             if let message = vm.loadingMessage {
@@ -58,6 +56,14 @@ struct GameView: View {
             if vm.isGameOver {
                 path.append(GameRoute.gameOver)
             }
+        }
+    }
+
+    var timerView: some View {
+        VStack {
+            Text("Round \(vm.round)")
+
+            CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive)
         }
     }
 }

@@ -62,5 +62,5 @@ let validImage: some View = Image(systemName: "checkmark.circle.fill")
 let accountPhotoCompressionQuality: Double = 0.3
 let horizontalPadding: CGFloat = 36
 let accountImagePickerHeight: CGFloat = 160
-let defaultMaxTime = 5
+let defaultMaxTime: Int = 5
 
