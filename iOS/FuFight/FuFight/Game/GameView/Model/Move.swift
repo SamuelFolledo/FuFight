@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+enum MoveType {
+    case attack
+    case defend
+}
+
 protocol Move {
     var name: String { get }
     var id: String { get }
     var backgroundColor: Color { get }
     var imageName: String { get }
+    var moveType: MoveType { get }
+    var padding: Double { get }
 }
 
 protocol Attack: Move {
@@ -24,12 +31,85 @@ protocol Attack: Move {
 }
 
 protocol Defend: Move {
-    ///The percentage amount of damage boost this move adds to attack's damage
+    ///The percentage amount of damage boost this move adds to attack's damage. 0 means no additional damage increase from this Defend move
     var damageMultiplier: Double { get }
-    ///The percentage amount of speed boost this move adds to attack's speed
+    ///The percentage amount of speed boost this move adds to attack's speed. 0 means no additional speed increase
     var speedMultiplier: Double { get }
-    ///The percentage amount of defense boost this move reduces from incoming damage
+    ///The percentage amount of defense boost this move reduces from incoming damage. 0 means no additional damage reduction
     var defenseMultiplier: Double { get }
+}
+
+enum Dash: String, Defend {
+    case left
+    case forward
+    case backward
+    case right
+
+    var name: String {
+        switch self {
+        case .left:
+            "Dash Left"
+        case .forward:
+            "Dash Forward"
+        case .backward:
+            "Dash Backward"
+        case .right:
+            "Dash Right"
+        }
+    }
+    var id: String { rawValue }
+    var backgroundColor: Color {
+        Color.blue
+    }
+    var imageName: String {
+        switch self {
+        case .left:
+            "defendLeft"
+        case .forward:
+            "defendForward"
+        case .backward:
+            "defendBack"
+        case .right:
+            "defendRight"
+        }
+    }
+    var moveType: MoveType { .defend }
+
+    var damageMultiplier: Double {
+        switch self {
+        case .forward:
+            0.5
+        case .left, .backward, .right:
+            0
+        }
+    }
+    var speedMultiplier: Double {
+        switch self {
+        case .left, .right:
+            0
+        case .forward:
+            1.5
+        case .backward:
+            0.5
+        }
+    }
+    var defenseMultiplier: Double {
+        switch self {
+        case .left, .right, .forward:
+            0
+        case .backward:
+            0.4
+        }
+    }
+
+    var padding: Double {
+        switch self {
+        case .left, .right:
+            32
+        case .forward, .backward:
+            20
+        }
+    }
 }
 
 enum Punch: String, Attack {
@@ -66,22 +146,23 @@ enum Punch: String, Attack {
     }
 
     var imageName: String {
-        ""
-//        switch self {
-//        case .leftPunchLight:
-//            <#code#>
-//        case .leftPunchMedium:
-//            <#code#>
-//        case .leftPunchHard:
-//            <#code#>
-//        case .rightPunchLight:
-//            <#code#>
-//        case .rightPunchMedium:
-//            <#code#>
-//        case .rightPunchHard:
-//            <#code#>
-//        }
+        switch self {
+        case .leftPunchLight:
+            "punchUpLight"
+        case .leftPunchMedium:
+            "punchUpMedium"
+        case .leftPunchHard:
+            "punchUpHard"
+        case .rightPunchLight:
+            "punchDownLight"
+        case .rightPunchMedium:
+            "punchDownMedium"
+        case .rightPunchHard:
+            "punchDownHard"
+        }
     }
+
+    var moveType: MoveType { .attack }
 
     var damage: Double {
         switch self {
@@ -113,6 +194,17 @@ enum Punch: String, Attack {
             0.25
         case .leftPunchHard, .rightPunchHard:
             0.35
+        }
+    }
+
+    var padding: Double {
+        switch self {
+        case .leftPunchLight, .rightPunchLight:
+            24
+        case .leftPunchMedium, .rightPunchMedium:
+            10
+        case .leftPunchHard, .rightPunchHard:
+            12
         }
     }
 }
