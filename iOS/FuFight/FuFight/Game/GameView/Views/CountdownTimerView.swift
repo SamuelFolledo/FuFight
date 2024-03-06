@@ -9,18 +9,30 @@ import SwiftUI
 
 struct CountdownTimerView: View {
     @Binding var timeRemaining: Int
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @Binding var isTimerActive: Bool
+    @Binding var round: Int
     @Environment(\.scenePhase) var scenePhase
 
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
     var body: some View {
-        Text("\(timeRemaining)")
-            .font(extraLargeTitleFont)
-            .foregroundStyle(backgroundColor)
-            .padding()
-            .frame(width: 160, height: 160)
-            .background(secondaryColor.opacity(0.75))
-            .clipShape(.circle)
+        Circle()
+            .foregroundStyle(.clear)
+            .background(
+                timerBackgroundImage
+                    .padding(.bottom, -40)
+            )
+            .overlay(
+                VStack(spacing: 4) {
+                    Text("\(timeRemaining)")
+                        .font(extraLargeTitleFont)
+                        .foregroundStyle(backgroundColor)
+
+                    Text("Round \(round)")
+                        .font(largeTitleFont)
+                        .foregroundStyle(backgroundColor)
+                }
+            )
             .onChange(of: scenePhase) {
                 switch scenePhase {
                 case .background, .inactive:
@@ -53,6 +65,6 @@ struct CountdownTimerView: View {
 #Preview {
     @State var remain = 5
     return NavigationView {
-        CountdownTimerView(timeRemaining: $remain, isTimerActive: .constant(true))
+        CountdownTimerView(timeRemaining: $remain, isTimerActive: .constant(true), round: .constant(3))
     }
 }

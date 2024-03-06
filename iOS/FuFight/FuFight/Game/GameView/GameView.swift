@@ -16,21 +16,20 @@ struct GameView: View {
         VStack(spacing: 0) {
             AccountHpView(player: vm.enemyPlayer, isEnemy: true)
                 .padding(.horizontal)
-                .padding(.bottom, 30)
-
-            Button("Attack player") {
-                vm.attack(damage: 10, toEnemy: false)
-            }
 
             Spacer()
 
-            Button("Attack enemy") {
-                vm.attack(damage: 10, toEnemy: true)
-            }
+            AttacksView()
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 4)
+
+            DefensesView()
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 4)
 
             AccountHpView(player: vm.accountPlayer)
                 .padding(.horizontal)
-                .padding(.top, 30)
+                .padding(.top, 8)
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
@@ -65,14 +64,9 @@ struct GameView: View {
     }
 
     var timerView: some View {
-        VStack {
-            Text("Round \(vm.round)")
-                .font(largeTitleFont)
-                .foregroundStyle(secondaryColor)
-
-            CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive)
-        }
-        .padding(.bottom, 300)
+        CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive, round: $vm.round)
+            .frame(width: 160)
+            .padding(.bottom, 400)
     }
 }
 
