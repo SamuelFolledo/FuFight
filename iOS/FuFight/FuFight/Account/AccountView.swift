@@ -60,6 +60,10 @@ struct AccountView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .background(
+            backgroundImage
+                .padding(.trailing, 600)
+        )
     }
 
     var editSaveButton: some View {

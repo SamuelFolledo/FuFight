@@ -32,7 +32,7 @@ enum AlertButtonType {
         case .ok, .secondaryOk:
             return backgroundUiColor
         case .custom:
-            return .clear
+            return backgroundUiColor
         }
     }
 
@@ -41,7 +41,7 @@ enum AlertButtonType {
         case .cancel:
             return .systemRed
         case .delete:
-            return .systemBackground
+            return .white
         case .ok:
             return systemUiColor
         case .secondaryCancel, .secondaryOk:

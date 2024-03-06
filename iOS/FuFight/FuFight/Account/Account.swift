@@ -38,7 +38,13 @@ class Account: ObservableObject, Codable {
     }
 
     //MARK: - Initializers
-    init() { }
+    ///Use this initializer for previews only
+    init() {
+        LOGD("Fake account initialized")
+        photoUrl = fakePhotoUrl
+        email = "samuelfolledo@gmail.com"
+        username = "Fake Samuel"
+    }
 
     ///Initializer for sign up only
     convenience init(_ authResult: AuthDataResult) {

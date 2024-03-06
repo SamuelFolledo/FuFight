@@ -48,6 +48,10 @@ struct AuthenticationView: View {
                    title: Str.putEmailOrUsernameToResetPassword,
                    primaryButton: AlertButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
                    isPresented: $vm.showForgotPassword)
+            .background(
+                backgroundImage
+                    .padding(.leading, 600)
+            )
         }
         .onAppear {
             vm.onAppear()
