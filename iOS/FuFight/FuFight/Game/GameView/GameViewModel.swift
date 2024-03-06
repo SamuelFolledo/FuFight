@@ -20,7 +20,11 @@ class GameViewModel: BaseViewModel {
     var accountPlayer: Player
     var enemyPlayer: Player
     var isGameOver: Bool = false
-    var timeRemaining = defaultMaxTime
+    var timeRemaining = defaultMaxTime {
+        didSet { handleTimeChanges() }
+    }
+    var isTimerActive: Bool = false
+    var round: Int = 1
 
     ///Initializer for testing purposes
     override init() {
@@ -39,6 +43,7 @@ class GameViewModel: BaseViewModel {
 
     override func onAppear() {
         super.onAppear()
+        startGame()
     }
 
     //MARK: - Public Methods
@@ -62,5 +67,13 @@ class GameViewModel: BaseViewModel {
 
 //MARK: - Private Methods
 private extension GameViewModel {
+    func startGame() {
+        isTimerActive = true
+    }
 
+    func handleTimeChanges() {
+        if timeRemaining == 0 {
+            round += 1
+        }
+    }
 }
