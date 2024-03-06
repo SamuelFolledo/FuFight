@@ -41,6 +41,14 @@ struct HomeView: View {
                     GameOverView(path: $vm.path)
                 }
             }
+            .background(
+                Image("homeBackground")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .ignoresSafeArea()
+                    .padding(.leading, 30)
+
+            )
         }
         .navigationTitle("Welcome \(vm.account.displayName)")
         .onAppear {
@@ -68,5 +76,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(vm: HomeViewModel(account: Account()))
+    HomeView(vm: HomeViewModel(account: fakeAccount))
 }

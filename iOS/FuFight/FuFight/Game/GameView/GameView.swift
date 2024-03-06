@@ -43,6 +43,14 @@ struct GameView: View {
                 ProgressView(message)
             }
         }
+        .background(
+            Image("gameBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .ignoresSafeArea()
+                .padding(vm.isBackgroundLeadingPadding ? .leading : .trailing, vm.backgroundPadding)
+
+        )
         .onAppear {
             vm.onAppear()
         }
@@ -62,9 +70,12 @@ struct GameView: View {
     var timerView: some View {
         VStack {
             Text("Round \(vm.round)")
+                .font(largeTitleFont)
+                .foregroundStyle(secondaryColor)
 
             CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive)
         }
+        .padding(.bottom, 200)
     }
 }
 

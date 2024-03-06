@@ -25,6 +25,9 @@ class GameViewModel: BaseViewModel {
     }
     var isTimerActive: Bool = false
     var round: Int = 1
+    var isBackgroundLeadingPadding = Bool.random()
+    //TODO: Check the actual maximum padding I can have
+    var backgroundPadding = Double.random(in: 0...1000)
 
     ///Initializer for testing purposes
     override init() {

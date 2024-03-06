@@ -14,6 +14,10 @@ import SwiftUI
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
 
+let fakePhotoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
+let fakeAccount = Account()
+
+
 //MARK: Firebase Firestore database constants
 let db = Firestore.firestore()
 let accountsDb = db.collection(kACCOUNTS)
@@ -31,10 +35,11 @@ let mediumTextFont = textFont.weight(.medium)
 let boldedTextFont = textFont.weight(.bold)
 let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
 let boldedButtonFont = buttonFont.weight(.bold)
+let largeTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
 let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
 
 //Colors
-let systemUiColor = UIColor.systemCyan
+let systemUiColor = UIColor.label
 let systemColor = Color(uiColor: systemUiColor)
 let backgroundUiColor = UIColor.systemBackground
 let backgroundColor = Color(uiColor: backgroundUiColor)

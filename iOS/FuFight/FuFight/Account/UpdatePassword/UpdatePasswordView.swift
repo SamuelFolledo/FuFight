@@ -50,6 +50,13 @@ struct UpdatePasswordView: View {
         .safeAreaInset(edge: .bottom) {
             updatePasswordButton
         }
+        .background(
+            Image("homeBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .ignoresSafeArea()
+                .padding(.trailing, 800)
+        )
     }
 
     var currentPasswordField: some View {

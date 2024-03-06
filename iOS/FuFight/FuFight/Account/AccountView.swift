@@ -60,6 +60,13 @@ struct AccountView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .background(
+            Image("homeBackground")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .ignoresSafeArea()
+                .padding(.trailing, 600)
+        )
     }
 
     var editSaveButton: some View {
