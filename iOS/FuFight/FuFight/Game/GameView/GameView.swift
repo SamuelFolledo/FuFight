@@ -9,8 +9,8 @@ import SwiftUI
 
 struct GameView: View {
     @Binding var path: NavigationPath
-
     @State var vm = GameViewModel()
+    @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
         VStack(spacing: 0) {
@@ -19,15 +19,15 @@ struct GameView: View {
 
             Spacer()
 
-            AttacksView()
+            AttacksView(attacks: vm.currentPlayer.attacks, selectionHandler: vm.selectMove(_:))
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 4)
 
-            DefensesView()
+            DefensesView(defenses: vm.currentPlayer.defenses, selectionHandler: vm.selectMove(_:))
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 4)
 
-            AccountHpView(player: vm.accountPlayer)
+            AccountHpView(player: vm.currentPlayer)
                 .padding(.horizontal)
                 .padding(.top, 8)
         }
@@ -61,10 +61,24 @@ struct GameView: View {
                 path.append(GameRoute.gameOver)
             }
         }
+        .onChange(of: scenePhase) {
+            switch scenePhase {
+            case .background, .inactive:
+                LOGD("Scene phase is \(scenePhase)")
+                vm.isTimerActive = false
+            case .active:
+                vm.isTimerActive = true
+            @unknown default:
+                LOGDE("Unknown scene phase \(scenePhase)")
+            }
+        }
+        .onReceive(vm.timer) { time in
+            vm.decrementTimeByOneSecond()
+        }
     }
 
     var timerView: some View {
-        CountdownTimerView(timeRemaining: $vm.timeRemaining, isTimerActive: $vm.isTimerActive, round: $vm.round)
+        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.currentPlayer.turns.count)
             .frame(width: 160)
             .padding(.bottom, 400)
     }

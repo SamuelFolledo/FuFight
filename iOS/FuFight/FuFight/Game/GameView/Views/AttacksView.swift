@@ -8,41 +8,48 @@
 import SwiftUI
 
 struct AttacksView: View {
+    var attacks: [Attack]
+    var selectionHandler: ((Attack) -> Void)
+
     var body: some View {
         VStack {
             HStack {
-                MoveButton(move: Punch.leftPunchLight)
-                    .frame(width: 100)
+                createButtonFrom(.leftLight)
 
                 Spacer()
 
-                MoveButton(move: Punch.rightPunchLight)
-                    .frame(width: 100)
+                createButtonFrom(.rightLight)
             }
 
             HStack {
-                MoveButton(move: Punch.leftPunchMedium)
-                    .frame(width: 100)
+                createButtonFrom(.leftMedium)
 
                 Spacer()
 
-                MoveButton(move: Punch.rightPunchMedium)
-                    .frame(width: 100)
+                createButtonFrom(.rightMedium)
             }
 
             HStack {
-                MoveButton(move: Punch.leftPunchHard)
-                    .frame(width: 100)
+                createButtonFrom(.leftHard)
 
                 Spacer()
 
-                MoveButton(move: Punch.rightPunchHard)
+                createButtonFrom(.rightHard)
+            }
+        }
+    }
+
+    @ViewBuilder func createButtonFrom(_ position: AttackPosition) -> some View {
+        ForEach(attacks, id: \.id) { attack in
+            if attack.position == position {
+                MoveButton(move: attack, action: { selectionHandler(attack) })
                     .frame(width: 100)
+                    .opacity(attack.state == .unselected ? 0.4 : 1)
             }
         }
     }
 }
 
 #Preview {
-    AttacksView()
+    AttacksView(attacks: defaultAllPunchAttacks, selectionHandler: { _ in })
 }
