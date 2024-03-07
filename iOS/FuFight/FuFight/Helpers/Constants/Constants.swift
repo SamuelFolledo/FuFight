@@ -14,7 +14,7 @@ import SwiftUI
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
 
-let fakePhotoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
+let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
 let fakeAccount = Account()
 
 
@@ -85,29 +85,6 @@ let yesButtonButtonImage: some View = Image("yesButton").defaultImageModifier()
 //Icons
 let coinImage: some View = Image("coin").defaultImageModifier()
 let diamondImage: some View = Image("diamond").defaultImageModifier()
-
-//Move
-let defendBackImage: some View = Image("defendBack").defaultImageModifier()
-let defendForwardImage: some View = Image("defendForward").defaultImageModifier()
-let defendLeftImage: some View = Image("defendLeft").defaultImageModifier()
-let defendRightImage: some View = Image("defendRight").defaultImageModifier()
-
-let kickDownLightImage: some View = Image("kickDownLight").defaultImageModifier()
-let kickDownMediumImage: some View = Image("kickDownMedium").defaultImageModifier()
-let kickDownHardImage: some View = Image("kickDownHard").defaultImageModifier()
-let kickUpLightImage: some View = Image("kickUpLight").defaultImageModifier()
-let kickUpMediumImage: some View = Image("kickUpMedium").defaultImageModifier()
-let kickUpHardImage: some View = Image("kickUpHard").defaultImageModifier()
-
-let defendBackgroundImage: some View = Image("moveBackgroundBlue").defaultImageModifier()
-let attackBackgroundImage: some View = Image("moveBackgroundRed").defaultImageModifier()
-
-let punchDownLightImage: some View = Image("punchDownLight").defaultImageModifier()
-let punchDownMediumImage: some View = Image("punchDownMedium").defaultImageModifier()
-let punchDownHardImage: some View = Image("punchDownHard").defaultImageModifier()
-let punchUpLightImage: some View = Image("punchUpLight").defaultImageModifier()
-let punchUpMediumImage: some View = Image("punchUpMedium").defaultImageModifier()
-let punchUpHardImage: some View = Image("punchUpHard").defaultImageModifier()
 
 //System Images
 let defaultProfilePhoto: UIImage = UIImage(systemName: "person.crop.circle")!

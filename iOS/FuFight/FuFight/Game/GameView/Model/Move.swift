@@ -148,17 +148,17 @@ enum Punch: String, Attack {
     var imageName: String {
         switch self {
         case .leftPunchLight:
-            "punchUpLight"
+            "punchLeftLight"
         case .leftPunchMedium:
-            "punchUpMedium"
+            "punchLeftMedium"
         case .leftPunchHard:
-            "punchUpHard"
+            "punchLeftHard"
         case .rightPunchLight:
-            "punchDownLight"
+            "punchRightLight"
         case .rightPunchMedium:
-            "punchDownMedium"
+            "punchRightMedium"
         case .rightPunchHard:
-            "punchDownHard"
+            "punchRightHard"
         }
     }
 
@@ -202,9 +202,9 @@ enum Punch: String, Attack {
         case .leftPunchLight, .rightPunchLight:
             24
         case .leftPunchMedium, .rightPunchMedium:
-            10
+            20
         case .leftPunchHard, .rightPunchHard:
-            12
+            18
         }
     }
 }
