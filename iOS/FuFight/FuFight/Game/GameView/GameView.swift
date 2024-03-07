@@ -19,11 +19,11 @@ struct GameView: View {
 
             Spacer()
 
-            AttacksView(attacks: vm.currentPlayer.attacks, selectionHandler: vm.selectMove(_:))
+            AttacksView(attacks: vm.currentPlayer.attacks, selectionHandler: vm.selectAttack(_:))
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 4)
 
-            DefensesView(defenses: vm.currentPlayer.defenses, selectionHandler: vm.selectMove(_:))
+            DefensesView(defenses: vm.currentPlayer.defenses, selectionHandler: vm.selectDefense(_:))
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 4)
 

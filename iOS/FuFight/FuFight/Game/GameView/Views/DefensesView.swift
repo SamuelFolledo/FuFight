@@ -26,10 +26,25 @@ struct DefensesView: View {
     }
 
     @ViewBuilder func createButtonFrom(_ position: DefendPosition) -> some View {
-        ForEach(defenses, id: \.id) { defense in
-            if defense.position == position {
-                MoveButton(move: defense, action: { selectionHandler(defense) })
-                .frame(width: 100)
+        ForEach(defenses, id: \.move.id) { move in
+            if move.move.position == position {
+                MoveButton(move: move.move, action: { selectionHandler(move) })
+                    .frame(width: 100)
+                    .blur(radius: move.state.blurRadius)
+                    .opacity(move.state.opacity)
+                    .overlay {
+                        switch move.state {
+                        case .cooldown:
+                            Text("\(move.cooldown)")
+                                .font(largeTitleFont)
+                                .foregroundStyle(.white)
+                        case .selected:
+                            Circle()
+                                .stroke(.yellow, lineWidth: 2)
+                        case .initial, .unselected:
+                            EmptyView()
+                        }
+                    }
             }
         }
     }

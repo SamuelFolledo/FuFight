@@ -40,11 +40,25 @@ struct AttacksView: View {
     }
 
     @ViewBuilder func createButtonFrom(_ position: AttackPosition) -> some View {
-        ForEach(attacks, id: \.id) { attack in
-            if attack.position == position {
-                MoveButton(move: attack, action: { selectionHandler(attack) })
+        ForEach(attacks, id: \.move.id) { move in
+            if move.move.position == position {
+                MoveButton(move: move.move, action: { selectionHandler(move) })
                     .frame(width: 100)
-                    .opacity(attack.state == .unselected ? 0.4 : 1)
+                    .blur(radius: move.state.blurRadius, opaque: false)
+                    .opacity(move.state.opacity)
+                    .overlay {
+                        switch move.state {
+                        case .cooldown:
+                            Text("\(move.cooldown)")
+                                .font(largeTitleFont)
+                                .foregroundStyle(.white)
+                        case .selected:
+                            Circle()
+                                .stroke(.yellow, lineWidth: 2)
+                        case .initial, .unselected, .bigFire, .smallFire:
+                            EmptyView()
+                        }
+                    }
             }
         }
     }
