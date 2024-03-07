@@ -22,11 +22,11 @@ struct CountdownTimerView: View {
                 VStack(spacing: 4) {
                     Text("\(timeRemaining)")
                         .font(extramediumTitleFont)
-                        .foregroundStyle(backgroundColor)
+                        .foregroundStyle(.white)
 
                     Text("Round \(round)")
                         .font(mediumTitleFont)
-                        .foregroundStyle(backgroundColor)
+                        .foregroundStyle(.white)
                 }
             )
     }
