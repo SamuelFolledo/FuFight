@@ -8,25 +8,33 @@
 import SwiftUI
 
 struct DefensesView: View {
+    var defenses: [Defend]
+    var selectionHandler: ((Defend) -> Void)
+
     var body: some View {
         HStack(alignment: .bottom) {
-            MoveButton(move: Dash.left)
-                .frame(width: 100)
+            createButtonFrom(.left)
 
             VStack {
-                MoveButton(move: Dash.forward)
-                    .frame(width: 100)
+                createButtonFrom(.forward)
 
-                MoveButton(move: Dash.backward)
-                    .frame(width: 100)
+                createButtonFrom(.backward)
             }
 
-            MoveButton(move: Dash.right)
+            createButtonFrom(.right)
+        }
+    }
+
+    @ViewBuilder func createButtonFrom(_ position: DefendPosition) -> some View {
+        ForEach(defenses, id: \.id) { defense in
+            if defense.position == position {
+                MoveButton(move: defense, action: { selectionHandler(defense) })
                 .frame(width: 100)
+            }
         }
     }
 }
 
 #Preview {
-    DefensesView()
+    DefensesView(defenses: defaultAllDashDefenses, selectionHandler: { _ in })
 }

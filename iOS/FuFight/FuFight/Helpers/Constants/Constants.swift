@@ -98,3 +98,6 @@ let invalidImage: some View = Image(systemName: "xmark.circle.fill")
     .foregroundColor(Color.systemRed)
 let validImage: some View = Image(systemName: "checkmark.circle.fill")
     .foregroundColor(Color.systemGreen)
+
+let defaultAllPunchAttacks: [Attack] = Punch.allCases.map { Attack($0) }
+let defaultAllDashDefenses: [Defend] = Dash.allCases.map { Defend($0) }

@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct MoveButton: View {
-    var move: Move
+    var move: any MoveProtocol
+    var action: (() -> Void)? = nil
 
     var body: some View {
         Button(action: {
-            TODO("Handle move \(move.name)")
+            action?()
         }, label: {
             Image(move.imageName)
                 .defaultImageModifier()
@@ -28,5 +29,5 @@ struct MoveButton: View {
 }
 
 #Preview {
-    MoveButton(move: Punch.leftPunchLight)
+    MoveButton(move: Punch.leftPunchLight, action: {})
 }
