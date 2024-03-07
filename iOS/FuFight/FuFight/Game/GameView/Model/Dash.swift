@@ -91,4 +91,8 @@ enum Dash: String, CaseIterable, DefendProtocol {
                 .right
         }
     }
+
+    var cooldown: Int {
+        1
+    }
 }

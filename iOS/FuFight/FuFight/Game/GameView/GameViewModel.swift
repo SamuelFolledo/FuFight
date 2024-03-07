@@ -22,22 +22,22 @@ struct Player {
             switch attacks[index].state {
             case .selected:
                 turn.attack = attacks[index]
-                attacks[index].state = .initial
+                attacks[index].setStateTo(.cooldown)
             case .cooldown:
-                TODO("Reduce cooldown")
+                attacks[index].reduceCooldown()
             case .initial, .unselected, .bigFire, .smallFire:
-                attacks[index].state = .initial
+                attacks[index].setStateTo(.initial)
             }
         }
         for index in defenses.indices {
             switch defenses[index].state {
             case .selected:
                 turn.defend = defenses[index]
-                defenses[index].state = .initial
+                defenses[index].setStateTo(.cooldown)
             case .cooldown:
-                TODO("Reduce cooldown")
+                defenses[index].reduceCooldown()
             case .initial, .unselected:
-                defenses[index].state = .initial
+                defenses[index].setStateTo(.initial)
             }
         }
         turns.append(turn)
@@ -66,7 +66,7 @@ class GameViewModel: BaseViewModel {
     override init() {
         let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
         self.currentPlayer = Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
     }
 
@@ -101,31 +101,35 @@ class GameViewModel: BaseViewModel {
         }
     }
 
-    func selectMove(_ selectedMove: any MoveProtocol) {
-        if selectedMove.moveType == .attack {
-            for (index, attack) in currentPlayer.attacks.enumerated() {
-                if attack.id == selectedMove.id {
-                    currentPlayer.attacks[index].state = .selected
-                } else {
-                    currentPlayer.attacks[index].state = .unselected
-                }
+    func selectAttack(_ selectedMove: Attack) {
+        guard selectedMove.state != .cooldown else { return }
+        for (index, attack) in currentPlayer.attacks.enumerated() {
+            if attack.move.id == selectedMove.move.id {
+                currentPlayer.attacks[index].setStateTo(.selected)
+            } else {
+                guard currentPlayer.attacks[index].state != .cooldown else { continue }
+                currentPlayer.attacks[index].setStateTo(.unselected)
             }
-        } else if selectedMove.moveType == .defend {
-            for (index, defense) in currentPlayer.defenses.enumerated() {
-                if defense.id == selectedMove.id {
-                    currentPlayer.defenses[index].state = .selected
-                } else {
-                    currentPlayer.defenses[index].state = .unselected
-                }
+        }
+    }
+
+    func selectDefense(_ selectedMove: Defend) {
+        guard selectedMove.state != .cooldown else { return }
+        for (index, defense) in currentPlayer.defenses.enumerated() {
+            if defense.move.id == selectedMove.move.id {
+                currentPlayer.defenses[index].setStateTo(.selected)
+            } else {
+                guard currentPlayer.defenses[index].state != .cooldown else { continue }
+                currentPlayer.defenses[index].setStateTo(.unselected)
             }
         }
     }
 
     func attack(_ attack: Attack, toEnemy: Bool) {
         if toEnemy {
-            enemyPlayer.hp -= attack.damage
+            enemyPlayer.hp -= attack.move.damage
         } else {
-            currentPlayer.hp -= attack.damage
+            currentPlayer.hp -= attack.move.damage
         }
         if enemyPlayer.hp <= 0 {
             TODO("Player won")
@@ -142,7 +146,7 @@ class GameViewModel: BaseViewModel {
 //MARK: - Private Methods
 private extension GameViewModel {
     func startGame() {
-        isTimerActive = true
+        goToNextRound()
     }
 
     func goToNextRound() {

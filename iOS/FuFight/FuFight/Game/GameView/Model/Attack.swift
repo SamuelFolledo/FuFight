@@ -23,6 +23,26 @@ enum AttackButtonState: Int {
     case cooldown = 3
     case smallFire = 4
     case bigFire = 5
+
+    var opacity: CGFloat {
+        switch self {
+        case .cooldown:
+            0.5
+        case .selected:
+            0.75
+        case .initial, .unselected, .smallFire, .bigFire:
+            1
+        }
+    }
+
+    var blurRadius: CGFloat {
+        switch self {
+        case .cooldown:
+            2
+        case .selected, .initial, .unselected, .smallFire, .bigFire:
+            0
+        }
+    }
 }
 
 protocol AttackProtocol: MoveProtocol {
@@ -37,31 +57,29 @@ protocol AttackProtocol: MoveProtocol {
 }
 
 
-struct Attack: AttackProtocol {
-    var name: String
-    var id: String
-    var backgroundColor: Color
-    var imageName: String
-    var moveType: MoveType
-    var padding: Double
-    var damage: Double
-    var speed: Double
-    var damageReduction: Double
-    var position: AttackPosition
+struct Attack {
+    private(set) var move: any AttackProtocol
+    private(set) var cooldown: Int = 0
+    private(set) var state: AttackButtonState = .initial
 
-    var state: AttackButtonState
+    init(_ move: any AttackProtocol) {
+        self.move = move
+    }
 
-    init(_ attack: any AttackProtocol) {
-        self.name = attack.name
-        self.id = attack.id
-        self.backgroundColor = attack.backgroundColor
-        self.imageName = attack.imageName
-        self.moveType = attack.moveType
-        self.padding = attack.padding
-        self.damage = attack.damage
-        self.speed = attack.speed
-        self.damageReduction = attack.damageReduction
-        self.position = attack.position
-        self.state = .selected
+    mutating func setStateTo(_ newState: AttackButtonState) {
+        state = newState
+        switch newState {
+        case .cooldown:
+            cooldown = move.cooldown
+        case .initial, .unselected, .selected, .smallFire, .bigFire:
+            break
+        }
+    }
+
+    mutating func reduceCooldown() {
+        cooldown -= 1
+        if cooldown <= 0 {
+            state = .initial
+        }
     }
 }

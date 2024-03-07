@@ -119,4 +119,15 @@ enum Punch: String, CaseIterable, AttackProtocol {
                 .rightHard
         }
     }
+
+    var cooldown: Int {
+        switch self {
+        case .leftPunchLight, .rightPunchLight:
+            1
+        case .leftPunchMedium, .rightPunchMedium:
+            2
+        case .leftPunchHard, .rightPunchHard:
+            3
+        }
+    }
 }

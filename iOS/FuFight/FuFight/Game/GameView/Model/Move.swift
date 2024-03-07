@@ -19,4 +19,5 @@ protocol MoveProtocol: Hashable {
     var imageName: String { get }
     var moveType: MoveType { get }
     var padding: Double { get }
+    var cooldown: Int { get }
 }

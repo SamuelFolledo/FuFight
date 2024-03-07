@@ -41,8 +41,9 @@ let mediumTextFont = textFont.weight(.medium)
 let boldedTextFont = textFont.weight(.bold)
 let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
 let boldedButtonFont = buttonFont.weight(.bold)
-let largeTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
-let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
+let mediumTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
+let largeTitleFont = Font.system(size: defaultFontSize * 4, weight: .bold)
+let extramediumTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
 
 //Colors
 let systemUiColor = UIColor.label
