@@ -230,14 +230,12 @@ class GameViewModel: BaseViewModel {
         case .forward, .backward:
             return true
         case .left:
-            let leftAttacks: [AttackPosition] = [.leftLight, .leftMedium, .leftHard]
-            let didLand = leftAttacks.contains(attackPosition)
-//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
-            return didLand
-        case .right:
             let rightAttacks: [AttackPosition] = [.rightLight, .rightMedium, .rightHard]
             let didLand = rightAttacks.contains(attackPosition)
-//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
+            return didLand
+        case .right:
+            let leftAttacks: [AttackPosition] = [.leftLight, .leftMedium, .leftHard]
+            let didLand = leftAttacks.contains(attackPosition)
             return didLand
         }
     }
