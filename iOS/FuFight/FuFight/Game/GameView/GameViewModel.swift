@@ -154,11 +154,11 @@ class GameViewModel: BaseViewModel {
 
     func applyDamages() {
         let round = currentPlayer.turns.count + 1
-        var currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses)
+        let currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses)
         var enemyTurn = Turn(round: round, attacks: enemyPlayer.attacks, defenses: enemyPlayer.defenses)
         //TODO: Remove these auto generated enemy turn
         while enemyTurn.attack == nil {
-            var randomAttack = Punch.allCases.randomElement()!
+            let randomAttack = Punch.allCases.randomElement()!
             for attack in enemyPlayer.attacks where attack.move.id == randomAttack.id {
                 if attack.cooldown <= 0 {
                     LOGD("Randomly generated enemy attack is \(attack)")
@@ -167,7 +167,7 @@ class GameViewModel: BaseViewModel {
             }
         }
         while enemyTurn.defend == nil {
-            var randomMove = Dash.allCases.randomElement()!
+            let randomMove = Dash.allCases.randomElement()!
             for defend in enemyPlayer.defenses where defend.move.id == randomMove.id {
                 if defend.cooldown <= 0 {
                     LOGD("Randomly generated enemy defend is \(defend)")
@@ -176,7 +176,7 @@ class GameViewModel: BaseViewModel {
             }
         }
         ///1) Check who is faster to see who goes first
-        var isCurrentFirst = currentTurn.speed > enemyTurn.speed
+        let isCurrentFirst = currentTurn.speed > enemyTurn.speed
         let firstTurn = isCurrentFirst ? currentTurn : enemyTurn
         let secondTurn = isCurrentFirst ? enemyTurn : currentTurn
         LOGD("First attacker is \(isCurrentFirst ? "Player" : "Enemy")")
