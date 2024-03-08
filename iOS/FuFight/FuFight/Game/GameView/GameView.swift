@@ -14,18 +14,16 @@ struct GameView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            AccountHpView(player: vm.enemyPlayer, isEnemy: true)
-                .padding(.horizontal)
+            VStack(alignment: .trailing) {
+                AccountHpView(player: vm.enemyPlayer, isEnemy: true)
+                    .padding(.horizontal)
+
+                enemyMovesPreview
+            }
 
             Spacer()
 
-            AttacksView(attacks: vm.currentPlayer.attacks, selectionHandler: vm.selectAttack(_:))
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 4)
-
-            DefensesView(defenses: vm.currentPlayer.defenses, selectionHandler: vm.selectDefense(_:))
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 4)
+            MovesView(attacks: vm.currentPlayer.attacks, defenses: vm.currentPlayer.defenses, type: .user)
 
             AccountHpView(player: vm.currentPlayer)
                 .padding(.horizontal)
@@ -81,6 +79,12 @@ struct GameView: View {
         CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.currentPlayer.turns.count)
             .frame(width: 160)
             .padding(.bottom, 400)
+    }
+
+    var enemyMovesPreview: some View {
+        MovesView(attacks: vm.enemyPlayer.attacks, defenses: vm.enemyPlayer.defenses, type: .enemy)
+            .frame(width: 100, height: 120)
+            .padding(.trailing)
     }
 }
 

@@ -73,7 +73,7 @@ enum Dash: String, CaseIterable, DefendProtocol {
     var padding: Double {
         switch self {
         case .left, .right:
-            32
+            20
         case .forward, .backward:
             20
         }

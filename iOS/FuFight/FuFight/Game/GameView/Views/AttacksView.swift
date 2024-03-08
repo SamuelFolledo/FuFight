@@ -10,6 +10,7 @@ import SwiftUI
 struct AttacksView: View {
     var attacks: [Attack]
     var selectionHandler: ((Attack) -> Void)
+    var isMini: Bool = false
 
     var body: some View {
         VStack {
@@ -42,8 +43,20 @@ struct AttacksView: View {
     @ViewBuilder func createButtonFrom(_ position: AttackPosition) -> some View {
         ForEach(attacks, id: \.move.id) { move in
             if move.move.position == position {
-                MoveButton(move: move.move, action: { selectionHandler(move) })
-                    .frame(width: 100)
+                Button(action: {
+                    selectionHandler(move)
+                }, label: {
+                    Image(move.move.imageName)
+                        .defaultImageModifier()
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .padding(isMini ? 4 : move.move.padding)
+                        .background(
+                            Image(move.move.moveType == .attack ? "moveBackgroundRed" : "moveBackgroundBlue")
+                                .backgroundImageModifier()
+                                .scaledToFit()
+                        )
+                })
+                    .frame(width: isMini ? 30 : 100)
                     .blur(radius: move.state.blurRadius, opaque: false)
                     .opacity(move.state.opacity)
                     .overlay {
@@ -65,5 +78,5 @@ struct AttacksView: View {
 }
 
 #Preview {
-    AttacksView(attacks: defaultAllPunchAttacks, selectionHandler: { _ in })
+    AttacksView(attacks: defaultAllPunchAttacks, selectionHandler: { _ in }, isMini: true)
 }

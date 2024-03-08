@@ -9,14 +9,13 @@ import SwiftUI
 
 extension Image {
     func defaultImageModifier() -> some View {
-        self
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-//            .aspectRatio(1.0, contentMode: .fit)
+        self.resizable()
+            .aspectRatio(1.0, contentMode: .fit)
     }
 
     func backgroundImageModifier() -> some View {
-        self.defaultImageModifier()
+        self.resizable()
+            .aspectRatio(contentMode: .fill)
             .ignoresSafeArea()
     }
 }
