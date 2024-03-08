@@ -77,4 +77,9 @@ struct Defend {
             state = .initial
         }
     }
+
+    mutating func restart() {
+        cooldown = 0
+        setStateTo(.initial)
+    }
 }

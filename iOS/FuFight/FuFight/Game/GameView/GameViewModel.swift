@@ -15,6 +15,9 @@ struct Player {
     var attacks: [Attack]
     var defenses: [Defend]
     var turns: [Turn] = []
+    var isDead: Bool {
+        hp <= 0
+    }
 
     mutating func prepareForNextRound() {
         var turn = Turn(round: turns.count + 1)
@@ -41,6 +44,17 @@ struct Player {
             }
         }
         turns.append(turn)
+    }
+
+    mutating func prepareForRematch() {
+        hp = maxHp
+        for index in attacks.indices {
+            attacks[index].restart()
+        }
+        for index in defenses.indices {
+            defenses[index].restart()
+        }
+        turns.removeAll()
     }
 }
 
@@ -95,7 +109,7 @@ class GameViewModel: BaseViewModel {
     override init() {
         let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
         self.currentPlayer = Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
     }
 
@@ -138,7 +152,7 @@ class GameViewModel: BaseViewModel {
             for (index, attack) in enemyPlayer.attacks.enumerated() {
                 if attack.move.id == randomAttack.id {
                     if attack.cooldown <= 0 {
-                        LOGD("Randomly generated enemy attack is \(attack)")
+                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
                         enemyTurn.update(attack)
                         enemyPlayer.attacks[index].setStateTo(.selected)
                     }
@@ -150,7 +164,7 @@ class GameViewModel: BaseViewModel {
             for (index, defend) in enemyPlayer.defenses.enumerated() {
                 if defend.move.id == randomDefend.id {
                     if defend.cooldown <= 0 {
-                        LOGD("Randomly generated enemy defend is \(defend)")
+                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
                         enemyTurn.update(defend)
                         enemyPlayer.defenses[index].setStateTo(.selected)
                     }
@@ -170,8 +184,10 @@ class GameViewModel: BaseViewModel {
                 let damage = firstAttack.move.damage * ((firstTurn.defend?.move.damageMultiplier ?? 0) + 1) * (1 - (secondTurn.defend?.move.defenseMultiplier ?? 0))
                 enemyPlayer.hp -= isCurrentFirst ? damage : 0
                 currentPlayer.hp -= isCurrentFirst ? 0 : damage
+                if enemyPlayer.isDead || currentPlayer.isDead {
+                    return gameOver()
+                }
                 secondAttackDamageReduction = firstAttack.move.damageReduction
-                LOGD("First and did \(damage) damage in round \(round)")
             } else {
                 LOGD("First and missed their attack in round \(round)")
             }
@@ -185,21 +201,14 @@ class GameViewModel: BaseViewModel {
                 let damage = secondAttack.move.damage * ((secondTurn.defend?.move.damageMultiplier ?? 0) + 1) * (1 - (firstTurn.defend?.move.defenseMultiplier ?? 0) + secondAttackDamageReduction)
                 enemyPlayer.hp -= isCurrentFirst ? 0 : damage
                 currentPlayer.hp -= isCurrentFirst ? damage : 0
-                LOGD("Second and did \(damage) damage in round \(round)")
+                if enemyPlayer.isDead || currentPlayer.isDead {
+                    return gameOver()
+                }
             } else {
                 LOGD("Second and missed their attack in round \(round)")
             }
         } else {
             LOGD("Second and did not select an attack in round \(round)")
-        }
-        if enemyPlayer.hp <= 0 {
-            TODO("Player won")
-            enemyPlayer.hp = 0
-            isGameOver = true
-        } else if currentPlayer.hp <= 0 {
-            TODO("Enemy won")
-            currentPlayer.hp = 0
-            isGameOver = true
         }
     }
 
@@ -211,14 +220,20 @@ class GameViewModel: BaseViewModel {
         case .left:
             let leftAttacks: [AttackPosition] = [.leftLight, .leftMedium, .leftHard]
             let didLand = leftAttacks.contains(attackPosition)
-            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
+//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
             return didLand
         case .right:
             let rightAttacks: [AttackPosition] = [.rightLight, .rightMedium, .rightHard]
             let didLand = rightAttacks.contains(attackPosition)
-            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
+//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
             return didLand
         }
+    }
+
+    func rematch() {
+        currentPlayer.prepareForRematch()
+        enemyPlayer.prepareForRematch()
+        startGame()
     }
 }
 
@@ -232,5 +247,16 @@ private extension GameViewModel {
         currentPlayer.prepareForNextRound()
         enemyPlayer.prepareForNextRound()
         isTimerActive = true
+    }
+
+    func gameOver() {
+        if enemyPlayer.hp <= 0 {
+            LOGD("Player won")
+            enemyPlayer.hp = 0
+        } else if currentPlayer.hp <= 0 {
+            LOGD("Enemy won")
+            currentPlayer.hp = 0
+        }
+        isGameOver = true
     }
 }

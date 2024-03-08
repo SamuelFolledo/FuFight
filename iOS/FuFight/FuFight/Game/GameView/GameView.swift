@@ -32,6 +32,10 @@ struct GameView: View {
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
+        .alert(title: vm.currentPlayer.isDead ? "You lost" : "You won!",
+               primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
+               secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
+               isPresented: $vm.isGameOver)
         .overlay {
             timerView
         }
@@ -53,12 +57,6 @@ struct GameView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .navigationBarBackButtonHidden()
-        .onChange(of: vm.isGameOver) {
-            TODO("Show results in an alert with buttons to go back home")
-            if vm.isGameOver {
-                path.append(GameRoute.gameOver)
-            }
-        }
         .onChange(of: scenePhase) {
             switch scenePhase {
             case .background, .inactive:
