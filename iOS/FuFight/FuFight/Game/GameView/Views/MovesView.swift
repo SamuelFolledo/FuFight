@@ -7,32 +7,57 @@
 
 import SwiftUI
 
-enum MovesViewType {
+enum MovesViewSourceType {
     ///Current user's MovesView
     case user
-    ///Enemy's MovesView which is placed mirrored at the top
+    ///Enemy's MovesView which is mini and mirrored at the top
     case enemy
+
+    var font: Font {
+        switch self {
+        case .user:
+            largeTitleFont
+        case .enemy:
+            smallTitleFont
+        }
+    }
+    var angle: Angle {
+        switch self {
+        case .user:
+                .radians(.zero)
+        case .enemy:
+                .radians(.pi)
+        }
+    }
+    var shouldFlip: Bool {
+        switch self {
+        case .user:
+            false
+        case .enemy:
+            true
+        }
+    }
 }
 
 struct MovesView: View {
-    var attacks: [Attack]
-    var defenses: [Defend]
-    var type: MovesViewType
+    @Binding var attacks: [Attack]
+    @Binding var defenses: [Defend]
+    var sourceType: MovesViewSourceType
 
     var body: some View {
         VStack {
-            AttacksView(attacks: attacks, selectionHandler: {_ in }, isMini: type == .enemy)
+            AttacksView(attacks: $attacks, sourceType: sourceType)
 
-            DefensesView(defenses: defenses, selectionHandler: {_ in }, isMini: type == .enemy)
+            DefensesView(defenses: $defenses, sourceType: sourceType)
         }
-        .scaleEffect(x: type == .enemy ? -1 : 1, y: 1) // flip horizontally for enemyType
-        .scaleEffect(x: 1, y: type == .enemy ? -1 : 1) // flip vertically if isTop
+        .scaleEffect(x: sourceType.shouldFlip ? -1 : 1, y: sourceType.shouldFlip ? -1 : 1) // flip vertically and horizontally
         .background(
             Group {
-                if type == .enemy {
-                    Color.systemGray
-                } else {
+                switch sourceType {
+                case .user:
                     Color.clear
+                case .enemy:
+                    Color.systemGray
                 }
             }
                 .cornerRadius(16)
@@ -44,5 +69,5 @@ struct MovesView: View {
 }
 
 #Preview {
-    MovesView(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, type: .enemy)
+    MovesView(attacks: .constant(defaultAllPunchAttacks), defenses: .constant(defaultAllDashDefenses), sourceType: .enemy)
 }

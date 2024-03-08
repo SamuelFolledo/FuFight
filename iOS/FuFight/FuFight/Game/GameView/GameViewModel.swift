@@ -128,30 +128,6 @@ class GameViewModel: BaseViewModel {
         }
     }
 
-    func selectAttack(_ selectedMove: Attack) {
-        guard selectedMove.state != .cooldown else { return }
-        for (index, attack) in currentPlayer.attacks.enumerated() {
-            if attack.move.id == selectedMove.move.id {
-                currentPlayer.attacks[index].setStateTo(.selected)
-            } else {
-                guard currentPlayer.attacks[index].state != .cooldown else { continue }
-                currentPlayer.attacks[index].setStateTo(.unselected)
-            }
-        }
-    }
-
-    func selectDefense(_ selectedMove: Defend) {
-        guard selectedMove.state != .cooldown else { return }
-        for (index, defense) in currentPlayer.defenses.enumerated() {
-            if defense.move.id == selectedMove.move.id {
-                currentPlayer.defenses[index].setStateTo(.selected)
-            } else {
-                guard currentPlayer.defenses[index].state != .cooldown else { continue }
-                currentPlayer.defenses[index].setStateTo(.unselected)
-            }
-        }
-    }
-
     func applyDamages() {
         let round = currentPlayer.turns.count + 1
         let currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses)
@@ -159,19 +135,25 @@ class GameViewModel: BaseViewModel {
         //TODO: Remove these auto generated enemy turn
         while enemyTurn.attack == nil {
             let randomAttack = Punch.allCases.randomElement()!
-            for attack in enemyPlayer.attacks where attack.move.id == randomAttack.id {
-                if attack.cooldown <= 0 {
-                    LOGD("Randomly generated enemy attack is \(attack)")
-                    enemyTurn.update(attack)
+            for (index, attack) in enemyPlayer.attacks.enumerated() {
+                if attack.move.id == randomAttack.id {
+                    if attack.cooldown <= 0 {
+                        LOGD("Randomly generated enemy attack is \(attack)")
+                        enemyTurn.update(attack)
+                        enemyPlayer.attacks[index].setStateTo(.selected)
+                    }
                 }
             }
         }
         while enemyTurn.defend == nil {
-            let randomMove = Dash.allCases.randomElement()!
-            for defend in enemyPlayer.defenses where defend.move.id == randomMove.id {
-                if defend.cooldown <= 0 {
-                    LOGD("Randomly generated enemy defend is \(defend)")
-                    enemyTurn.update(defend)
+            let randomDefend = Dash.allCases.randomElement()!
+            for (index, defend) in enemyPlayer.defenses.enumerated() {
+                if defend.move.id == randomDefend.id {
+                    if defend.cooldown <= 0 {
+                        LOGD("Randomly generated enemy defend is \(defend)")
+                        enemyTurn.update(defend)
+                        enemyPlayer.defenses[index].setStateTo(.selected)
+                    }
                 }
             }
         }

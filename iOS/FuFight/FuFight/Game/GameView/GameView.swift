@@ -23,7 +23,7 @@ struct GameView: View {
 
             Spacer()
 
-            MovesView(attacks: vm.currentPlayer.attacks, defenses: vm.currentPlayer.defenses, type: .user)
+            MovesView(attacks: $vm.currentPlayer.attacks, defenses: $vm.currentPlayer.defenses, sourceType: .user)
 
             AccountHpView(player: vm.currentPlayer)
                 .padding(.horizontal)
@@ -82,7 +82,7 @@ struct GameView: View {
     }
 
     var enemyMovesPreview: some View {
-        MovesView(attacks: vm.enemyPlayer.attacks, defenses: vm.enemyPlayer.defenses, type: .enemy)
+        MovesView(attacks: $vm.enemyPlayer.attacks, defenses: $vm.enemyPlayer.defenses, sourceType: .enemy)
             .frame(width: 100, height: 120)
             .padding(.trailing)
     }
