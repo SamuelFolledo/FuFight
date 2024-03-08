@@ -196,9 +196,37 @@ struct MainAlert: View {
             .opacity(0.55)
             .opacity(backgroundOpacity)
             .onTapGesture {
-                animate(isShown: false) {
-                    dismiss()
+                //When tapped outside of the alert, run one of the button's action
+                var action: (() -> Void)?
+                if let secondaryButton {
+                    action = {
+                        animate(isShown: false) {
+                            dismiss()
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                            secondaryButton.action?()
+                        }
+                    }
+                } else if let dismissButton {
+                    action = {
+                        animate(isShown: false) {
+                            dismiss()
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                            dismissButton.action?()
+                        }
+                    }
+                } else if let primaryButton {
+                    action = {
+                        animate(isShown: false) {
+                            dismiss()
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                            primaryButton.action?()
+                        }
+                    }
                 }
+                action?()
             }
     }
 
