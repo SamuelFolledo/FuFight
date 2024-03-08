@@ -15,7 +15,7 @@ struct GameView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .trailing) {
-                AccountHpView(player: vm.enemyPlayer, isEnemy: true)
+                PlayerView(player: vm.enemyPlayer, isEnemy: true)
                     .padding(.horizontal)
 
                 enemyMovesPreview
@@ -23,15 +23,19 @@ struct GameView: View {
 
             Spacer()
 
-            MovesView(attacks: vm.currentPlayer.attacks, defenses: vm.currentPlayer.defenses, type: .user)
+            MovesView(attacks: $vm.currentPlayer.attacks, defenses: $vm.currentPlayer.defenses, sourceType: .user)
 
-            AccountHpView(player: vm.currentPlayer)
+            PlayerView(player: vm.currentPlayer)
                 .padding(.horizontal)
                 .padding(.top, 8)
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
+        .alert(title: vm.currentPlayer.isDead ? "You lost" : "You won!",
+               primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
+               secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
+               isPresented: $vm.isGameOver)
         .overlay {
             timerView
         }
@@ -53,12 +57,6 @@ struct GameView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .navigationBarBackButtonHidden()
-        .onChange(of: vm.isGameOver) {
-            TODO("Show results in an alert with buttons to go back home")
-            if vm.isGameOver {
-                path.append(GameRoute.gameOver)
-            }
-        }
         .onChange(of: scenePhase) {
             switch scenePhase {
             case .background, .inactive:
@@ -82,7 +80,7 @@ struct GameView: View {
     }
 
     var enemyMovesPreview: some View {
-        MovesView(attacks: vm.enemyPlayer.attacks, defenses: vm.enemyPlayer.defenses, type: .enemy)
+        MovesView(attacks: $vm.enemyPlayer.attacks, defenses: $vm.enemyPlayer.defenses, sourceType: .enemy)
             .frame(width: 100, height: 120)
             .padding(.trailing)
     }

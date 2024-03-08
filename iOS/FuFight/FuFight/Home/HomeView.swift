@@ -37,8 +37,8 @@ struct HomeView: View {
                 switch route {
                 case .game:
                     GameView(path: $vm.path)
-                case .gameOver:
-                    GameOverView(path: $vm.path)
+//                case .gameOver:
+//                    GameOverView(path: $vm.path)
                 }
             }
             .background(

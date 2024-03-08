@@ -82,4 +82,9 @@ struct Attack {
             state = .initial
         }
     }
+
+    mutating func restart() {
+        cooldown = 0
+        setStateTo(.initial)
+    }
 }

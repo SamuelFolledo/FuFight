@@ -9,5 +9,5 @@ import Foundation
 
 enum GameRoute: String {
     case game
-    case gameOver
+//    case gameOver
 }

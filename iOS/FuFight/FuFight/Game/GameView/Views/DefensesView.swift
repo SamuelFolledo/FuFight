@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct DefensesView: View {
-    var defenses: [Defend]
-    var selectionHandler: ((Defend) -> Void)
-    var isMini: Bool = false
+    @Binding var defenses: [Defend]
+    var sourceType: MovesViewSourceType
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -30,27 +29,28 @@ struct DefensesView: View {
         ForEach(defenses, id: \.move.id) { move in
             if move.move.position == position {
                 Button(action: {
-                    selectionHandler(move)
+                    selectMove(move)
                 }, label: {
                     Image(move.move.imageName)
                         .defaultImageModifier()
                         .aspectRatio(1.0, contentMode: .fit)
-                        .padding(isMini ? 4 : move.move.padding)
+                        .padding(sourceType == .enemy ? 4 : move.move.padding)
                         .background(
                             Image(move.move.moveType == .attack ? "moveBackgroundRed" : "moveBackgroundBlue")
                                 .backgroundImageModifier()
                                 .scaledToFit()
                         )
                 })
-                .frame(width: isMini ? 20 : 100)
+                .frame(width: sourceType.shouldFlip ? 18 : 100)
                 .blur(radius: move.state.blurRadius, opaque: false)
                 .opacity(move.state.opacity)
                 .overlay {
                     switch move.state {
                     case .cooldown:
                         Text("\(move.cooldown)")
-                            .font(largeTitleFont)
+                            .font(sourceType.font)
                             .foregroundStyle(.white)
+                            .rotationEffect(sourceType.angle)
                     case .selected:
                         Circle()
                             .stroke(.yellow, lineWidth: 2)
@@ -61,8 +61,20 @@ struct DefensesView: View {
             }
         }
     }
+
+    func selectMove(_ selectedMove: Defend) {
+        guard selectedMove.state != .cooldown else { return }
+        for (index, defense) in defenses.enumerated() {
+            if defense.move.id == selectedMove.move.id {
+                defenses[index].setStateTo(.selected)
+            } else {
+                guard defenses[index].state != .cooldown else { continue }
+                defenses[index].setStateTo(.unselected)
+            }
+        }
+    }
 }
 
 #Preview {
-    DefensesView(defenses: defaultAllDashDefenses, selectionHandler: { _ in })
+    DefensesView(defenses: .constant(defaultAllDashDefenses), sourceType: .enemy)
 }
