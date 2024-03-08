@@ -15,7 +15,7 @@ struct GameView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .trailing) {
-                AccountHpView(player: vm.enemyPlayer, isEnemy: true)
+                PlayerView(player: vm.enemyPlayer, isEnemy: true)
                     .padding(.horizontal)
 
                 enemyMovesPreview
@@ -25,7 +25,7 @@ struct GameView: View {
 
             MovesView(attacks: $vm.currentPlayer.attacks, defenses: $vm.currentPlayer.defenses, sourceType: .user)
 
-            AccountHpView(player: vm.currentPlayer)
+            PlayerView(player: vm.currentPlayer)
                 .padding(.horizontal)
                 .padding(.top, 8)
         }

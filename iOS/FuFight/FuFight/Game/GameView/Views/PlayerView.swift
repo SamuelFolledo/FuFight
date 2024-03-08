@@ -1,5 +1,5 @@
 //
-//  AccountHpView.swift
+//  PlayerView.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 3/4/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AccountHpView: View {
+struct PlayerView: View {
     var player: Player
     var isEnemy = false
 
@@ -17,15 +17,15 @@ struct AccountHpView: View {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
 
-            VStack(alignment: isEnemy ? .trailing : .leading, spacing: 0) {
+            VStack(alignment: isEnemy ? .trailing : .leading, spacing: 4) {
                 if !isEnemy {
-                    nameText
+                    nameView
                 }
 
                 hpBarView
 
                 if isEnemy {
-                    nameText
+                    nameView
                 }
             }
 
@@ -33,7 +33,9 @@ struct AccountHpView: View {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
         }
-        .padding(8)
+        .padding(.horizontal, 8)
+        .padding(.top, isEnemy ? 8 : 4)
+        .padding(.bottom, isEnemy ? 4 : 8)
         .background(
             Color.systemGray
                 .ignoresSafeArea()
@@ -84,22 +86,39 @@ struct AccountHpView: View {
         }
     }
 
-    var nameText: some View {
-        Text(player.username)
-            .font(mediumTextFont)
-            .foregroundStyle(.white)
+    var nameView: some View {
+        HStack {
+            if isEnemy && player.hasSpeedBoost {
+                statusView
+            }
+
+            Text(player.username)
+                .font(mediumTextFont)
+                .foregroundStyle(.white)
+
+            if !isEnemy && player.hasSpeedBoost {
+                statusView
+            }
+        }
+    }
+
+    var statusView: some View {
+        HStack {
+            plusImage
+                .frame(width: 20, height: 20)
+        }
     }
 }
 
 #Preview {
     let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
     return VStack(spacing: 20) {
-        AccountHpView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        AccountHpView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 80, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        AccountHpView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 50, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        AccountHpView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), 
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 80, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 50, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), 
                       isEnemy: true)
-        AccountHpView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 0, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses),
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 0, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses),
                       isEnemy: true)
     }
 }
