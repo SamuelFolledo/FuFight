@@ -57,23 +57,74 @@ struct AttacksView: View {
                 })
                 .frame(width: sourceType.shouldFlip ? 30 : 100)
                 .blur(radius: move.state.blurRadius, opaque: false)
+                .colorMultiply(move.state == .selected ? Color.systemGray2 : Color.white)
                 .opacity(move.state.opacity)
                 .overlay {
-                    switch move.state {
-                    case .cooldown:
-                        Text("\(move.cooldown)")
-                            .font(sourceType.font)
-                            .foregroundStyle(.white)
-                            .rotationEffect(sourceType.angle)
-                    case .selected:
-                        Circle()
-                            .stroke(.yellow, lineWidth: 2)
-                    case .initial, .unselected, .bigFire, .smallFire:
-                        EmptyView()
+                    getFireView(from: move)
+                }
+                .overlay {
+                    Group {
+                        switch move.state {
+                        case .cooldown:
+                            Text("\(move.cooldown)")
+                                .font(sourceType.font)
+                                .foregroundStyle(.white)
+                        case .selected:
+                            Circle()
+                                .stroke(.green, lineWidth: sourceType.shouldFlip ? 2 : 4)
+                        case .initial, .unselected:
+                            EmptyView()
+                        }
                     }
+                    .rotationEffect(sourceType.angle)
+                    .allowsHitTesting(false)
                 }
             }
         }
+    }
+
+    func getFireView(from move: Attack) -> some View {
+        Group {
+            if let fireState = move.fireState {
+                switch move.state {
+                case .cooldown:
+                    EmptyView()
+                case .initial, .unselected, .selected:
+                    switch fireState {
+                    case .small:
+                        switch sourceType {
+                        case .user:
+                            GIFView(type: URLType.name("weakRedFire"))
+                                .frame(width: 800, height: 420)
+                                .padding(.bottom, 75)
+                                .padding(.trailing, 30)
+                        case .enemy:
+                            GIFView(type: URLType.name("weakRedFire"))
+                                .frame(width: 160, height: 85)
+                                .padding(.bottom, 16)
+                                .padding(.trailing, 4)
+                        }
+                    case .big:
+                        switch sourceType {
+                        case .user:
+                            GIFView(type: URLType.name("strongRedFire"))
+                                .frame(width: 800, height: 420)
+                                .padding(.bottom, 65)
+                                .padding(.trailing, 30)
+                        case .enemy:
+                            GIFView(type: URLType.name("strongRedFire"))
+                                .frame(width: 160, height: 90)
+                                .padding(.bottom, 16)
+                                .padding(.trailing, 4)
+                        }
+                    }
+                }
+            } else {
+                EmptyView()
+            }
+        }
+        .rotationEffect(sourceType.angle)
+        .allowsHitTesting(false)
     }
 
     func selectMove(_ selectedMove: Attack) {
@@ -90,5 +141,11 @@ struct AttacksView: View {
 }
 
 #Preview {
-    AttacksView(attacks: .constant(defaultAllPunchAttacks), sourceType: .enemy)
+    @State var attacks: [Attack] = defaultAllPunchAttacks
+
+    return VStack(spacing: 200) {
+        AttacksView(attacks: $attacks, sourceType: .enemy)
+
+        AttacksView(attacks: $attacks, sourceType: .user)
+    }
 }

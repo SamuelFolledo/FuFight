@@ -30,7 +30,7 @@ struct Player {
                 attacks[index].setStateTo(.cooldown)
             case .cooldown:
                 attacks[index].reduceCooldown()
-            case .initial, .unselected, .bigFire, .smallFire:
+            case .initial, .unselected:
                 attacks[index].setStateTo(.initial)
             }
         }
