@@ -53,7 +53,7 @@ struct DefensesView: View {
                             .rotationEffect(sourceType.angle)
                     case .selected:
                         Circle()
-                            .stroke(.yellow, lineWidth: 2)
+                            .stroke(.green, lineWidth: sourceType.shouldFlip ? 2 : 4)
                     case .initial, .unselected:
                         EmptyView()
                     }

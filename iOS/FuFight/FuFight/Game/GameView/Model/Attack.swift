@@ -16,35 +16,6 @@ enum AttackPosition: Int {
     case rightHard = 6
 }
 
-enum AttackButtonState: Int {
-    case initial = 0
-    case unselected = 1
-    case selected = 2
-    case cooldown = 3
-    case smallFire = 4
-    case bigFire = 5
-
-    var opacity: CGFloat {
-        switch self {
-        case .cooldown:
-            0.5
-        case .selected:
-            0.75
-        case .initial, .unselected, .smallFire, .bigFire:
-            1
-        }
-    }
-
-    var blurRadius: CGFloat {
-        switch self {
-        case .cooldown:
-            2
-        case .selected, .initial, .unselected, .smallFire, .bigFire:
-            0
-        }
-    }
-}
-
 protocol AttackProtocol: MoveProtocol {
     ///The base damage of this attack
     var damage: Double { get }
@@ -60,18 +31,19 @@ protocol AttackProtocol: MoveProtocol {
 struct Attack {
     private(set) var move: any AttackProtocol
     private(set) var cooldown: Int = 0
-    private(set) var state: AttackButtonState = .initial
+    private(set) var state: MoveButtonState = .initial
+    private(set) var fireState: FireState? = nil
 
     init(_ move: any AttackProtocol) {
         self.move = move
     }
 
-    mutating func setStateTo(_ newState: AttackButtonState) {
+    mutating func setStateTo(_ newState: MoveButtonState) {
         state = newState
         switch newState {
         case .cooldown:
             cooldown = move.cooldown
-        case .initial, .unselected, .selected, .smallFire, .bigFire:
+        case .initial, .unselected, .selected:
             break
         }
     }
@@ -86,5 +58,19 @@ struct Attack {
     mutating func restart() {
         cooldown = 0
         setStateTo(.initial)
+    }
+}
+
+enum FireState {
+    case small
+    case big
+
+    var imageView: GIFView {
+        switch self {
+        case .small:
+            GIFView(type: URLType.name("weakRedFire"))
+        case .big:
+            GIFView(type: URLType.name("strongRedFire"))
+        }
     }
 }

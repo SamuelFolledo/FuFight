@@ -14,33 +14,6 @@ enum DefendPosition: Int {
     case right = 4
 }
 
-enum DefendButtonState: Int {
-    case initial = 0
-    case unselected = 1
-    case selected = 2
-    case cooldown = 3
-
-    var opacity: CGFloat {
-        switch self {
-        case .cooldown:
-            0.5
-        case .selected:
-            0.75
-        case .initial, .unselected:
-            1
-        }
-    }
-
-    var blurRadius: CGFloat {
-        switch self {
-        case .cooldown:
-            2
-        case .initial, .selected, .unselected:
-            0
-        }
-    }
-}
-
 protocol DefendProtocol: MoveProtocol {
     ///The percentage amount of damage boost this move adds to attack's damage. 0 means no additional damage increase from this DefendProtocol move
     var damageMultiplier: Double { get }
@@ -55,13 +28,13 @@ protocol DefendProtocol: MoveProtocol {
 struct Defend {
     private(set) var move: any DefendProtocol
     private(set) var cooldown: Int = 0
-    private(set) var state: DefendButtonState = .initial
+    private(set) var state: MoveButtonState = .initial
 
     init(_ move: any DefendProtocol) {
         self.move = move
     }
 
-    mutating func setStateTo(_ newState: DefendButtonState) {
+    mutating func setStateTo(_ newState: MoveButtonState) {
         state = newState
         switch newState {
         case .cooldown:
