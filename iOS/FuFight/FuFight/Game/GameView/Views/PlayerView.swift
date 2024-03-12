@@ -88,24 +88,55 @@ struct PlayerView: View {
 
     var nameView: some View {
         HStack {
-            if isEnemy && player.hasSpeedBoost {
-                statusView
+            if isEnemy {
+                if !player.turns.isEmpty {
+                    damagesList
+                }
+
+                if player.hasSpeedBoost {
+                    plusImage
+                        .frame(width: 20, height: 20)
+                }
             }
 
             Text(player.username)
                 .font(mediumTextFont)
                 .foregroundStyle(.white)
 
-            if !isEnemy && player.hasSpeedBoost {
-                statusView
+            if !isEnemy {
+                if player.hasSpeedBoost {
+                    plusImage
+                        .frame(width: 20, height: 20)
+                }
+
+                if !player.turns.isEmpty {
+                    damagesList
+                }
             }
         }
     }
 
-    var statusView: some View {
-        HStack {
-            plusImage
-                .frame(width: 20, height: 20)
+    var damagesList: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
+                ForEach(player.turns.dropLast().reversed(), id: \.round) { turn in
+                    Group {
+                        if let damage = turn.totalDamage {
+                            if damage <= 0 {
+                                Text("Round \(turn.round): N/A")
+                                    .foregroundStyle(.white)
+                            } else {
+                                Text("Round \(turn.round): \(damage.intString)")
+                                    .foregroundStyle(.red)
+                            }
+                        } else {
+                            Text("Round \(turn.round): Dodged")
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .font(mediumTextFont)
+                }
+            }
         }
     }
 }

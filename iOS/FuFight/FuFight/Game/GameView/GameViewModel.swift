@@ -67,8 +67,8 @@ class GameViewModel: BaseViewModel {
 private extension GameViewModel {
     func startGame() {
         let isCurrentSpeedBoosted = Int.random(in: 0...1) == 0
-        currentPlayer.hasSpeedBoost = isCurrentSpeedBoosted
-        enemyPlayer.hasSpeedBoost = !isCurrentSpeedBoosted
+        currentPlayer.giveSpeedBoost(isCurrentSpeedBoosted)
+        enemyPlayer.giveSpeedBoost(!isCurrentSpeedBoosted)
         goToNextRound()
     }
 
@@ -81,10 +81,10 @@ private extension GameViewModel {
     func gameOver() {
         if enemyPlayer.hp <= 0 {
             LOGD("Player won")
-            enemyPlayer.hp = 0
+            enemyPlayer.gameOver()
         } else if currentPlayer.hp <= 0 {
             LOGD("Enemy won")
-            currentPlayer.hp = 0
+            currentPlayer.gameOver()
         }
         isGameOver = true
     }
@@ -96,7 +96,7 @@ private extension GameViewModel {
                 if attack.move.id == randomAttack.id {
                     if attack.cooldown <= 0 {
                         LOGD("Randomly generated enemy attack is \(attack.move.name)")
-                        turn.update(attack)
+                        turn.update(attack: attack)
                         enemyPlayer.attacks[index].setStateTo(.selected)
                     }
                 }
@@ -108,7 +108,7 @@ private extension GameViewModel {
                 if defend.move.id == randomDefend.id {
                     if defend.cooldown <= 0 {
                         LOGD("Randomly generated enemy defend is \(defend.move.name)")
-                        turn.update(defend)
+                        turn.update(defend: defend)
                         enemyPlayer.defenses[index].setStateTo(.selected)
                     }
                 }
@@ -147,37 +147,45 @@ private extension GameViewModel {
         if let firstAttack = firstTurn.attack {
             if didLand(attackPosition: firstAttack.move.position, opposingDefense: secondTurn.defend) {
                 let totalDamage = calculateDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
-                enemyPlayer.hp -= isCurrentFirst ? totalDamage : 0
-                currentPlayer.hp -= isCurrentFirst ? 0 : totalDamage
+                if isCurrentFirst {
+                    enemyPlayer.damage(amount: totalDamage)
+                } else {
+                    currentPlayer.damage(amount: totalDamage)
+                }
                 if enemyPlayer.isDead || currentPlayer.isDead {
                     return gameOver()
                 }
                 ///Additional damage reduction for the second attacker
                 secondAttackDamageReduction = firstAttack.move.damageReduction
             } else {
-                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
+                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
             }
         } else {
 //            LOGD("First and did not select an attack in round \(round)")
+            isCurrentFirst ? enemyPlayer.damage(amount: 0) : currentPlayer.damage(amount: 0)
         }
         ///3) Apply second attacker's damage
         if let secondAttack = secondTurn.attack {
             if didLand(attackPosition: secondAttack.move.position, opposingDefense: firstTurn.defend) {
                 let totalDamage = calculateDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
-                enemyPlayer.hp -= isCurrentFirst ? 0 : totalDamage
-                currentPlayer.hp -= isCurrentFirst ? totalDamage : 0
+                if isCurrentFirst {
+                    currentPlayer.damage(amount: totalDamage)
+                } else {
+                    enemyPlayer.damage(amount: totalDamage)
+                }
                 if enemyPlayer.isDead || currentPlayer.isDead {
                     return gameOver()
                 }
             } else {
-                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
+                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
             }
         } else {
 //            LOGD("Second and did not select an attack in round \(round)")
+            isCurrentFirst ? currentPlayer.damage(amount: 0) : enemyPlayer.damage(amount: 0)
         }
         ///4) For the next turn, give the speed boost to whoever went first
-        currentPlayer.hasSpeedBoost = isCurrentFirst
-        enemyPlayer.hasSpeedBoost = !isCurrentFirst
+        currentPlayer.giveSpeedBoost(isCurrentFirst)
+        enemyPlayer.giveSpeedBoost(!isCurrentFirst)
     }
 
     func didLand(attackPosition: AttackPosition, opposingDefense: Defend?) -> Bool {
