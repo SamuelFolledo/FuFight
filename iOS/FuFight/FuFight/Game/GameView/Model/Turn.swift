@@ -12,7 +12,10 @@ class Turn {
     private(set) var attack: Attack?
     private(set) var defend: (Defend)?
     private(set) var speed: CGFloat = 0
-    private(set) var hasSpeedBoost: Bool
+    ///True if user on this turn had the speed boost
+    var hasSpeedBoost: Bool
+    ///nil means no attack selected, 0 means dodged
+    private(set) var totalDamage: CGFloat? = 0
 
     init(round: Int, hasSpeedBoost: Bool) {
         self.round = round
@@ -31,14 +34,18 @@ class Turn {
         updateSpeed()
     }
 
-    func update(_ attack: Attack?) {
+    func update(attack: Attack?) {
         self.attack = attack
         updateSpeed()
     }
 
-    func update(_ defend: Defend?) {
+    func update(defend: Defend?) {
         self.defend = defend
         updateSpeed()
+    }
+
+    func updateTotalDamage(to amount: CGFloat?) {
+        self.totalDamage = amount
     }
 }
 
@@ -48,5 +55,15 @@ private extension Turn {
         let speedMultiplier = defend?.move.speedMultiplier ?? 0
         let speedBoostMultiplier = hasSpeedBoost ? 0.1 : 0
         speed = moveSpeed * (1 + speedMultiplier) * (1 + speedBoostMultiplier)
+    }
+}
+
+extension Turn: Equatable, Hashable {
+    static func == (lhs: Turn, rhs: Turn) -> Bool {
+        return lhs.round == rhs.round
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        return hasher.combine(round)
     }
 }

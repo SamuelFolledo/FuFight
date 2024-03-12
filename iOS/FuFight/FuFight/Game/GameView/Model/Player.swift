@@ -11,15 +11,14 @@ import Foundation
 class Player {
     private(set) var photoUrl: URL
     private(set) var username: String
-    var hp: CGFloat
+    private(set) var hp: CGFloat
     let maxHp: CGFloat
     var attacks: [Attack]
     var defenses: [Defend]
     private(set) var turns: [Turn] = []
-    var hasSpeedBoost: Bool = false
     private(set) var boostLevel = 0
     private(set) var didMissAttack = false
-
+    private(set) var hasSpeedBoost = false
     var isDead: Bool {
         hp <= 0
     }
@@ -32,7 +31,6 @@ class Player {
         self.attacks = attacks
         self.defenses = defenses
         self.turns = turns
-        self.hasSpeedBoost = hasSpeedBoost
         self.boostLevel = boostLevel
     }
 
@@ -59,6 +57,23 @@ class Player {
 
     func attackMissed() {
         didMissAttack = true
+        turns.last?.updateTotalDamage(to: nil)
+    }
+
+    func giveSpeedBoost(_ shouldSpeedBoost: Bool) {
+        hasSpeedBoost = shouldSpeedBoost
+        if turns.last != nil {
+            turns.last!.hasSpeedBoost = shouldSpeedBoost
+        }
+    }
+
+    func damage(amount: CGFloat) {
+        hp -= amount
+        turns.last?.updateTotalDamage(to: amount)
+    }
+
+    func gameOver() {
+        hp = 0
     }
 }
 
@@ -117,7 +132,7 @@ private extension Player {
             switch attacks[index].state {
             case .selected:
                 attacks[index].setStateTo(.cooldown)
-                turn.update(attacks[index])
+                turn.update(attack: attacks[index])
             case .cooldown:
                 attacks[index].reduceCooldown()
             case .initial, .unselected:
@@ -131,7 +146,7 @@ private extension Player {
             switch defenses[index].state {
             case .selected:
                 defenses[index].setStateTo(.cooldown)
-                turn.update(defenses[index])
+                turn.update(defend: defenses[index])
             case .cooldown:
                 defenses[index].reduceCooldown()
             case .initial, .unselected:
