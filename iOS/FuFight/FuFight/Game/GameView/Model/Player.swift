@@ -9,15 +9,16 @@ import Foundation
 
 @Observable
 class Player {
-    var photoUrl: URL
-    var username: String
+    private(set) var photoUrl: URL
+    private(set) var username: String
     var hp: CGFloat
     let maxHp: CGFloat
     var attacks: [Attack]
     var defenses: [Defend]
-    var turns: [Turn] = []
+    private(set) var turns: [Turn] = []
     var hasSpeedBoost: Bool = false
-    var boostLevel = 0
+    private(set) var boostLevel = 0
+    private(set) var didMissAttack = false
 
     var isDead: Bool {
         hp <= 0
@@ -41,6 +42,7 @@ class Player {
         updateFireState(attacks: &attacks, turn: &turn, boostLevel: &boostLevel)
         updateDefensesState(defenses: &defenses, turn: &turn)
         turns.append(turn)
+        didMissAttack = false
     }
 
     func prepareForRematch() {
@@ -52,12 +54,18 @@ class Player {
             defenses[index].restart()
         }
         turns.removeAll()
+        didMissAttack = false
+    }
+
+    func attackMissed() {
+        didMissAttack = true
     }
 }
 
 private extension Player {
     func updateFireState(attacks: inout [Attack], turn: inout Turn, boostLevel: inout Int) {
-        if let selectedAttack = turn.attack,
+        if !didMissAttack,
+           let selectedAttack = turn.attack,
            selectedAttack.fireState != .big {
             boostLevel += 1
             let isMaxBoost = boostLevel > 1

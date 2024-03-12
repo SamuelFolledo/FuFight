@@ -119,10 +119,9 @@ private extension GameViewModel {
 
     /// Returns the attacker's total damage based on defender's defend choice
     /// - Parameters:
-    ///   - attack: attacker's attack
-    ///   - defend: defender's defend choice
-    ///   - damageReduction: only pass a value if attacker is going second
-    /// - Returns: Total damage of the attacker's attack
+    ///   - attackerTurn: attacker's attack
+    ///   - defenderTurn: defender's defend choice
+    ///   - secondAttackDamageReduction: only pass a value if attacker is going second
     func calculateDamage(attackerTurn: Turn, defenderTurn: Turn, secondAttackDamageReduction: CGFloat = 0) -> CGFloat {
         let baseDamage = attackerTurn.attack?.move.damage ?? 0
         let defenseDamageMultiplier = attackerTurn.defend?.move.damageMultiplier ?? 0
@@ -143,7 +142,7 @@ private extension GameViewModel {
         let isCurrentFirst = currentTurn.speed > enemyTurn.speed
         let firstTurn = isCurrentFirst ? currentTurn : enemyTurn
         let secondTurn = isCurrentFirst ? enemyTurn : currentTurn
-        ///2) Apply first turn's damage
+        ///2) Apply first attacker's damage
         var secondAttackDamageReduction: CGFloat = 0
         if let firstAttack = firstTurn.attack {
             if didLand(attackPosition: firstAttack.move.position, opposingDefense: secondTurn.defend) {
@@ -153,15 +152,15 @@ private extension GameViewModel {
                 if enemyPlayer.isDead || currentPlayer.isDead {
                     return gameOver()
                 }
-                //Apply damage reduction for the second attacker
+                ///Additional damage reduction for the second attacker
                 secondAttackDamageReduction = firstAttack.move.damageReduction
             } else {
-                //                LOGD("First and missed their attack in round \(round)")
+                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
             }
         } else {
-            //            LOGD("First and did not select an attack in round \(round)")
+//            LOGD("First and did not select an attack in round \(round)")
         }
-        ///3) Apply second turn's damage
+        ///3) Apply second attacker's damage
         if let secondAttack = secondTurn.attack {
             if didLand(attackPosition: secondAttack.move.position, opposingDefense: firstTurn.defend) {
                 let totalDamage = calculateDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
@@ -171,10 +170,10 @@ private extension GameViewModel {
                     return gameOver()
                 }
             } else {
-                //                LOGD("Second and missed their attack in round \(round)")
+                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
             }
         } else {
-            //            LOGD("Second and did not select an attack in round \(round)")
+//            LOGD("Second and did not select an attack in round \(round)")
         }
         ///4) For the next turn, give the speed boost to whoever went first
         currentPlayer.hasSpeedBoost = isCurrentFirst
