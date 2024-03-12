@@ -7,14 +7,17 @@
 
 import SwiftUI
 
-enum Punch: String, CaseIterable, AttackProtocol {
+enum Punch: String, CaseIterable {
     case leftPunchLight
     case leftPunchMedium
     case leftPunchHard
     case rightPunchLight
     case rightPunchMedium
     case rightPunchHard
+}
 
+//MARK: MoveProtocol extension 
+extension Punch {
     var id: String {
         rawValue
     }
@@ -59,6 +62,31 @@ enum Punch: String, CaseIterable, AttackProtocol {
 
     var moveType: MoveType { .attack }
 
+    var padding: Double {
+        switch self {
+        case .leftPunchLight, .rightPunchLight:
+            24
+        case .leftPunchMedium, .rightPunchMedium:
+            20
+        case .leftPunchHard, .rightPunchHard:
+            18
+        }
+    }
+
+    var cooldown: Int {
+        switch self {
+        case .leftPunchLight, .rightPunchLight:
+            1
+        case .leftPunchMedium, .rightPunchMedium:
+            2
+        case .leftPunchHard, .rightPunchHard:
+            3
+        }
+    }
+}
+
+//MARK: AttackProtocol extension
+extension Punch: AttackProtocol {
     var damage: Double {
         switch self {
         case .leftPunchLight, .rightPunchLight:
@@ -92,17 +120,6 @@ enum Punch: String, CaseIterable, AttackProtocol {
         }
     }
 
-    var padding: Double {
-        switch self {
-        case .leftPunchLight, .rightPunchLight:
-            24
-        case .leftPunchMedium, .rightPunchMedium:
-            20
-        case .leftPunchHard, .rightPunchHard:
-            18
-        }
-    }
-
     var position: AttackPosition {
         switch self {
         case .leftPunchLight:
@@ -120,14 +137,12 @@ enum Punch: String, CaseIterable, AttackProtocol {
         }
     }
 
-    var cooldown: Int {
+    var canBoost: Bool {
         switch self {
-        case .leftPunchLight, .rightPunchLight:
-            1
-        case .leftPunchMedium, .rightPunchMedium:
-            2
-        case .leftPunchHard, .rightPunchHard:
-            3
+        case .leftPunchLight, .rightPunchLight, .rightPunchMedium:
+            true
+        case .leftPunchMedium, .leftPunchHard, .rightPunchHard:
+            false
         }
     }
 }

@@ -7,100 +7,6 @@
 
 import SwiftUI
 
-struct Player {
-    var photoUrl: URL
-    var username: String
-    var hp: CGFloat
-    let maxHp: CGFloat
-    var attacks: [Attack]
-    var defenses: [Defend]
-    var turns: [Turn] = []
-    var hasSpeedBoost: Bool = false
-
-    var isDead: Bool {
-        hp <= 0
-    }
-
-    mutating func prepareForNextRound() {
-        var turn = Turn(round: turns.count + 1, hasSpeedBoost: hasSpeedBoost)
-        for index in attacks.indices {
-            switch attacks[index].state {
-            case .selected:
-                turn.update(attacks[index])
-                attacks[index].setStateTo(.cooldown)
-            case .cooldown:
-                attacks[index].reduceCooldown()
-            case .initial, .unselected:
-                attacks[index].setStateTo(.initial)
-            }
-        }
-        for index in defenses.indices {
-            switch defenses[index].state {
-            case .selected:
-                turn.update(defenses[index])
-                defenses[index].setStateTo(.cooldown)
-            case .cooldown:
-                defenses[index].reduceCooldown()
-            case .initial, .unselected:
-                defenses[index].setStateTo(.initial)
-            }
-        }
-        turns.append(turn)
-    }
-
-    mutating func prepareForRematch() {
-        hp = maxHp
-        for index in attacks.indices {
-            attacks[index].restart()
-        }
-        for index in defenses.indices {
-            defenses[index].restart()
-        }
-        turns.removeAll()
-    }
-}
-
-struct Turn {
-    private(set) var round: Int
-    private(set) var attack: Attack?
-    private(set) var defend: (Defend)?
-    private(set) var speed: CGFloat = 0
-    private(set) var hasSpeedBoost: Bool
-
-    init(round: Int, hasSpeedBoost: Bool) {
-        self.round = round
-        self.attack = nil
-        self.defend = nil
-        self.speed = 0
-        self.hasSpeedBoost = hasSpeedBoost
-    }
-
-    init(round: Int, attacks: [Attack], defenses: [Defend], hasSpeedBoost: Bool) {
-        self.round = round
-        self.attack = attacks.first { $0.state == .selected }
-        self.defend = defenses.first { $0.state == .selected }
-        self.hasSpeedBoost = hasSpeedBoost
-        updateSpeed()
-    }
-
-    mutating func update(_ attack: Attack?) {
-        self.attack = attack
-        updateSpeed()
-    }
-
-    mutating func update(_ defend: Defend?) {
-        self.defend = defend
-        updateSpeed()
-    }
-
-    private mutating func updateSpeed() {
-        let moveSpeed = attack?.move.speed ?? 0
-        let speedMultiplier = defend?.move.speedMultiplier ?? 0
-        let speedBoostMultiplier = hasSpeedBoost ? 0.1 : 0
-        speed = moveSpeed * (1 + speedMultiplier) * (1 + speedBoostMultiplier)
-    }
-}
-
 @Observable
 class GameViewModel: BaseViewModel {
     var currentPlayer: Player
@@ -116,8 +22,8 @@ class GameViewModel: BaseViewModel {
     ///Initializer for testing purposes
     override init() {
         let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
-        self.currentPlayer = Player(photoUrl: photoUrl, username: "Samuel", hp: 5, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 5, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.currentPlayer = Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
     }
 
@@ -147,98 +53,6 @@ class GameViewModel: BaseViewModel {
             if !isGameOver {
                 goToNextRound()
             }
-        }
-    }
-
-    func applyDamages() {
-        let round = currentPlayer.turns.count + 1
-        let currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses, hasSpeedBoost: currentPlayer.hasSpeedBoost)
-        var enemyTurn = Turn(round: round, attacks: enemyPlayer.attacks, defenses: enemyPlayer.defenses, hasSpeedBoost: enemyPlayer.hasSpeedBoost)
-        //TODO: Remove these auto generated enemy turn
-        while enemyTurn.attack == nil {
-            let randomAttack = Punch.allCases.randomElement()!
-            for (index, attack) in enemyPlayer.attacks.enumerated() {
-                if attack.move.id == randomAttack.id {
-                    if attack.cooldown <= 0 {
-                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
-                        enemyTurn.update(attack)
-                        enemyPlayer.attacks[index].setStateTo(.selected)
-                    }
-                }
-            }
-        }
-        while enemyTurn.defend == nil {
-            let randomDefend = Dash.allCases.randomElement()!
-            for (index, defend) in enemyPlayer.defenses.enumerated() {
-                if defend.move.id == randomDefend.id {
-                    if defend.cooldown <= 0 {
-                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
-                        enemyTurn.update(defend)
-                        enemyPlayer.defenses[index].setStateTo(.selected)
-                    }
-                }
-            }
-        }
-        ///1) Check who is faster to see who goes first
-        let isCurrentFirst = currentTurn.speed > enemyTurn.speed
-        let firstTurn = isCurrentFirst ? currentTurn : enemyTurn
-        let secondTurn = isCurrentFirst ? enemyTurn : currentTurn
-        LOGD("First attacker is \(isCurrentFirst ? "Player" : "Enemy")")
-        ///2) Apply first turn's damage
-        var secondAttackDamageReduction: CGFloat = 0
-        if let firstAttack = firstTurn.attack {
-            if didLand(attackPosition: firstAttack.move.position, opposingDefense: secondTurn.defend) {
-                //Total damage = attackDamage * (damageMultiplier + 1) * (1 - enemyDamageReduction)
-                let damage = firstAttack.move.damage * ((firstTurn.defend?.move.damageMultiplier ?? 0) + 1) * (1 - (secondTurn.defend?.move.defenseMultiplier ?? 0))
-                enemyPlayer.hp -= isCurrentFirst ? damage : 0
-                currentPlayer.hp -= isCurrentFirst ? 0 : damage
-                if enemyPlayer.isDead || currentPlayer.isDead {
-                    return gameOver()
-                }
-                //Apply damage reduction for the next attack
-                secondAttackDamageReduction = firstAttack.move.damageReduction
-            } else {
-                LOGD("First and missed their attack in round \(round)")
-            }
-        } else {
-            LOGD("First and did not select an attack in round \(round)")
-        }
-        ///3) Apply second turn's damage
-        if let secondAttack = secondTurn.attack {
-            if didLand(attackPosition: secondAttack.move.position, opposingDefense: firstTurn.defend) {
-                //Total damage = attackDamage * (damageMultiplier + 1) * (1 - enemyDamageReduction)
-                let damage = secondAttack.move.damage * ((secondTurn.defend?.move.damageMultiplier ?? 0) + 1) * (1 - (firstTurn.defend?.move.defenseMultiplier ?? 0) + secondAttackDamageReduction)
-                enemyPlayer.hp -= isCurrentFirst ? 0 : damage
-                currentPlayer.hp -= isCurrentFirst ? damage : 0
-                if enemyPlayer.isDead || currentPlayer.isDead {
-                    return gameOver()
-                }
-            } else {
-                LOGD("Second and missed their attack in round \(round)")
-            }
-        } else {
-            LOGD("Second and did not select an attack in round \(round)")
-        }
-        ///4) For the next turn, give the speed boost to whoever went first
-        currentPlayer.hasSpeedBoost = isCurrentFirst
-        enemyPlayer.hasSpeedBoost = !isCurrentFirst
-    }
-
-    func didLand(attackPosition: AttackPosition, opposingDefense: Defend?) -> Bool {
-        guard let opposingDefense else { return true }
-        switch opposingDefense.move.position {
-        case .forward, .backward:
-            return true
-        case .left:
-            let leftAttacks: [AttackPosition] = [.leftLight, .leftMedium, .leftHard]
-            let didLand = leftAttacks.contains(attackPosition)
-//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
-            return didLand
-        case .right:
-            let rightAttacks: [AttackPosition] = [.rightLight, .rightMedium, .rightHard]
-            let didLand = rightAttacks.contains(attackPosition)
-//            LOGD("Did land \(didLand) for \(attackPosition) to \(opposingDefense.move.position)")
-            return didLand
         }
     }
 
@@ -273,5 +87,109 @@ private extension GameViewModel {
             currentPlayer.hp = 0
         }
         isGameOver = true
+    }
+
+    func generateEnemyTurn(_ turn: inout Turn) {
+        while turn.attack == nil {
+            let randomAttack = Punch.allCases.randomElement()!
+            for (index, attack) in enemyPlayer.attacks.enumerated() {
+                if attack.move.id == randomAttack.id {
+                    if attack.cooldown <= 0 {
+                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
+                        turn.update(attack)
+                        enemyPlayer.attacks[index].setStateTo(.selected)
+                    }
+                }
+            }
+        }
+        while turn.defend == nil {
+            let randomDefend = Dash.allCases.randomElement()!
+            for (index, defend) in enemyPlayer.defenses.enumerated() {
+                if defend.move.id == randomDefend.id {
+                    if defend.cooldown <= 0 {
+                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
+                        turn.update(defend)
+                        enemyPlayer.defenses[index].setStateTo(.selected)
+                    }
+                }
+            }
+        }
+    }
+
+
+    /// Returns the attacker's total damage based on defender's defend choice
+    /// - Parameters:
+    ///   - attack: attacker's attack
+    ///   - defend: defender's defend choice
+    ///   - damageReduction: only pass a value if attacker is going second
+    /// - Returns: Total damage of the attacker's attack
+    func calculateDamage(attackerTurn: Turn, defenderTurn: Turn, secondAttackDamageReduction: CGFloat = 0) -> CGFloat {
+        let baseDamage = attackerTurn.attack?.move.damage ?? 0
+        let defenseDamageMultiplier = attackerTurn.defend?.move.damageMultiplier ?? 0
+        let boostDamageMultiplier = attackerTurn.attack?.fireState?.boostMultiplier ?? 0
+        let enemyDamageReduction = defenderTurn.defend?.move.defenseMultiplier ?? 0
+        //Total damage = baseDamage * (damageMultiplier + fireDamageMultiplier + 1) * (1 - enemyDamageReduction)
+        let totalDamage = baseDamage * (defenseDamageMultiplier + boostDamageMultiplier + 1) * (1 - enemyDamageReduction - secondAttackDamageReduction)
+        return totalDamage
+    }
+
+    func applyDamages() {
+        let round = currentPlayer.turns.count + 1
+        let currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses, hasSpeedBoost: currentPlayer.hasSpeedBoost)
+        var enemyTurn = Turn(round: round, attacks: enemyPlayer.attacks, defenses: enemyPlayer.defenses, hasSpeedBoost: enemyPlayer.hasSpeedBoost)
+        //TODO: Remove these auto generated enemy turn
+        generateEnemyTurn(&enemyTurn)
+        ///1) Check who is faster to see who goes first
+        let isCurrentFirst = currentTurn.speed > enemyTurn.speed
+        let firstTurn = isCurrentFirst ? currentTurn : enemyTurn
+        let secondTurn = isCurrentFirst ? enemyTurn : currentTurn
+        ///2) Apply first turn's damage
+        var secondAttackDamageReduction: CGFloat = 0
+        if let firstAttack = firstTurn.attack {
+            if didLand(attackPosition: firstAttack.move.position, opposingDefense: secondTurn.defend) {
+                let totalDamage = calculateDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
+                enemyPlayer.hp -= isCurrentFirst ? totalDamage : 0
+                currentPlayer.hp -= isCurrentFirst ? 0 : totalDamage
+                if enemyPlayer.isDead || currentPlayer.isDead {
+                    return gameOver()
+                }
+                //Apply damage reduction for the second attacker
+                secondAttackDamageReduction = firstAttack.move.damageReduction
+            } else {
+                //                LOGD("First and missed their attack in round \(round)")
+            }
+        } else {
+            //            LOGD("First and did not select an attack in round \(round)")
+        }
+        ///3) Apply second turn's damage
+        if let secondAttack = secondTurn.attack {
+            if didLand(attackPosition: secondAttack.move.position, opposingDefense: firstTurn.defend) {
+                let totalDamage = calculateDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
+                enemyPlayer.hp -= isCurrentFirst ? 0 : totalDamage
+                currentPlayer.hp -= isCurrentFirst ? totalDamage : 0
+                if enemyPlayer.isDead || currentPlayer.isDead {
+                    return gameOver()
+                }
+            } else {
+                //                LOGD("Second and missed their attack in round \(round)")
+            }
+        } else {
+            //            LOGD("Second and did not select an attack in round \(round)")
+        }
+        ///4) For the next turn, give the speed boost to whoever went first
+        currentPlayer.hasSpeedBoost = isCurrentFirst
+        enemyPlayer.hasSpeedBoost = !isCurrentFirst
+    }
+
+    func didLand(attackPosition: AttackPosition, opposingDefense: Defend?) -> Bool {
+        guard let opposingDefense else { return true }
+        switch opposingDefense.move.position {
+        case .forward, .backward:
+            return true
+        case .left:
+            return !attackPosition.isLeft
+        case .right:
+            return attackPosition.isLeft
+        }
     }
 }

@@ -14,6 +14,10 @@ enum AttackPosition: Int {
     case rightMedium = 4
     case leftHard = 5
     case rightHard = 6
+
+    var isLeft: Bool {
+        return rawValue % 2 == 1
+    }
 }
 
 protocol AttackProtocol: MoveProtocol {
@@ -25,6 +29,8 @@ protocol AttackProtocol: MoveProtocol {
     var damageReduction: Double { get }
     ///Position of the attack in the view
     var position: AttackPosition { get }
+    ///Returns true if attack can increase next attack's damage
+    var canBoost: Bool { get }
 }
 
 
@@ -33,6 +39,9 @@ struct Attack {
     private(set) var cooldown: Int = 0
     private(set) var state: MoveButtonState = .initial
     private(set) var fireState: FireState? = nil
+    var isAvailableNextTurn: Bool {
+        return cooldown <= 1
+    }
 
     init(_ move: any AttackProtocol) {
         self.move = move
@@ -58,6 +67,11 @@ struct Attack {
     mutating func restart() {
         cooldown = 0
         setStateTo(.initial)
+        setFireTo(nil)
+    }
+
+    mutating func setFireTo(_ newFireState: FireState?) {
+        self.fireState = newFireState
     }
 }
 
@@ -65,12 +79,12 @@ enum FireState {
     case small
     case big
 
-    var imageView: GIFView {
+    var boostMultiplier: CGFloat {
         switch self {
         case .small:
-            GIFView(type: URLType.name("weakRedFire"))
+            0.2
         case .big:
-            GIFView(type: URLType.name("strongRedFire"))
+            0.35
         }
     }
 }
