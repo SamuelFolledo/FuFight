@@ -158,10 +158,9 @@ private extension GameViewModel {
                 ///Additional damage reduction for the second attacker
                 secondAttackDamageReduction = firstAttack.move.damageReduction
             } else {
-                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
+                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
             }
         } else {
-//            LOGD("First and did not select an attack in round \(round)")
             isCurrentFirst ? enemyPlayer.damage(amount: 0) : currentPlayer.damage(amount: 0)
         }
         ///3) Apply second attacker's damage
@@ -177,10 +176,9 @@ private extension GameViewModel {
                     return gameOver()
                 }
             } else {
-                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
+                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
             }
         } else {
-//            LOGD("Second and did not select an attack in round \(round)")
             isCurrentFirst ? currentPlayer.damage(amount: 0) : enemyPlayer.damage(amount: 0)
         }
         ///4) For the next turn, give the speed boost to whoever went first
