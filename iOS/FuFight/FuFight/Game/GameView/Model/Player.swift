@@ -19,9 +19,8 @@ class Player {
     private(set) var boostLevel = 0
     private(set) var didMissAttack = false
     private(set) var hasSpeedBoost = false
-    var isDead: Bool {
-        hp <= 0
-    }
+    var isDead: Bool { hp <= 0 }
+    var hpText: String { String(format: "%.2f", hp) }
 
     init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, attacks: [Attack], defenses: [Defend], turns: [Turn] = [], hasSpeedBoost: Bool = false, boostLevel: Int = 0) {
         self.photoUrl = photoUrl

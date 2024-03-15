@@ -58,7 +58,7 @@ struct PlayerView: View {
                         .foregroundColor(self.calculateBarColor())
                 }
                 .overlay(
-                    Text("\(Int(player.hp)) / \(Int(player.maxHp))")
+                    Text("\(player.hpText) / \(Int(player.maxHp))")
                         .font(mediumTextFont)
                         .foregroundStyle(.white)
                         .padding()
