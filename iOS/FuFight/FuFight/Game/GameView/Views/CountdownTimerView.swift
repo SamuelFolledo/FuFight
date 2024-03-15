@@ -21,7 +21,7 @@ struct CountdownTimerView: View {
             .overlay(
                 VStack(spacing: 4) {
                     Text("\(timeRemaining)")
-                        .font(extramediumTitleFont)
+                        .font(extraLargeTitleFont)
                         .foregroundStyle(.white)
 
                     Text("Round \(round)")

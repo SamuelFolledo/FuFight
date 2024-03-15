@@ -14,18 +14,17 @@ struct HomeView: View {
         NavigationStack(path: $vm.path) {
             ScrollView {
                 VStack {
-                    Text("Welcome \(vm.account.displayName)")
+                    navigationView
 
-                    Spacer()
+                    VStack {
+                        Text("Welcome \(vm.account.displayName)")
+                            .font(mediumTitleFont)
+                            .foregroundStyle(.white)
 
-                    playButton
-                }
-                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                .padding()
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        accountImage
+                        Spacer()
                     }
+                    .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                    .padding()
                 }
             }
             .overlay {
@@ -37,8 +36,6 @@ struct HomeView: View {
                 switch route {
                 case .game:
                     GameView(path: $vm.path)
-//                case .gameOver:
-//                    GameOverView(path: $vm.path)
                 }
             }
             .background(
@@ -46,8 +43,12 @@ struct HomeView: View {
                     .padding(.leading, 30)
 
             )
+            .safeAreaInset(edge: .bottom) {
+                playButton
+            }
+            .navigationBarHidden(true)
+            .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Welcome \(vm.account.displayName)")
         .onAppear {
             vm.onAppear()
         }
@@ -55,6 +56,15 @@ struct HomeView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+    }
+
+    var navigationView: some View {
+        HStack {
+            accountImage
+
+            Spacer()
+        }
+        .padding(.horizontal, smallerHorizontalPadding)
     }
 
     var accountImage: some View {
@@ -67,7 +77,8 @@ struct HomeView: View {
         Button {
             vm.path.append(GameRoute.game)
         } label: {
-            Text("Start game")
+            Image("playButton")
+                .frame(width: 200)
         }
     }
 }
