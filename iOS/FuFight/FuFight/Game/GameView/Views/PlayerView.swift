@@ -119,7 +119,8 @@ struct PlayerView: View {
     var damagesList: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
-                ForEach(player.turns.dropLast().reversed(), id: \.round) { turn in
+                let turns = player.hp > 0 ? player.turns.dropLast() : player.turns
+                ForEach(turns.reversed(), id: \.round) { turn in
                     Group {
                         if let damage = turn.totalDamage {
                             if damage <= 0 {
