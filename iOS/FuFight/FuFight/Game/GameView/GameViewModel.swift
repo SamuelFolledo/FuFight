@@ -30,7 +30,6 @@ class GameViewModel: BaseViewModel {
         self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
-        startNewGame()
     }
 
     init(enemyPlayer: Player) {
@@ -145,12 +144,12 @@ private extension GameViewModel {
                 applyDamage(nil, to: secondPlayer)
             } else {
                 let totalDamage = getTotalDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
+                applyDamage(totalDamage, to: secondPlayer)
                 if enemyPlayer.isDead || player.isDead {
                     return gameOver()
                 }
                 ///Additional damage reduction for the second attacker
                 secondAttackDamageReduction = firstAttack.move.damageReduction
-                applyDamage(totalDamage, to: secondPlayer)
             }
         } else {
             applyDamage(0, to: secondPlayer)
@@ -162,10 +161,10 @@ private extension GameViewModel {
                 applyDamage(nil, to: firstPlayer)
             } else {
                 let totalDamage = getTotalDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
+                applyDamage(totalDamage, to: firstPlayer)
                 if enemyPlayer.isDead || player.isDead {
                     return gameOver()
                 }
-                applyDamage(totalDamage, to: firstPlayer)
             }
         } else {
             applyDamage(0, to: firstPlayer)
@@ -189,15 +188,16 @@ private extension GameViewModel {
         return totalDamage
     }
 
+    ///Applies damage to player and update the attacker's boost level
     func applyDamage(_ damage: CGFloat?, to playerToDamage: Player) {
         playerToDamage.damage(amount: damage)
         let didDodge = damage == nil || (damage ?? 0) == 0
         if playerToDamage.isEnemy {
-            currentRound.enemyDamage = damage
+            currentRound.damage = damage
             //Increment boost level if attack landed, or set to 9
             player.setBoostLevel(to: didDodge ? 0 : player.boostLevel + 1)
         } else {
-            currentRound.damage = damage
+            currentRound.enemyDamage = damage
             enemyPlayer.setBoostLevel(to: didDodge ? 0 : enemyPlayer.boostLevel + 1)
         }
     }
