@@ -18,19 +18,12 @@ struct GameView: View {
                 PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
                     .padding(.horizontal)
 
-                enemyMovesPreview
+                enemyMovesView
             }
 
             Spacer()
 
-            MovesView(attacks: vm.currentRound.attacks, 
-                      defenses: vm.currentRound.defenses,
-                      sourceType: .user,
-                      attackSelected: { attack in
-                vm.attackSelected(attack, isEnemy: false)
-            }, defenseSelected: { defense in
-                vm.defenseSelected(defense, isEnemy: false)
-            })
+            playerMovesView
             
             PlayerView(player: vm.player, rounds: vm.rounds)
                 .padding(.horizontal)
@@ -86,12 +79,28 @@ struct GameView: View {
             .padding(.bottom, 400)
     }
 
-    var enemyMovesPreview: some View {
-        MovesView(attacks: vm.currentRound.enemyAttacks,
-                  defenses: vm.currentRound.enemyDefenses,
-                  sourceType: .enemy)
+
+    @ViewBuilder var enemyMovesView: some View {
+        if !vm.rounds.isEmpty {
+            MovesView(attacks: vm.currentRound.enemyAttacks,
+                      defenses: vm.currentRound.enemyDefenses,
+                      sourceType: .enemy)
             .frame(width: 100, height: 120)
             .padding(.trailing)
+        }
+    }
+
+    @ViewBuilder var playerMovesView: some View {
+        if !vm.rounds.isEmpty {
+            MovesView(attacks: vm.currentRound.attacks,
+                      defenses: vm.currentRound.defenses,
+                      sourceType: .user,
+                      attackSelected: { attack in
+                vm.attackSelected(attack, isEnemy: false)
+            }, defenseSelected: { defense in
+                vm.defenseSelected(defense, isEnemy: false)
+            })
+        }
     }
 }
 

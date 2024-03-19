@@ -79,7 +79,13 @@ class Round {
                 //Do not boost the hard attacks on stage 1 boost
                 let hardAttackPositions: [AttackPosition] = [.rightHard, .leftHard]
                 if !hardAttackPositions.contains(attacks[index].move.position) {
-                    attacks[index].setFireTo(.small)
+                    if attacks[index].move.canBoost {
+                        //If light or medium attack can boost, set it to small fire
+                        attacks[index].setFireTo(.small)
+                    } else {
+                        //If light or medium attack cannot boost, then set it to big fire
+                        attacks[index].setFireTo(.big)
+                    }
                 }
             case 2:
                 attacks[index].setFireTo(.big)

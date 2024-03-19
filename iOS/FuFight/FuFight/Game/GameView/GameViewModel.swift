@@ -30,7 +30,6 @@ class GameViewModel: BaseViewModel {
         self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
-        startNewGame()
     }
 
     init(enemyPlayer: Player) {
@@ -189,6 +188,7 @@ private extension GameViewModel {
         return totalDamage
     }
 
+    ///Applies damage to player and update the attacker's boost level
     func applyDamage(_ damage: CGFloat?, to playerToDamage: Player) {
         playerToDamage.damage(amount: damage)
         let didDodge = damage == nil || (damage ?? 0) == 0

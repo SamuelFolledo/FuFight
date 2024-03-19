@@ -29,7 +29,7 @@ protocol AttackProtocol: MoveProtocol {
     var damageReduction: Double { get }
     ///Position of the attack in the view
     var position: AttackPosition { get }
-    ///Returns true if attack can increase next attack's damage
+    ///Returns true if attack can increase next attack's damage. If true, these attacks can be slightly boosted indicated with small fire
     var canBoost: Bool { get }
 }
 

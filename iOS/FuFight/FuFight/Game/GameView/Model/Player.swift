@@ -20,12 +20,7 @@ class Player {
     private(set) var boostLevel = 0
     var isDead: Bool { hp <= 0 }
     var hpText: String { String(format: "%.2f", hp) }
-    var isEnemy: Bool {
-        if let currentUsername = Account.current?.username {
-            return username != currentUsername
-        }
-        return true
-    }
+    private(set) var isEnemy: Bool = true
 
     ///Round 1 initializer
     init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, attacks: [Attack], defenses: [Defend], turns: [Turn] = [], hasSpeedBoost: Bool = false, boostLevel: Int = 0) {
@@ -35,6 +30,9 @@ class Player {
         self.maxHp = maxHp
         self.turns = turns
         self.boostLevel = boostLevel
+        if let currentUsername = Account.current?.username {
+            self.isEnemy = username != currentUsername
+        }
     }
 
     func createTurn(from currentRound: Round) {
