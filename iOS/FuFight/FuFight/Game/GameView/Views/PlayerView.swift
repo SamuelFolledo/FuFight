@@ -122,7 +122,7 @@ struct PlayerView: View {
                 let rounds = player.hp > 0 ? rounds.dropLast().reversed() : rounds.reversed()
                 ForEach(Array(zip(rounds.indices, rounds)), id: \.1) { index, round in
                     Group {
-                        let totalDamage = player.isEnemy ? rounds[index].enemyDamage : rounds[index].damage
+                        let totalDamage = player.isEnemy ? rounds[index].damage : rounds[index].enemyDamage
                         if let totalDamage {
                             if totalDamage <= 0 {
                                 Text("Round \(round.id): N/A")
