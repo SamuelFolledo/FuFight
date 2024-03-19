@@ -17,7 +17,7 @@ class GameViewModel: BaseViewModel {
     var isBackgroundLeadingPadding = Bool.random()
     //TODO: Check the actual maximum padding I can have
     var backgroundPadding = Double.random(in: 0...1000)
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     ///Contains each round's information. New round is created at the beginning of each round. Meanwhile a turn gets created at the end of the round
     var rounds: [Round] = []
     var currentRound: Round { rounds.last! }
@@ -47,25 +47,11 @@ class GameViewModel: BaseViewModel {
     //MARK: - Public Methods
     func decrementTimeByOneSecond() {
         guard isTimerActive else { return }
-        if timeRemaining > 0 {
-            timeRemaining -= 1
+        if timeRemaining > 0.01 {
+            timeRemaining -= 0.1
         } else {
+            endOfRoundHandler()
             timeRemaining = defaultMaxTime
-        }
-        if timeRemaining == 0 {
-            isTimerActive = false
-            //1. Create a turn from current user's selection
-            player.createTurn(from: currentRound)
-            //2. Get/Fetch enemy's turn
-            enemyPlayer.createTurn(from: currentRound)
-            //TODO: Remove this auto generated enemy turn
-            enemyPlayer.generateEnemyTurnIfNeeded(currentRound: currentRound)
-            //3. Apply damages
-            calculateDamages()
-            if !isGameOver {
-                createNewRound()
-                isTimerActive = true
-            }
         }
     }
 
@@ -108,6 +94,30 @@ private extension GameViewModel {
         isTimerActive = true
     }
 
+    func endOfRoundHandler() {
+        isTimerActive = false
+        //1. Create a turn from current user's selection
+        player.createTurn(from: currentRound)
+        //2. Get/Fetch enemy's turn
+        enemyPlayer.createTurn(from: currentRound)
+        //TODO: Remove this auto generated enemy turn
+        enemyPlayer.generateEnemyTurnIfNeeded(currentRound: currentRound)
+        //3. Apply damages
+        calculateDamages()
+        if enemyPlayer.hp <= 0 {
+            LOGD("Player won")
+            isGameOver = true
+            enemyPlayer.gameOver()
+        } else if player.hp <= 0 {
+            LOGD("Enemy won")
+            isGameOver = true
+            player.gameOver()
+        } else {
+            createNewRound()
+            isTimerActive = true
+        }
+    }
+
     func createNewRound(isFirstRound: Bool = false) {
         var nextRound: Round
         if isFirstRound {
@@ -117,17 +127,6 @@ private extension GameViewModel {
             nextRound.updateAttacksFireStateForNextRound(previousRound: currentRound, boostLevel: player.boostLevel)
         }
         rounds.append(nextRound)
-    }
-
-    func gameOver() {
-        if enemyPlayer.hp <= 0 {
-            LOGD("Player won")
-            enemyPlayer.gameOver()
-        } else if player.hp <= 0 {
-            LOGD("Enemy won")
-            player.gameOver()
-        }
-        isGameOver = true
     }
 
     func calculateDamages() {
@@ -146,7 +145,7 @@ private extension GameViewModel {
                 let totalDamage = getTotalDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
                 applyDamage(totalDamage, to: secondPlayer)
                 if enemyPlayer.isDead || player.isDead {
-                    return gameOver()
+                    return
                 }
                 ///Additional damage reduction for the second attacker
                 secondAttackDamageReduction = firstAttack.move.damageReduction
@@ -163,7 +162,7 @@ private extension GameViewModel {
                 let totalDamage = getTotalDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
                 applyDamage(totalDamage, to: firstPlayer)
                 if enemyPlayer.isDead || player.isDead {
-                    return gameOver()
+                    return
                 }
             }
         } else {

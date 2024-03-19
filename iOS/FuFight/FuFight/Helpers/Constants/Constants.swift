@@ -32,7 +32,7 @@ let accountPhotoCompressionQuality: Double = 0.3
 let smallerHorizontalPadding: CGFloat = 18
 let horizontalPadding: CGFloat = 36
 let accountImagePickerHeight: CGFloat = 160
-let defaultMaxTime: Int = 5
+let defaultMaxTime: CGFloat = 5
 let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
 
