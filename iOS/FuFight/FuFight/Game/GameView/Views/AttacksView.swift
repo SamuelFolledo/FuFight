@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AttacksView: View {
-    @Binding var attacks: [Attack]
+    var attacks: [Attack]
     var sourceType: MovesViewSourceType
+    var moveSelected: ((Attack) -> Void)?
 
     var body: some View {
         VStack {
@@ -43,7 +44,8 @@ struct AttacksView: View {
         ForEach(attacks, id: \.move.id) { move in
             if move.move.position == position {
                 Button(action: {
-                    selectMove(move)
+//                    selectMove(move)
+                    moveSelected?(move)
                 }, label: {
                     Image(move.move.imageName)
                         .defaultImageModifier()
@@ -127,25 +129,25 @@ struct AttacksView: View {
         .allowsHitTesting(false)
     }
 
-    func selectMove(_ selectedMove: Attack) {
-        guard selectedMove.state != .cooldown else { return }
-        for (index, attack) in attacks.enumerated() {
-            if attack.move.id == selectedMove.move.id {
-                attacks[index].setStateTo(.selected)
-            } else {
-                guard attacks[index].state != .cooldown else { continue }
-                attacks[index].setStateTo(.unselected)
-            }
-        }
-    }
+//    func selectMove(_ selectedMove: Attack) {
+//        guard selectedMove.state != .cooldown else { return }
+//        for (index, attack) in attacks.enumerated() {
+//            if attack.move.id == selectedMove.move.id {
+//                attacks[index].setStateTo(.selected)
+//            } else {
+//                guard attacks[index].state != .cooldown else { continue }
+//                attacks[index].setStateTo(.unselected)
+//            }
+//        }
+//    }
 }
 
 #Preview {
     @State var attacks: [Attack] = defaultAllPunchAttacks
 
     return VStack(spacing: 200) {
-        AttacksView(attacks: $attacks, sourceType: .enemy)
+        AttacksView(attacks: attacks, sourceType: .enemy)
 
-        AttacksView(attacks: $attacks, sourceType: .user)
+        AttacksView(attacks: attacks, sourceType: .user)
     }
 }

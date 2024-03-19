@@ -36,6 +36,7 @@ protocol AttackProtocol: MoveProtocol {
 
 struct Attack {
     private(set) var move: any AttackProtocol
+    ///Attack's current cooldown
     private(set) var cooldown: Int = 0
     private(set) var state: MoveButtonState = .initial
     private(set) var fireState: FireState? = nil
@@ -52,7 +53,9 @@ struct Attack {
         switch newState {
         case .cooldown:
             cooldown = move.cooldown
-        case .initial, .unselected, .selected:
+        case .unselected, .selected:
+            break
+        case .initial:
             break
         }
     }
@@ -60,7 +63,7 @@ struct Attack {
     mutating func reduceCooldown() {
         cooldown -= 1
         if cooldown <= 0 {
-            state = .initial
+            setStateTo(.initial)
         }
     }
 

@@ -13,145 +13,86 @@ class Player {
     private(set) var username: String
     private(set) var hp: CGFloat
     let maxHp: CGFloat
-    var attacks: [Attack]
-    var defenses: [Defend]
     private(set) var turns: [Turn] = []
+    var currentTurn: Turn {
+        return turns.last!
+    }
     private(set) var boostLevel = 0
-    private(set) var didMissAttack = false
-    private(set) var hasSpeedBoost = false
-    var isDead: Bool {
-        hp <= 0
+    var isDead: Bool { hp <= 0 }
+    var hpText: String { String(format: "%.2f", hp) }
+    var isEnemy: Bool {
+        if let currentUsername = Account.current?.username {
+            return username != currentUsername
+        }
+        return true
     }
 
+    ///Round 1 initializer
     init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, attacks: [Attack], defenses: [Defend], turns: [Turn] = [], hasSpeedBoost: Bool = false, boostLevel: Int = 0) {
         self.photoUrl = photoUrl
         self.username = username
         self.hp = hp
         self.maxHp = maxHp
-        self.attacks = attacks
-        self.defenses = defenses
         self.turns = turns
         self.boostLevel = boostLevel
     }
 
-    func prepareForNextRound() {
-        var turn = Turn(round: turns.count + 1, hasSpeedBoost: hasSpeedBoost)
-        updateAttacksState(attacks: &attacks, turn: &turn)
-        updateFireState(attacks: &attacks, turn: &turn, boostLevel: &boostLevel)
-        updateDefensesState(defenses: &defenses, turn: &turn)
-        turns.append(turn)
-        didMissAttack = false
+    func createTurn(from currentRound: Round) {
+        let currentTurn = Turn(round: currentRound, isEnemy: isEnemy)
+        turns.append(currentTurn)
+    }
+
+    func generateEnemyTurnIfNeeded(currentRound: Round) {
+        //TODO: Remove this auto generated enemy turn
+        let turn = Turn(round: currentRound, isEnemy: isEnemy)
+        while turn.attack == nil {
+            let randomAttack = Punch.allCases.randomElement()!
+            for (index, attack) in currentRound.enemyAttacks.enumerated() {
+                if attack.move.id == randomAttack.id {
+                    if attack.cooldown <= 0 {
+                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
+                        currentRound.enemyAttacks[index].setStateTo(.selected)
+                        turn.update(attack: currentRound.enemyAttacks[index])
+                    }
+                }
+            }
+        }
+        while turn.defend == nil {
+            let randomDefend = Dash.allCases.randomElement()!
+//            let randomDefend: Dash = [Dash.left, Dash.right].randomElement()!
+            for (index, defend) in currentRound.enemyDefenses.enumerated() {
+                if defend.move.id == randomDefend.id {
+                    if defend.cooldown <= 0 {
+                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
+                        currentRound.enemyDefenses[index].setStateTo(.selected)
+                        turn.update(defend: currentRound.enemyDefenses[index])
+                    }
+                }
+            }
+        }
+        turns[turns.count - 1] = turn
     }
 
     func prepareForRematch() {
         hp = maxHp
-        for index in attacks.indices {
-            attacks[index].restart()
-        }
-        for index in defenses.indices {
-            defenses[index].restart()
-        }
         turns.removeAll()
-        didMissAttack = false
+        setBoostLevel(to: 0)
     }
 
-    func attackMissed() {
-        didMissAttack = true
-        turns.last?.updateTotalDamage(to: nil)
-    }
-
-    func giveSpeedBoost(_ shouldSpeedBoost: Bool) {
-        hasSpeedBoost = shouldSpeedBoost
-        if turns.last != nil {
-            turns.last!.hasSpeedBoost = shouldSpeedBoost
+    func damage(amount: CGFloat?) {
+        if let amount {
+            hp -= amount
         }
-    }
-
-    func damage(amount: CGFloat) {
-        hp -= amount
-        turns.last?.updateTotalDamage(to: amount)
     }
 
     func gameOver() {
         hp = 0
     }
-}
 
-private extension Player {
-    func updateFireState(attacks: inout [Attack], turn: inout Turn, boostLevel: inout Int) {
-        if !didMissAttack,
-           let selectedAttack = turn.attack,
-           selectedAttack.fireState != .big {
-            boostLevel += 1
-            let isMaxBoost = boostLevel > 1
-            for (index, attack) in attacks.enumerated() {
-                switch attacks[index].state {
-                case .selected, .cooldown, .unselected:
-                    continue
-                case .initial:
-                    ///This works because all of attacks's state are either in cooldown or initial
-                    if selectedAttack.move.canBoost {
-                        if !isMaxBoost {
-                            ///Do not boost the hard attacks on stage 1 boost
-                            let indexOfHardAttacks: [AttackPosition] = [.rightHard, .leftHard]
-                            if !indexOfHardAttacks.contains(attacks[index].move.position) {
-                                if attack.move.canBoost {
-                                    attacks[index].setFireTo(.small)
-                                } else {
-                                    attacks[index].setFireTo(.big)
-                                }
-                            } else {
-                                attacks[index].setFireTo(nil)
-                            }
-                        } else {
-                            ///If stage 2 boost, then make all available attacks have a big fire
-                            attacks[index].setFireTo(.big)
-                        }
-                    } else {
-                        removeAllFires()
-                    }
-                }
-            }
-            if isMaxBoost {
-                boostLevel = 0
-            }
-        } else {
-            removeAllFires()
-        }
-
-        func removeAllFires() {
+    func setBoostLevel(to level: Int) {
+        boostLevel = level
+        if boostLevel > 2 {
             boostLevel = 0
-            attacks.indices.forEach {
-                attacks[$0].setFireTo(nil)
-            }
-        }
-    }
-
-    func updateAttacksState(attacks: inout [Attack], turn: inout Turn) {
-        for index in attacks.indices {
-            switch attacks[index].state {
-            case .selected:
-                attacks[index].setStateTo(.cooldown)
-                turn.update(attack: attacks[index])
-            case .cooldown:
-                attacks[index].reduceCooldown()
-            case .initial, .unselected:
-                attacks[index].setStateTo(.initial)
-            }
-        }
-    }
-
-    func updateDefensesState(defenses: inout [Defend], turn: inout Turn) {
-        for index in defenses.indices {
-            switch defenses[index].state {
-            case .selected:
-                defenses[index].setStateTo(.cooldown)
-                turn.update(defend: defenses[index])
-            case .cooldown:
-                defenses[index].reduceCooldown()
-            case .initial, .unselected:
-                defenses[index].setStateTo(.initial)
-            }
         }
     }
 }
