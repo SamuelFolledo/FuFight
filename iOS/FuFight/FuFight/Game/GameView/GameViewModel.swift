@@ -12,6 +12,8 @@ class GameViewModel: BaseViewModel {
     var player: Player
     var enemyPlayer: Player
     var isGameOver: Bool = false
+    ///Note this will not pause the game for online games
+    var isGamePaused: Bool = false
     var timeRemaining = defaultMaxTime
     var isTimerActive: Bool = false
     var isBackgroundLeadingPadding = Bool.random()
