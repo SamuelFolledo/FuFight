@@ -10,11 +10,15 @@ import SwiftUI
 struct PlayerView: View {
     var player: Player
     var rounds: [Round]
+    var onImageTappedAction: (()->Void)?
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             if !player.isEnemy {
                 AccountImage(url: player.photoUrl, radius: 30)
+                    .onTapGesture {
+                        onImageTappedAction?()
+                    }
             }
 
             VStack(alignment: player.isEnemy ? .trailing : .leading, spacing: 4) {

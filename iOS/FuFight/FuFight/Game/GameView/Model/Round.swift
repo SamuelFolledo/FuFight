@@ -54,47 +54,6 @@ class Round {
         self.hasSpeedBoost = hasSpeedBoost
         updateMovesForNextRound(previousRound: previousRound)
     }
-
-    ///Update attacks's fire state based on previous round and boost level
-    func updateAttacksFireStateForNextRound(previousRound: Round, boostLevel: Int) {
-        let didLand = previousRound.damage != nil
-        let didAttack = previousRound.selectedAttack != nil
-        for index in attacks.indices {
-            if !didLand || !didAttack {
-                //If previous attack is nil or missed, do not boost
-                attacks[index].setFireTo(nil)
-                continue
-            }
-            let previousAttack = previousRound.selectedAttack!
-            if !previousAttack.move.canBoost {
-                //If previous attack cannot boost, do not boost
-                attacks[index].setFireTo(nil)
-                continue
-            }
-            //If previous attack landed and can boost, set fire depending on the boost level
-            switch boostLevel {
-            case 0:
-                attacks[index].setFireTo(nil)
-            case 1:
-                //Do not boost the hard attacks on stage 1 boost
-                let hardAttackPositions: [AttackPosition] = [.rightHard, .leftHard]
-                if !hardAttackPositions.contains(attacks[index].move.position) {
-                    if attacks[index].move.canBoost {
-                        //If light or medium attack can boost, set it to small fire
-                        attacks[index].setFireTo(.small)
-                    } else {
-                        //If light or medium attack cannot boost, then set it to big fire
-                        attacks[index].setFireTo(.big)
-                    }
-                }
-            case 2:
-                attacks[index].setFireTo(.big)
-            default:
-                attacks[index].setFireTo(nil)
-                LOGE("Invalid boost level")
-            }
-        }
-    }
 }
 
 private extension Round {

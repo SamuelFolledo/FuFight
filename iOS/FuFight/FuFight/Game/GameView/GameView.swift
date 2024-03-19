@@ -25,7 +25,9 @@ struct GameView: View {
 
             playerMovesView
             
-            PlayerView(player: vm.player, rounds: vm.rounds)
+            PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
+                vm.isGamePaused = true
+            })
                 .padding(.horizontal)
                 .padding(.top, 8)
         }
@@ -36,6 +38,10 @@ struct GameView: View {
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
                secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
                isPresented: $vm.isGameOver)
+        .alert(title: "Game is paused",
+               primaryButton: AlertButton(title: "Resume", action: {}),
+               secondaryButton: AlertButton(title: "Exit", action: { path.removeLast(path.count) }),
+               isPresented: $vm.isGamePaused)
         .overlay {
             timerView
         }
