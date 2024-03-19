@@ -124,9 +124,61 @@ private extension GameViewModel {
             nextRound = Round(round: rounds.count + 1, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, hasSpeedBoost: hasSpeedBoostNextRound, enemyAttacks: defaultAllPunchAttacks, enemyDefenses: defaultAllDashDefenses)
         } else {
             nextRound = Round(previousRound: currentRound, hasSpeedBoost: hasSpeedBoostNextRound)
-            nextRound.updateAttacksFireStateForNextRound(previousRound: currentRound, boostLevel: player.boostLevel)
+            updateAttacksWithFireForNextRound(previousRound: currentRound, attacksToUpdate: &nextRound.attacks, player: player)
+            updateAttacksWithFireForNextRound(previousRound: currentRound, attacksToUpdate: &nextRound.enemyAttacks, player: enemyPlayer)
         }
         rounds.append(nextRound)
+    }
+    
+    ///Update attacks's fire state based on previous round and boost level
+    func updateAttacksWithFireForNextRound(previousRound: Round, attacksToUpdate: inout [Attack], player: Player) {
+        let isEnemy = player.isEnemy
+        let didLand: Bool
+        let didAttack: Bool
+        if isEnemy {
+            didLand = previousRound.enemyDamage != nil
+            didAttack = previousRound.selectedEnemyAttack != nil
+        } else {
+            didLand = previousRound.damage != nil
+            didAttack = previousRound.selectedAttack != nil
+        }
+        for index in attacksToUpdate.indices {
+            if !didLand || !didAttack {
+                //If previous attack is nil or missed, do not boost
+                attacksToUpdate[index].setFireTo(nil)
+                continue
+            }
+            let previousAttack = isEnemy ? previousRound.selectedEnemyAttack! : previousRound.selectedAttack!
+            if !previousAttack.move.canBoost {
+                //If previous attack cannot boost, do not boost
+                attacksToUpdate[index].setFireTo(nil)
+                continue
+            }
+            //If previous attack landed and can boost, set fire depending on the boost level
+            switch player.boostLevel {
+            case 0:
+                attacksToUpdate[index].setFireTo(nil)
+            case 1:
+                //Do not boost the hard attacks on stage 1 boost
+                let hardAttackPositions: [AttackPosition] = [.rightHard, .leftHard]
+                if !hardAttackPositions.contains(attacksToUpdate[index].move.position) {
+                    if attacksToUpdate[index].move.canBoost {
+                        //If light or medium attack can boost, set it to small fire
+                        attacksToUpdate[index].setFireTo(.small)
+                    } else {
+                        //If light or medium attack cannot boost, then set it to big fire
+                        attacksToUpdate[index].setFireTo(.big)
+                    }
+                } else {
+                    attacksToUpdate[index].setFireTo(nil)
+                }
+            case 2:
+                attacksToUpdate[index].setFireTo(.big)
+            default:
+                attacksToUpdate[index].setFireTo(nil)
+                LOGE("Invalid boost level")
+            }
+        }
     }
 
     func calculateDamages() {
@@ -193,7 +245,7 @@ private extension GameViewModel {
         let didDodge = damage == nil || (damage ?? 0) == 0
         if playerToDamage.isEnemy {
             currentRound.damage = damage
-            //Increment boost level if attack landed, or set to 9
+            //Increment boost level if attack landed, or set to 0
             player.setBoostLevel(to: didDodge ? 0 : player.boostLevel + 1)
         } else {
             currentRound.enemyDamage = damage
