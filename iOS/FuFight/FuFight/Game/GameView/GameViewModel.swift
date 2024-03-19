@@ -9,7 +9,7 @@ import SwiftUI
 
 @Observable
 class GameViewModel: BaseViewModel {
-    var currentPlayer: Player
+    var player: Player
     var enemyPlayer: Player
     var isGameOver: Bool = false
     var timeRemaining = defaultMaxTime
@@ -18,17 +18,23 @@ class GameViewModel: BaseViewModel {
     //TODO: Check the actual maximum padding I can have
     var backgroundPadding = Double.random(in: 0...1000)
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    ///Contains each round's information. New round is created at the beginning of each round. Meanwhile a turn gets created at the end of the round
+    var rounds: [Round] = []
+    var currentRound: Round { rounds.last! }
+    ///Keeps track of which player gets the speed boost next round. True if current player attacked first and landed it
+    var hasSpeedBoostNextRound = Int.random(in: 0...1) == 0 //TODO: Multiplayer game mode should be synced between games
 
     ///Initializer for testing purposes
     override init() {
         let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
-        self.currentPlayer = Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
+        startNewGame()
     }
 
     init(enemyPlayer: Player) {
-        self.currentPlayer = Player(photoUrl: Account.current!.photoUrl!, username: Account.current!.displayName, hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.player = Player(photoUrl: Account.current!.photoUrl!, username: Account.current!.displayName, hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         //TODO: Show enemy
         self.enemyPlayer = enemyPlayer
         super.init()
@@ -36,7 +42,7 @@ class GameViewModel: BaseViewModel {
 
     override func onAppear() {
         super.onAppear()
-        startGame()
+        startNewGame()
     }
 
     //MARK: - Public Methods
@@ -49,152 +55,150 @@ class GameViewModel: BaseViewModel {
         }
         if timeRemaining == 0 {
             isTimerActive = false
-            applyDamages()
+            //1. Create a turn from current user's selection
+            player.createTurn(from: currentRound)
+            //2. Get/Fetch enemy's turn
+            enemyPlayer.createTurn(from: currentRound)
+            //TODO: Remove this auto generated enemy turn
+            enemyPlayer.generateEnemyTurnIfNeeded(currentRound: currentRound)
+            //3. Apply damages
+            calculateDamages()
             if !isGameOver {
-                goToNextRound()
+                createNewRound()
+                isTimerActive = true
             }
         }
     }
 
     func rematch() {
-        currentPlayer.prepareForRematch()
+        player.prepareForRematch()
         enemyPlayer.prepareForRematch()
-        startGame()
+        rounds.removeAll()
+        startNewGame()
+    }
+
+    func attackSelected(_ selectedMove: Attack, isEnemy: Bool) {
+        guard selectedMove.state != .cooldown else { return }
+        for (index, attack) in currentRound.attacks.enumerated() {
+            if attack.move.id == selectedMove.move.id {
+                currentRound.attacks[index].setStateTo(.selected)
+            } else {
+                guard currentRound.attacks[index].state != .cooldown else { continue }
+                currentRound.attacks[index].setStateTo(.unselected)
+            }
+        }
+    }
+
+    func defenseSelected(_ selectedMove: Defend, isEnemy: Bool) {
+        guard selectedMove.state != .cooldown else { return }
+        for (index, defense) in currentRound.defenses.enumerated() {
+            if defense.move.id == selectedMove.move.id {
+                currentRound.defenses[index].setStateTo(.selected)
+            } else {
+                guard currentRound.defenses[index].state != .cooldown else { continue }
+                currentRound.defenses[index].setStateTo(.unselected)
+            }
+        }
     }
 }
 
 //MARK: - Private Methods
 private extension GameViewModel {
-    func startGame() {
-        let isCurrentSpeedBoosted = Int.random(in: 0...1) == 0
-        currentPlayer.giveSpeedBoost(isCurrentSpeedBoosted)
-        enemyPlayer.giveSpeedBoost(!isCurrentSpeedBoosted)
-        goToNextRound()
+    func startNewGame() {
+        createNewRound(isFirstRound: true)
+        isTimerActive = true
     }
 
-    func goToNextRound() {
-        currentPlayer.prepareForNextRound()
-        enemyPlayer.prepareForNextRound()
-        isTimerActive = true
+    func createNewRound(isFirstRound: Bool = false) {
+        var nextRound: Round
+        if isFirstRound {
+            nextRound = Round(round: rounds.count + 1, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, hasSpeedBoost: hasSpeedBoostNextRound, enemyAttacks: defaultAllPunchAttacks, enemyDefenses: defaultAllDashDefenses)
+        } else {
+            nextRound = Round(previousRound: currentRound, hasSpeedBoost: hasSpeedBoostNextRound)
+            nextRound.updateAttacksFireStateForNextRound(previousRound: currentRound, boostLevel: player.boostLevel)
+        }
+        rounds.append(nextRound)
     }
 
     func gameOver() {
         if enemyPlayer.hp <= 0 {
             LOGD("Player won")
             enemyPlayer.gameOver()
-        } else if currentPlayer.hp <= 0 {
+        } else if player.hp <= 0 {
             LOGD("Enemy won")
-            currentPlayer.gameOver()
+            player.gameOver()
         }
         isGameOver = true
     }
 
-    func generateEnemyTurn(_ turn: inout Turn) {
-        while turn.attack == nil {
-            let randomAttack = Punch.allCases.randomElement()!
-            for (index, attack) in enemyPlayer.attacks.enumerated() {
-                if attack.move.id == randomAttack.id {
-                    if attack.cooldown <= 0 {
-                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
-                        turn.update(attack: attack)
-                        enemyPlayer.attacks[index].setStateTo(.selected)
-                    }
+    func calculateDamages() {
+        ///1) Check which player  is faster to see who goes first
+        let isCurrentFirst = player.currentTurn.speed > enemyPlayer.currentTurn.speed
+        let firstPlayer = isCurrentFirst ? player : enemyPlayer
+        let secondPlayer = isCurrentFirst ? enemyPlayer : player
+        let firstTurn = firstPlayer.currentTurn
+        let secondTurn = secondPlayer.currentTurn
+        ///2) Apply first attacker's damage
+        var secondAttackDamageReduction: CGFloat = 0
+        if let firstAttack = firstTurn.attack {
+            if secondTurn.didDodge(firstAttack) {
+                applyDamage(nil, to: secondPlayer)
+            } else {
+                let totalDamage = getTotalDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
+                if enemyPlayer.isDead || player.isDead {
+                    return gameOver()
                 }
+                ///Additional damage reduction for the second attacker
+                secondAttackDamageReduction = firstAttack.move.damageReduction
+                applyDamage(totalDamage, to: secondPlayer)
             }
+        } else {
+            applyDamage(0, to: secondPlayer)
         }
-        while turn.defend == nil {
-            let randomDefend = Dash.allCases.randomElement()!
-            for (index, defend) in enemyPlayer.defenses.enumerated() {
-                if defend.move.id == randomDefend.id {
-                    if defend.cooldown <= 0 {
-                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
-                        turn.update(defend: defend)
-                        enemyPlayer.defenses[index].setStateTo(.selected)
-                    }
-                }
-            }
-        }
-    }
 
+        ///3) Apply second attacker's damage
+        if let secondAttack = secondTurn.attack {
+            if firstTurn.didDodge(secondAttack) {
+                applyDamage(nil, to: firstPlayer)
+            } else {
+                let totalDamage = getTotalDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
+                if enemyPlayer.isDead || player.isDead {
+                    return gameOver()
+                }
+                applyDamage(totalDamage, to: firstPlayer)
+            }
+        } else {
+            applyDamage(0, to: firstPlayer)
+        }
+        ///4) For the next turn, give the speed boost to whoever went first
+        //TODO: Fix who gets the speed boost if dodged here
+        hasSpeedBoostNextRound = isCurrentFirst
+    }
 
     /// Returns the attacker's total damage based on defender's defend choice
     /// - Parameters:
     ///   - attackerTurn: attacker's attack
     ///   - defenderTurn: defender's defend choice
     ///   - secondAttackDamageReduction: only pass a value if attacker is going second
-    func calculateDamage(attackerTurn: Turn, defenderTurn: Turn, secondAttackDamageReduction: CGFloat = 0) -> CGFloat {
+    func getTotalDamage(attackerTurn: Turn, defenderTurn: Turn, secondAttackDamageReduction: CGFloat = 0) -> CGFloat {
         let baseDamage = attackerTurn.attack?.move.damage ?? 0
         let defenseDamageMultiplier = attackerTurn.defend?.move.damageMultiplier ?? 0
         let boostDamageMultiplier = attackerTurn.attack?.fireState?.boostMultiplier ?? 0
         let enemyDamageReduction = defenderTurn.defend?.move.defenseMultiplier ?? 0
-        //Total damage = baseDamage * (damageMultiplier + fireDamageMultiplier + 1) * (1 - enemyDamageReduction)
         let totalDamage = baseDamage * (defenseDamageMultiplier + boostDamageMultiplier + 1) * (1 - enemyDamageReduction - secondAttackDamageReduction)
         return totalDamage
     }
 
-    func applyDamages() {
-        let round = currentPlayer.turns.count + 1
-        let currentTurn = Turn(round: round, attacks: currentPlayer.attacks, defenses: currentPlayer.defenses, hasSpeedBoost: currentPlayer.hasSpeedBoost)
-        var enemyTurn = Turn(round: round, attacks: enemyPlayer.attacks, defenses: enemyPlayer.defenses, hasSpeedBoost: enemyPlayer.hasSpeedBoost)
-        //TODO: Remove these auto generated enemy turn
-        generateEnemyTurn(&enemyTurn)
-        ///1) Check who is faster to see who goes first
-        let isCurrentFirst = currentTurn.speed > enemyTurn.speed
-        let firstTurn = isCurrentFirst ? currentTurn : enemyTurn
-        let secondTurn = isCurrentFirst ? enemyTurn : currentTurn
-        ///2) Apply first attacker's damage
-        var secondAttackDamageReduction: CGFloat = 0
-        if let firstAttack = firstTurn.attack {
-            if didLand(attackPosition: firstAttack.move.position, opposingDefense: secondTurn.defend) {
-                let totalDamage = calculateDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
-                if isCurrentFirst {
-                    enemyPlayer.damage(amount: totalDamage)
-                } else {
-                    currentPlayer.damage(amount: totalDamage)
-                }
-                if enemyPlayer.isDead || currentPlayer.isDead {
-                    return gameOver()
-                }
-                ///Additional damage reduction for the second attacker
-                secondAttackDamageReduction = firstAttack.move.damageReduction
-            } else {
-                isCurrentFirst ? currentPlayer.attackMissed() : enemyPlayer.attackMissed()
-            }
+    func applyDamage(_ damage: CGFloat?, to playerToDamage: Player) {
+        playerToDamage.damage(amount: damage)
+        let didDodge = damage == nil || (damage ?? 0) == 0
+        if playerToDamage.isEnemy {
+            currentRound.enemyDamage = damage
+            //Increment boost level if attack landed, or set to 9
+            player.setBoostLevel(to: didDodge ? 0 : player.boostLevel + 1)
         } else {
-            isCurrentFirst ? enemyPlayer.damage(amount: 0) : currentPlayer.damage(amount: 0)
-        }
-        ///3) Apply second attacker's damage
-        if let secondAttack = secondTurn.attack {
-            if didLand(attackPosition: secondAttack.move.position, opposingDefense: firstTurn.defend) {
-                let totalDamage = calculateDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
-                if isCurrentFirst {
-                    currentPlayer.damage(amount: totalDamage)
-                } else {
-                    enemyPlayer.damage(amount: totalDamage)
-                }
-                if enemyPlayer.isDead || currentPlayer.isDead {
-                    return gameOver()
-                }
-            } else {
-                isCurrentFirst ? enemyPlayer.attackMissed() : currentPlayer.attackMissed()
-            }
-        } else {
-            isCurrentFirst ? currentPlayer.damage(amount: 0) : enemyPlayer.damage(amount: 0)
-        }
-        ///4) For the next turn, give the speed boost to whoever went first
-        currentPlayer.giveSpeedBoost(isCurrentFirst)
-        enemyPlayer.giveSpeedBoost(!isCurrentFirst)
-    }
-
-    func didLand(attackPosition: AttackPosition, opposingDefense: Defend?) -> Bool {
-        guard let opposingDefense else { return true }
-        switch opposingDefense.move.position {
-        case .forward, .backward:
-            return true
-        case .left:
-            return !attackPosition.isLeft
-        case .right:
-            return attackPosition.isLeft
+            currentRound.damage = damage
+            enemyPlayer.setBoostLevel(to: didDodge ? 0 : enemyPlayer.boostLevel + 1)
         }
     }
 }

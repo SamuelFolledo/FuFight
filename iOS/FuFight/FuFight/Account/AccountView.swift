@@ -64,6 +64,9 @@ struct AccountView: View {
             backgroundImage
                 .padding(.trailing, 600)
         )
+        .onTapGesture {
+            hideKeyboard()
+        }
     }
 
     var editSaveButton: some View {

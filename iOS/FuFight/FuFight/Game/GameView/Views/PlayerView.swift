@@ -9,33 +9,33 @@ import SwiftUI
 
 struct PlayerView: View {
     var player: Player
-    var isEnemy = false
+    var rounds: [Round]
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
-            if !isEnemy {
+            if !player.isEnemy {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
 
-            VStack(alignment: isEnemy ? .trailing : .leading, spacing: 4) {
-                if !isEnemy {
+            VStack(alignment: player.isEnemy ? .trailing : .leading, spacing: 4) {
+                if !player.isEnemy {
                     nameView
                 }
 
                 hpBarView
 
-                if isEnemy {
+                if player.isEnemy {
                     nameView
                 }
             }
 
-            if isEnemy {
+            if player.isEnemy {
                 AccountImage(url: player.photoUrl, radius: 30)
             }
         }
         .padding(.horizontal, 8)
-        .padding(.top, isEnemy ? 8 : 4)
-        .padding(.bottom, isEnemy ? 4 : 8)
+        .padding(.top, player.isEnemy ? 8 : 4)
+        .padding(.bottom, player.isEnemy ? 4 : 8)
         .background(
             Color.systemGray
                 .ignoresSafeArea()
@@ -88,12 +88,12 @@ struct PlayerView: View {
 
     var nameView: some View {
         HStack {
-            if isEnemy {
+            if player.isEnemy {
                 if !player.turns.isEmpty {
                     damagesList
                 }
 
-                if player.hasSpeedBoost {
+                if !rounds.isEmpty, !rounds.last!.hasSpeedBoost {
                     plusImage
                         .frame(width: 20, height: 20)
                 }
@@ -103,8 +103,8 @@ struct PlayerView: View {
                 .font(mediumTextFont)
                 .foregroundStyle(.white)
 
-            if !isEnemy {
-                if player.hasSpeedBoost {
+            if !player.isEnemy {
+                if !rounds.isEmpty, rounds.last!.hasSpeedBoost {
                     plusImage
                         .frame(width: 20, height: 20)
                 }
@@ -119,18 +119,20 @@ struct PlayerView: View {
     var damagesList: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
-                ForEach(player.turns.dropLast().reversed(), id: \.round) { turn in
+                let rounds = player.hp > 0 ? rounds.dropLast().reversed() : rounds.reversed()
+                ForEach(Array(zip(rounds.indices, rounds)), id: \.1) { index, round in
                     Group {
-                        if let damage = turn.totalDamage {
-                            if damage <= 0 {
-                                Text("Round \(turn.round): N/A")
+                        let totalDamage = player.isEnemy ? rounds[index].enemyDamage : rounds[index].damage
+                        if let totalDamage {
+                            if totalDamage <= 0 {
+                                Text("Round \(round.id): N/A")
                                     .foregroundStyle(.white)
                             } else {
-                                Text("Round \(turn.round): \(damage.intString)")
+                                Text("Round \(round.id): \(totalDamage.intString)")
                                     .foregroundStyle(.red)
                             }
                         } else {
-                            Text("Round \(turn.round): Dodged")
+                            Text("Round \(round.id): Dodged")
                                 .foregroundStyle(.white)
                         }
                     }
@@ -144,12 +146,10 @@ struct PlayerView: View {
 #Preview {
     let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
     return VStack(spacing: 20) {
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 80, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 50, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), 
-                      isEnemy: true)
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 0, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses),
-                      isEnemy: true)
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), rounds: [])
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 80, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), rounds: [])
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 50, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), rounds: [])
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), rounds: [])
+        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 0, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses), rounds: [])
     }
 }

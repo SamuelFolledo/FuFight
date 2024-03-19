@@ -10,26 +10,22 @@ import Foundation
 class Turn {
     private(set) var round: Int
     private(set) var attack: Attack?
-    private(set) var defend: (Defend)?
-    private(set) var speed: CGFloat = 0
-    ///True if user on this turn had the speed boost
-    var hasSpeedBoost: Bool
-    ///nil means no attack selected, 0 means dodged
-    private(set) var totalDamage: CGFloat? = 0
+    private(set) var defend: Defend?
+    var speed: CGFloat = 0
+    private var hasSpeedBoost: Bool = false
 
-    init(round: Int, hasSpeedBoost: Bool) {
-        self.round = round
-        self.attack = nil
-        self.defend = nil
-        self.speed = 0
-        self.hasSpeedBoost = hasSpeedBoost
-    }
-
-    init(round: Int, attacks: [Attack], defenses: [Defend], hasSpeedBoost: Bool) {
-        self.round = round
-        self.attack = attacks.first { $0.state == .selected }
-        self.defend = defenses.first { $0.state == .selected }
-        self.hasSpeedBoost = hasSpeedBoost
+    ///Initializer for completed turn
+    init(round: Round, isEnemy: Bool) {
+        self.round = round.id
+        if isEnemy {
+            attack = round.selectedEnemyAttack
+            defend = round.selectedEnemyDefense
+            hasSpeedBoost = !round.hasSpeedBoost
+        } else {
+            attack = round.selectedAttack
+            defend = round.selectedDefense
+            hasSpeedBoost = round.hasSpeedBoost
+        }
         self.speed = 0
         updateSpeed()
     }
@@ -44,8 +40,11 @@ class Turn {
         updateSpeed()
     }
 
-    func updateTotalDamage(to amount: CGFloat?) {
-        self.totalDamage = amount
+    ///Returns false if the selected defense position can
+    func didDodge(_ enemyAttack: Attack?) -> Bool {
+        guard let enemyAttack else { return true }
+        guard let defend else { return false }
+        return defend.didDodge(enemyAttack.move.position)
     }
 }
 

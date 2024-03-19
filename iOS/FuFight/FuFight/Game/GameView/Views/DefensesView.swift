@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct DefensesView: View {
-    @Binding var defenses: [Defend]
+    var defenses: [Defend]
     var sourceType: MovesViewSourceType
+    var moveSelected: ((Defend) -> Void)?
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -29,7 +30,8 @@ struct DefensesView: View {
         ForEach(defenses, id: \.move.id) { move in
             if move.move.position == position {
                 Button(action: {
-                    selectMove(move)
+//                    selectMove(move)
+                    moveSelected?(move)
                 }, label: {
                     Image(move.move.imageName)
                         .defaultImageModifier()
@@ -62,19 +64,19 @@ struct DefensesView: View {
         }
     }
 
-    func selectMove(_ selectedMove: Defend) {
-        guard selectedMove.state != .cooldown else { return }
-        for (index, defense) in defenses.enumerated() {
-            if defense.move.id == selectedMove.move.id {
-                defenses[index].setStateTo(.selected)
-            } else {
-                guard defenses[index].state != .cooldown else { continue }
-                defenses[index].setStateTo(.unselected)
-            }
-        }
-    }
+//    func selectMove(_ selectedMove: Defend) {
+//        guard selectedMove.state != .cooldown else { return }
+//        for (index, defense) in defenses.enumerated() {
+//            if defense.move.id == selectedMove.move.id {
+//                defenses[index].setStateTo(.selected)
+//            } else {
+//                guard defenses[index].state != .cooldown else { continue }
+//                defenses[index].setStateTo(.unselected)
+//            }
+//        }
+//    }
 }
 
 #Preview {
-    DefensesView(defenses: .constant(defaultAllDashDefenses), sourceType: .enemy)
+    DefensesView(defenses: defaultAllDashDefenses, sourceType: .enemy)
 }

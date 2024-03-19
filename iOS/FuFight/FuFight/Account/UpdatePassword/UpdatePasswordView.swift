@@ -50,6 +50,9 @@ struct UpdatePasswordView: View {
         .safeAreaInset(edge: .bottom) {
             updatePasswordButton
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
         .background(
             backgroundImage
                 .padding(.trailing, 800)

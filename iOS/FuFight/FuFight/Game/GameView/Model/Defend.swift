@@ -55,4 +55,15 @@ struct Defend {
         cooldown = 0
         setStateTo(.initial)
     }
+
+    func didDodge(_ enemyAttackPosition: AttackPosition) -> Bool {
+        switch move.position {
+        case .forward, .backward:
+            return false
+        case .left:
+            return enemyAttackPosition.isLeft
+        case .right:
+            return !enemyAttackPosition.isLeft
+        }
+    }
 }

@@ -15,7 +15,7 @@ struct GameView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .trailing) {
-                PlayerView(player: vm.enemyPlayer, isEnemy: true)
+                PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
                     .padding(.horizontal)
 
                 enemyMovesPreview
@@ -23,16 +23,23 @@ struct GameView: View {
 
             Spacer()
 
-            MovesView(attacks: $vm.currentPlayer.attacks, defenses: $vm.currentPlayer.defenses, sourceType: .user)
-
-            PlayerView(player: vm.currentPlayer)
+            MovesView(attacks: vm.currentRound.attacks, 
+                      defenses: vm.currentRound.defenses,
+                      sourceType: .user,
+                      attackSelected: { attack in
+                vm.attackSelected(attack, isEnemy: false)
+            }, defenseSelected: { defense in
+                vm.defenseSelected(defense, isEnemy: false)
+            })
+            
+            PlayerView(player: vm.player, rounds: vm.rounds)
                 .padding(.horizontal)
                 .padding(.top, 8)
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
                isPresented: $vm.isAlertPresented)
-        .alert(title: vm.currentPlayer.isDead ? "You lost" : "You won!",
+        .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
                secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
                isPresented: $vm.isGameOver)
@@ -74,13 +81,15 @@ struct GameView: View {
     }
 
     var timerView: some View {
-        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.currentPlayer.turns.count)
+        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.rounds.count)
             .frame(width: 160)
             .padding(.bottom, 400)
     }
 
     var enemyMovesPreview: some View {
-        MovesView(attacks: $vm.enemyPlayer.attacks, defenses: $vm.enemyPlayer.defenses, sourceType: .enemy)
+        MovesView(attacks: vm.currentRound.enemyAttacks,
+                  defenses: vm.currentRound.enemyDefenses,
+                  sourceType: .enemy)
             .frame(width: 100, height: 120)
             .padding(.trailing)
     }

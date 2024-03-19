@@ -33,9 +33,6 @@ struct AuthenticationView: View {
                 .padding(.horizontal, horizontalPadding)
                 .allowsHitTesting(vm.loadingMessage == nil)
             }
-            .onTapGesture {
-                hideKeyboard()
-            }
             .navigationBarTitle(vm.step.title, displayMode: .large)
             .overlay {
                 if let message = vm.loadingMessage {
@@ -50,7 +47,7 @@ struct AuthenticationView: View {
                    isPresented: $vm.showForgotPassword)
             .background(
                 backgroundImage
-                    .padding(.leading, 600)
+                    .padding(.trailing, 400)
             )
         }
         .onAppear {
@@ -58,6 +55,9 @@ struct AuthenticationView: View {
         }
         .onDisappear {
             vm.onDisappear()
+        }
+        .onTapGesture {
+            hideKeyboard()
         }
     }
 
