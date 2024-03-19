@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CountdownTimerView: View {
-    var timeRemaining: Int
+    var timeRemaining: CGFloat
     var round: Int
 
     var body: some View {
@@ -20,14 +20,15 @@ struct CountdownTimerView: View {
             )
             .overlay(
                 VStack(spacing: 4) {
-                    Text("\(timeRemaining)")
-                        .font(extraLargeTitleFont)
+                    Text("\(String(format: "%.1f", timeRemaining))")
+                        .font(largeTitleFont)
                         .foregroundStyle(.white)
 
                     Text("Round \(round)")
                         .font(mediumTitleFont)
                         .foregroundStyle(.white)
                 }
+                    .padding(.top, 30)
             )
     }
 }
