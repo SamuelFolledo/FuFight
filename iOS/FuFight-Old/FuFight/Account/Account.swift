@@ -10,7 +10,6 @@ import Foundation
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
-import FirebaseFirestoreSwift
 
 class Account: ObservableObject, Codable {
     @DocumentID var id: String?
