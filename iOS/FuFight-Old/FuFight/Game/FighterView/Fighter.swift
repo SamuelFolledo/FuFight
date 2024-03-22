@@ -11,9 +11,10 @@ class Fighter {
     var name: String = "Samuel"
     var idleImageName: String
     var dodgeImageName: String
-    var isFrontFacing: Bool = true
+    var isFrontFacing: Bool
 
-    init() {
+    init(isEnemy: Bool) {
+        isFrontFacing = isEnemy
         let postFix: String = isFrontFacing ? "Back" : "Front"
         idleImageName = "\(name)-idle\(postFix)"
         dodgeImageName = "\(name)-dodge\(postFix)"

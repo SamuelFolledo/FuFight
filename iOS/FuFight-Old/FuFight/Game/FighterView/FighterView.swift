@@ -8,25 +8,30 @@
 import SwiftUI
 
 struct FighterView: View {
-    var fighter: Fighter = Fighter()
+    var fighter: Fighter
     @State var shouldDodge = false
+    var verticalPadding: CGFloat {
+        fighter.isFrontFacing ? 240 : 70
+    }
+
     var body: some View {
         VStack {
             if shouldDodge {
                 GIFView(type: URLType.name(fighter.dodgeImageName))
-                    .padding(.top, 240)
-                    .padding(.bottom, -240)
+                    .padding(.top, verticalPadding)
+                    .padding(.bottom, -verticalPadding)
                     .frame(width: 358, height: 525) //1204 x 1764
             } else {
                 GIFView(type: URLType.name(fighter.idleImageName))
-                    .padding(.top, 240)
-                    .padding(.bottom, -240)
+                    .padding(.top, verticalPadding)
+                    .padding(.bottom, -verticalPadding)
                     .frame(width: 200, height: 592) //672 x 1992
             }
         }
         .onAppear {
             testAnimations()
         }
+        .padding(.trailing, fighter.isFrontFacing ? 50 : 0)
     }
 
     func getDelay() -> DispatchTime {
@@ -84,6 +89,6 @@ struct FighterView: View {
 
 #Preview {
     return VStack(spacing: 20) {
-        FighterView()
+        FighterView(fighter: Fighter(isEnemy: false))
     }
 }

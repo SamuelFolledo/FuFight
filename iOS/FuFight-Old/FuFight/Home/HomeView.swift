@@ -51,6 +51,7 @@ struct HomeView: View {
         }
         .onAppear {
             vm.onAppear()
+            vm.path.append(GameRoute.game)
         }
         .onDisappear {
             vm.onDisappear()
