@@ -114,9 +114,6 @@ struct GameView: View {
 
     @ViewBuilder var fightersView: some View {
         FighterView()
-            .padding(.top, 240)
-            .padding(.bottom, -240)
-            .frame(width: 200, height: 592)
             .ignoresSafeArea()
     }
 }
