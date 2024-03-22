@@ -13,23 +13,27 @@ struct GameView: View {
     @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .trailing) {
-                PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
-                    .padding(.horizontal)
+        ZStack {
+            fightersView
 
-                enemyMovesView
-            }
+            VStack(spacing: 0) {
+                VStack(alignment: .trailing) {
+                    PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
+                        .padding(.horizontal)
 
-            Spacer()
+                    enemyMovesView
+                }
 
-            playerMovesView
-            
-            PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
-                vm.isGamePaused = true
-            })
+                Spacer()
+
+                playerMovesView
+
+                PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
+                    vm.isGamePaused = true
+                })
                 .padding(.horizontal)
                 .padding(.top, 8)
+            }
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
@@ -53,7 +57,6 @@ struct GameView: View {
         .background(
             gameBackgroundImage
                 .padding(vm.isBackgroundLeadingPadding ? .leading : .trailing, vm.backgroundPadding)
-
         )
         .onAppear {
             vm.onAppear()
@@ -107,6 +110,14 @@ struct GameView: View {
                 vm.defenseSelected(defense, isEnemy: false)
             })
         }
+    }
+
+    @ViewBuilder var fightersView: some View {
+        FighterView()
+            .padding(.top, 240)
+            .padding(.bottom, -240)
+            .frame(width: 200, height: 592)
+            .ignoresSafeArea()
     }
 }
 
