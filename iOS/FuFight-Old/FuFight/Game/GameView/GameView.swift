@@ -113,8 +113,12 @@ struct GameView: View {
     }
 
     @ViewBuilder var fightersView: some View {
-        FighterView()
-            .ignoresSafeArea()
+        ZStack {
+            FighterView(fighter: Fighter(isEnemy: false))
+
+            FighterView(fighter: Fighter(isEnemy: true))
+        }
+        .ignoresSafeArea()
     }
 }
 
