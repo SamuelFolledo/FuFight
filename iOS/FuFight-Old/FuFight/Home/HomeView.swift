@@ -12,21 +12,29 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $vm.path) {
-            ScrollView {
-                VStack {
-                    navigationView
+            GeometryReader { proxy in
+                ScrollView {
+                    ZStack {
+                        FighterPreview()
+                            .frame(width: proxy.size.width, height: proxy.size.height)
 
-                    VStack {
-                        Text("Welcome \(vm.account.displayName)")
-                            .font(mediumTitleFont)
-                            .foregroundStyle(.white)
+                        VStack {
+                            navigationView
 
-                        Spacer()
+                            VStack {
+                                Text("Welcome \(vm.account.displayName)")
+                                    .font(mediumTitleFont)
+                                    .foregroundStyle(.white)
+
+                                Spacer()
+                            }
+                            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                            .padding()
+                        }
                     }
-                    .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                    .padding()
                 }
             }
+            .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
             .overlay {
                 if let message = vm.loadingMessage {
                     ProgressView(message)
@@ -41,7 +49,6 @@ struct HomeView: View {
             .background(
                 backgroundImage
                     .padding(.leading, 30)
-
             )
             .safeAreaInset(edge: .bottom) {
                 playButton

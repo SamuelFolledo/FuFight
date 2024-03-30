@@ -25,13 +25,7 @@ struct ScenekitView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UIViewType {
-        // create and add a camera to the scene
-        cameraNode.camera = SCNCamera()
-        cameraNode.position = .init(x: -5, y: 3.5, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
-        cameraNode.eulerAngles = .init(x: 0, y: -89.5, z: 0) //X: zooms in and out, Y: rotates horizontally, Z: rotates vertically
-
-        scene.rootNode.addChildNode(cameraNode)
-
+        setUpCamera()
         setUpLight()
 
         scene.rootNode.addChildNode(playerNode)
@@ -60,6 +54,14 @@ struct ScenekitView: UIViewRepresentable {
 }
 
 private extension ScenekitView {
+    func setUpCamera() {
+        // create and add a camera to the scene
+        cameraNode.camera = SCNCamera()
+        cameraNode.position = .init(x: -5, y: 3.5, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
+        cameraNode.eulerAngles = .init(x: 0, y: -89.5, z: 0) //X: zooms in and out, Y: rotates horizontally, Z: rotates vertically
+        scene.rootNode.addChildNode(cameraNode)
+    }
+
     func setUpLight() {
         lightNode.light = SCNLight()
         lightNode.position = .init(x: -5, y: 3.5, z: 3.2)
@@ -93,7 +95,6 @@ private extension ScenekitView {
     @State var animationType: FighterAnimationType = animationToTest
     @State var playerNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
     @State var enemyNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
-
 
     return ScenekitView(animation: $animationType, playerNode: $playerNode, enemyNode: $enemyNode)
         .overlay(
