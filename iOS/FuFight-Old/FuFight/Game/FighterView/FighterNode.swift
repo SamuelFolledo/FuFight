@@ -21,9 +21,8 @@ class FighterNode: SCNNode {
     init(fighter: Fighter) {
         self.fighter = fighter
         super.init()
-        LOGD("===========================================================================")
-        setupModel()
-        loadAnimations()
+        LOGD("\n===========================================================================")
+        recreateNode(with: .idle)
         positionModel()
         LOGD("===========================================================================\n\n")
     }
@@ -32,15 +31,20 @@ class FighterNode: SCNNode {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupModel() {
-        LOGD("Setting up \(fighter.type.name)")
-        let fighterScene = try! SCNScene(url: fighter.type.daeUrl!, options: nil)
+    private func recreateNode(with animationType: FighterAnimationType) {
+        fighter.animations.removeAll()
+        daeHolderNode.removeFromParentNode()
+        daeHolderNode.removeAllAnimations(withBlendOutDuration: animationType.fadeOutDuration * 2)
+        daeHolderNode = SCNNode()
+        bonesNode = SCNNode()
+        bonesNode.removeFromParentNode()
+        let animationScene = try! SCNScene(url: fighter.type.animationUrl(animationType)!, options: nil)
         //Correct way of loading a dae model
-        for child in fighterScene.rootNode.childNodes {
+        for child in animationScene.rootNode.childNodes {
             daeHolderNode.addChildNode(child)
         }
-        addChildNode(daeHolderNode)
         bonesNode = daeHolderNode.childNode(withName: fighter.type.bonesName, recursively: true)!
+        addChildNode(daeHolderNode)
     }
 
     private func positionModel() {
@@ -55,20 +59,18 @@ class FighterNode: SCNNode {
 //        rotation = .init(1, 0, 0, 0)
     }
 
-    func loadAnimations() {
-        fighter.animations.removeAll()
-
-        loadAnimation(.idle)
-        loadAnimation(.idleStand)
-        loadAnimation(.idleTired)
-        loadAnimation(.punchHighLightLeft)
-        loadAnimation(.punchHighMediumLeft)
-        loadAnimation(.punchHighHardLeft)
-        loadAnimation(.punchHighLightRight)
-        loadAnimation(.punchHighMediumRight)
-        loadAnimation(.punchHighHardRight)
-        LOGD("Loaded CA animations count: \(fighter.animations.count)")
-    }
+//    func loadAnimations() {
+//        loadAnimation(.idle)
+//        loadAnimation(.idleStand)
+//        loadAnimation(.idleTired)
+//        loadAnimation(.punchHighLightLeft)
+//        loadAnimation(.punchHighMediumLeft)
+//        loadAnimation(.punchHighHardLeft)
+//        loadAnimation(.punchHighLightRight)
+//        loadAnimation(.punchHighMediumRight)
+//        loadAnimation(.punchHighHardRight)
+//        LOGD("Loaded CA animations count: \(fighter.animations.count)")
+//    }
 
     //MARK: - Load animation
     func loadAnimation(_ animationType: FighterAnimationType) {
@@ -96,7 +98,7 @@ class FighterNode: SCNNode {
                 }
             }
             animationsNode.addChildNode(child)
-            animationsNode.isHidden = true
+//            animationsNode.isHidden = true
         }
 
         // Add the node to the holder
@@ -140,36 +142,18 @@ class FighterNode: SCNNode {
         case .stop:
             stopAnimations()
         case .punchHighLightRight, .punchHighMediumRight, .punchHighHardRight, .punchHighLightLeft, .punchHighMediumLeft, .punchHighHardLeft, .idleStand, .idleTired:
-            if let newNode = daeHolderNode.childNode(withName: animationType.rawValue, recursively: true) {
-                //Note: Uncomment below to check the DAE's animation's full duration
-                //                printAnimationDuration(for: animationType)
-                //                LOGD("PLAYING \(bonesNode.animationKeys) at \(bonesNode.name ?? "")")
-                ///Play Animation
-                daeHolderNode.removeFromParentNode()
-                bonesNode.removeFromParentNode()
-                daeHolderNode.removeAllAnimations(withBlendOutDuration: animationType.fadeOutDuration * 2)
-                daeHolderNode = SCNNode()
-                bonesNode = SCNNode()
-                let attackScene = try! SCNScene(url: fighter.type.animationUrl(animationType)!, options: nil)
-                //Correct way of loading a dae model
-                for child in attackScene.rootNode.childNodes {
-                    daeHolderNode.addChildNode(child)
-                }
-                bonesNode = daeHolderNode.childNode(withName: fighter.type.bonesName, recursively: true)!
-                addChildNode(daeHolderNode)
+            //Note: Uncomment below to check the DAE's animation's full duration
+            //                printAnimationDuration(for: animationType)
+            //                LOGD("PLAYING \(bonesNode.animationKeys) at \(bonesNode.name ?? "")")
+            //Play Animation
+            recreateNode(with: animationType)
 
-                ///Go back to idle state
-                let deadline: DispatchTime = .now() + CGFloat(animationType.duration - 0.15)
-                DispatchQueue.main.asyncAfter(deadline: deadline) {
-                    self.daeHolderNode.removeFromParentNode()
-                    self.bonesNode.removeFromParentNode()
-                    self.daeHolderNode = SCNNode()
-                    self.bonesNode = SCNNode()
-                    self.setupModel()
-                    self.loadAnimations()
-                    self.currentAnimation = nil
-                    completion()
-                }
+            //Go back to idle state
+            let deadline: DispatchTime = .now() + CGFloat(animationType.duration - 0.1)
+            DispatchQueue.main.asyncAfter(deadline: deadline) {
+                self.recreateNode(with: .idle)
+                self.currentAnimation = nil
+                completion()
             }
         }
     }
