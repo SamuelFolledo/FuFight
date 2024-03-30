@@ -10,19 +10,21 @@ import SceneKit
 
 ///UIView representable for the GameScene and Fighters
 struct GameSceneView: UIViewRepresentable {
-    typealias UIViewType = SCNView
-    @Binding var animation: FighterAnimationType
-
-    let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
+    @Binding var playerAnimation: FighterAnimationType
+    @Binding var enemyAnimation: FighterAnimationType
     @Binding var playerNode: FighterNode
     @Binding var enemyNode: FighterNode
+
+    typealias UIViewType = SCNView
+    let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
 
-    init(animation: Binding<FighterAnimationType>, playerNode: Binding<FighterNode>, enemyNode: Binding<FighterNode>) {
-        self._animation = animation
+    init(playerNode: Binding<FighterNode>, playerAnimation: Binding<FighterAnimationType>, enemyNode: Binding<FighterNode>, enemyAnimation: Binding<FighterAnimationType>) {
         self._playerNode = playerNode
+        self._playerAnimation = playerAnimation
         self._enemyNode = enemyNode
+        self._enemyAnimation = enemyAnimation
     }
 
     func makeUIView(context: Context) -> UIViewType {
@@ -43,12 +45,16 @@ struct GameSceneView: UIViewRepresentable {
     }
 
     func updateUIView(_ sceneView: UIViewType, context: Context) {
-//        controlAnimation(animation, node: playerNode)
+        controlAnimation(playerAnimation, node: playerNode)
     }
 
     func controlAnimation(_ animationType: FighterAnimationType, node: FighterNode) {
-        if node == playerNode {
-            node.playAnimation(animationType) //TODO: Load other animations and test changing animation
+        if animationType != .idle {
+            if node == playerNode {
+                node.playAnimation(animationType) {
+                    playerAnimation = .idle
+                }
+            }
         }
     }
 }
@@ -92,11 +98,12 @@ private extension GameSceneView {
 }
 
 #Preview("Game's Preview", traits: .portrait) {
-    @State var animationType: FighterAnimationType = animationToTest
+    @State var playerAnimation: FighterAnimationType = animationToTest
     @State var playerNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
+    @State var enemyAnimation: FighterAnimationType = animationToTest
     @State var enemyNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
 
-    return GameSceneView(animation: $animationType, playerNode: $playerNode, enemyNode: $enemyNode)
+    return GameSceneView(playerNode: $playerNode, playerAnimation: $playerAnimation, enemyNode: $enemyNode, enemyAnimation: $enemyAnimation)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
@@ -104,30 +111,34 @@ private extension GameSceneView {
                       attackSelected: { attack in
                           switch attack.move.position {
                           case .leftLight:
-                              playerNode.playAnimation(.punchHighLightLeft)
+                              playerNode.playAnimation(.punchHighLightLeft, completion: goToIdle)
                           case .rightLight:
-                              playerNode.playAnimation(.punchHighLightRight)
+                              playerNode.playAnimation(.punchHighLightRight, completion: goToIdle)
                           case .leftMedium:
-                              playerNode.playAnimation(.punchHighMediumLeft)
+                              playerNode.playAnimation(.punchHighMediumLeft, completion: goToIdle)
                           case .rightMedium:
-                              playerNode.playAnimation(.punchHighMediumRight)
+                              playerNode.playAnimation(.punchHighMediumRight, completion: goToIdle)
                           case .leftHard:
-                              playerNode.playAnimation(.punchHighHardLeft)
+                              playerNode.playAnimation(.punchHighHardLeft, completion: goToIdle)
                           case .rightHard:
-                              playerNode.playAnimation(.punchHighHardRight)
+                              playerNode.playAnimation(.punchHighHardRight, completion: goToIdle)
                           }
                       }, defenseSelected: { defense in
                           switch defense.move.position {
                           case .forward:
-                              playerNode.playAnimation(.idle)
+                              playerNode.playAnimation(.idle, completion: goToIdle)
                           case .left:
-                              playerNode.playAnimation(.idleStand)
+                              playerNode.playAnimation(.idleStand, completion: goToIdle)
                           case .backward:
-                              playerNode.playAnimation(.idleTired)
+                              playerNode.playAnimation(.idleTired, completion: goToIdle)
                           case .right:
-                              playerNode.playAnimation(.idleStand)
+                              playerNode.playAnimation(.idleStand, completion: goToIdle)
                           }
                       })
         )
         .ignoresSafeArea()
+
+    func goToIdle() {
+        playerAnimation = .idle
+    }
 }

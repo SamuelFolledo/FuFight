@@ -11,9 +11,10 @@ import SwiftUI
 class GameViewModel: BaseViewModel {
     var player: Player
     var fighter: FighterNode!
+    var playerAnimation: FighterAnimationType = .idle
     var enemyPlayer: Player
     var enemyFighter: FighterNode!
-    var playerAnimation: FighterAnimationType = animationToTest
+    var enemyAnimation: FighterAnimationType = .idle
     var isGameOver: Bool = false
     ///Note this will not pause the game for online games
     var isGamePaused: Bool = false
@@ -76,6 +77,22 @@ class GameViewModel: BaseViewModel {
         for (index, attack) in currentRound.attacks.enumerated() {
             if attack.move.id == selectedMove.move.id {
                 currentRound.attacks[index].setStateTo(.selected)
+                if let punch = Punch(rawValue: attack.move.id) {
+                    switch punch.position {
+                    case .leftLight:
+                        playerAnimation = .punchHighLightLeft
+                    case .rightLight:
+                        playerAnimation = .punchHighLightRight
+                    case .leftMedium:
+                        playerAnimation = .punchHighMediumLeft
+                    case .rightMedium:
+                        playerAnimation = .punchHighMediumRight
+                    case .leftHard:
+                        playerAnimation = .punchHighHardLeft
+                    case .rightHard:
+                        playerAnimation = .punchHighHardRight
+                    }
+                }
             } else {
                 guard currentRound.attacks[index].state != .cooldown else { continue }
                 currentRound.attacks[index].setStateTo(.unselected)
@@ -88,6 +105,18 @@ class GameViewModel: BaseViewModel {
         for (index, defense) in currentRound.defenses.enumerated() {
             if defense.move.id == selectedMove.move.id {
                 currentRound.defenses[index].setStateTo(.selected)
+                if let move = Dash(rawValue: defense.move.id) {
+                    switch move.position {
+                    case .forward:
+                        playerAnimation = .idle
+                    case .backward:
+                        playerAnimation = .idleStand
+                    case .left:
+                        playerAnimation = .idleTired
+                    case .right:
+                        playerAnimation = .idleTired
+                    }
+                }
             } else {
                 guard currentRound.defenses[index].state != .cooldown else { continue }
                 currentRound.defenses[index].setStateTo(.unselected)
