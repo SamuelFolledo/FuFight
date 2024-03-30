@@ -19,9 +19,6 @@ class GameViewModel: BaseViewModel {
     var isGamePaused: Bool = false
     var timeRemaining = defaultMaxTime
     var isTimerActive: Bool = false
-    var isBackgroundLeadingPadding = Bool.random()
-    //TODO: Check the actual maximum padding I can have
-    var backgroundPadding = Double.random(in: 0...1000)
     let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
     ///Contains each round's information. New round is created at the beginning of each round. Meanwhile a turn gets created at the end of the round
     var rounds: [Round] = []

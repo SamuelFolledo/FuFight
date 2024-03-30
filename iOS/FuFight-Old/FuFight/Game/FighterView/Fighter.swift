@@ -18,9 +18,9 @@ enum FighterType {
         switch self {
         case .samuel:
 //            return "3DAssets.scnassets/Characters/Samuel/assets/samuel"
-            return "3DAssets.scnassets/Characters/\(name)/\(FighterAnimationType.idle.animationPath)"
+            animationPath(.idle)
         case .bianca:
-            return "3DAssets.scnassets/Characters/\(name)/\(FighterAnimationType.idle.animationPath)"
+            animationPath(.idle)
         }
     }
 
@@ -55,9 +55,12 @@ enum FighterType {
         }
     }
 
+    func animationPath(_ animationType: FighterAnimationType) -> String {
+        "3DAssets.scnassets/Characters/\(name)/\(animationType.animationPath)"
+    }
+
     func animationUrl(_ animationType: FighterAnimationType) -> URL? {
-        let path = "3DAssets.scnassets/Characters/\(name)/\(animationType.animationPath)"
-        return Bundle.main.url(forResource: path, withExtension: "dae")
+        return Bundle.main.url(forResource: animationPath(animationType), withExtension: "dae")
     }
 }
 
@@ -67,11 +70,6 @@ class Fighter {
     var animations: [FightAnimation] = []
 
     var name: String { type.name }
-    var postFix: String { isEnemy ? "Back" : "Front" }
-    ///for 2D
-    var idleImageName: String { "\(name)-idle\(postFix)" }
-    ///for 2D
-    var dodgeImageName: String { "\(name)-dodge\(postFix)" }
 
     init(type: FighterType, isEnemy: Bool) {
         self.type = type

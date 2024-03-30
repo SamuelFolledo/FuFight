@@ -23,7 +23,7 @@ class FighterNode: SCNNode {
         LOGD("===========================================================================")
         setupModel()
         loadAnimations()
-        positionModel(self)
+        positionModel()
         LOGD("===========================================================================\n\n")
     }
 
@@ -42,24 +42,16 @@ class FighterNode: SCNNode {
         bonesNode = daeHolderNode.childNode(withName: fighter.type.bonesName, recursively: true)!
     }
 
-    private func positionModel(_ node: SCNNode) {
-        if node == self {
-            node.scale = SCNVector3Make(fighter.type.scale, fighter.type.scale, fighter.type.scale)
-            let xPosition: Float = fighter.isEnemy ? 1.5 : 0    //further
-            let yPosition: Float = 0.5                          //vertical position
-            let zPosition: Float = fighter.isEnemy ? 3.2 : 3    //horizontal position
-            node.position = SCNVector3Make(xPosition, yPosition, zPosition)
-//            node.skinner = nil
-            let angle: Float = fighter.isEnemy ? -90 : 90
-            node.eulerAngles = .init(x: 0, y: angle, z: 0)
-            //        node.rotation = .init(1, 0, 0, 0)
-        } else {
-//            node.skinner = nil //uncommenting this makes the node not animate
-            LOGD("Positioninggg \(node.name ?? "")")
-            node.position = position
-            node.eulerAngles = eulerAngles
-            node.scale = scale
-        }
+    private func positionModel() {
+        scale = SCNVector3Make(fighter.type.scale, fighter.type.scale, fighter.type.scale)
+        let xPosition: Float = fighter.isEnemy ? 1.5 : 0    //further
+        let yPosition: Float = 0.5                          //vertical position
+        let zPosition: Float = fighter.isEnemy ? 3.2 : 3    //horizontal position
+        position = SCNVector3Make(xPosition, yPosition, zPosition)
+        let angle: Float = fighter.isEnemy ? -90 : 90
+        eulerAngles = .init(x: 0, y: angle, z: 0)
+//        skinner = nil
+//        rotation = .init(1, 0, 0, 0)
     }
 
     func loadAnimations() {
@@ -74,13 +66,12 @@ class FighterNode: SCNNode {
         loadAnimation(.punchHighLightRight)
         loadAnimation(.punchHighMediumRight)
         loadAnimation(.punchHighHardRight)
-
-        LOGD("Loaded animations count: \(fighter.animations.count)")
+        LOGD("Loaded CA animations count: \(fighter.animations.count)")
     }
 
     //MARK: - Load animation
     func loadAnimation(_ animationType: FighterAnimationType) {
-        // Load the character in the idle animation
+        // Load the dae file for that animation
         let path = "3DAssets.scnassets/Characters/\(fighter.name)/\(animationType.animationPath)"
         let scene = SCNScene(named: path)!
 
