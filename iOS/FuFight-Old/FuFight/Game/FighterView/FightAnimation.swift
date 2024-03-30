@@ -89,6 +89,16 @@ enum FighterAnimationType: String, CaseIterable {
         }
     }
 
+    ///Returns true if dae file's childNodes has animationKeys
+    var hasCaAnimation: Bool {
+        switch self {
+        case .idle:
+            true
+        case .punchHighLightRight, .punchHighMediumRight, .punchHighHardRight, .punchHighLightLeft, .punchHighMediumLeft, .punchHighHardLeft, .idleStand, .idleTired, .stop:
+            false
+        }
+    }
+
     var isRemovedFromCompletion: Bool {
         switch self {
         case .idle, .idleStand, .idleTired, .stop:

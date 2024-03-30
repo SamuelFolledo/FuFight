@@ -20,6 +20,11 @@ struct FighterPreview: UIViewRepresentable {
         view.backgroundColor = UIColor.clear
         view.allowsCameraControl = true
         view.autoenablesDefaultLighting = true
+        view.allowsCameraControl = true
+        view.defaultCameraController.interactionMode = .orbitTurntable
+        view.defaultCameraController.inertiaEnabled = true
+        view.defaultCameraController.maximumVerticalAngle = 89
+        view.defaultCameraController.minimumVerticalAngle = -89
         let path = "3DAssets.scnassets/Characters/\(fighter.name)/\(animation.animationPath)"
         view.scene = SCNScene(named: path)
         return view
