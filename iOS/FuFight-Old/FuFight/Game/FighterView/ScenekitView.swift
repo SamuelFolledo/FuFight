@@ -8,7 +8,8 @@
 import SwiftUI
 import SceneKit
 
-struct ScenekitView : UIViewRepresentable {
+struct ScenekitView: UIViewRepresentable {
+    typealias UIViewType = SCNView
     @Binding var animation: FighterAnimationType
 
     let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
@@ -23,11 +24,12 @@ struct ScenekitView : UIViewRepresentable {
         self._enemyNode = enemyNode
     }
 
-    func makeUIView(context: Context) -> SCNView {
+    func makeUIView(context: Context) -> UIViewType {
         // create and add a camera to the scene
         cameraNode.camera = SCNCamera()
         cameraNode.position = .init(x: -5, y: 3.5, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
         cameraNode.eulerAngles = .init(x: 0, y: -89.5, z: 0) //X: zooms in and out, Y: rotates horizontally, Z: rotates vertically
+
         scene.rootNode.addChildNode(cameraNode)
 
         setUpLight()
@@ -39,8 +41,9 @@ struct ScenekitView : UIViewRepresentable {
         return scnView
     }
 
-    func updateUIView(_ sceneView: SCNView, context: Context) {
+    func updateUIView(_ sceneView: UIViewType, context: Context) {
         sceneView.scene = scene
+
         // allows the user to manipulate the camera
         //TODO: 1 Set allowsCameraControl to false for production
         sceneView.allowsCameraControl = true
@@ -51,7 +54,7 @@ struct ScenekitView : UIViewRepresentable {
     func controlAnimation(_ animationType: FighterAnimationType, node: FighterNode) {
 //        LOGD("333 Playing \(animationType.rawValue)--")
         if node == playerNode {
-            node.playAnimation(animationType)
+            node.playAnimation(animationType) //TODO: Load other animations and test changing animation
         }
     }
 }

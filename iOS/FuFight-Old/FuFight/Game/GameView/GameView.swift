@@ -13,27 +13,27 @@ struct GameView: View {
     @Environment(\.scenePhase) var scenePhase
 
     var body: some View {
-        ZStack {
-            fightersView
+        VStack(spacing: 0) {
+            VStack(alignment: .trailing) {
+                PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
+                    .padding(.horizontal)
 
-            VStack(spacing: 0) {
-                VStack(alignment: .trailing) {
-                    PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
-                        .padding(.horizontal)
-
-                    enemyMovesView
-                }
-
-                Spacer()
-
-                playerMovesView
-
-                PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
-                    vm.isGamePaused = true
-                })
-                .padding(.horizontal)
-                .padding(.top, 8)
+                enemyMovesView
             }
+
+            Spacer()
+
+            playerMovesView
+
+            PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
+                vm.isGamePaused = true
+            })
+            .padding(.horizontal)
+            .padding(.top, 8)
+        }
+        .background {
+            ScenekitView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
+                .ignoresSafeArea()
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
@@ -54,10 +54,6 @@ struct GameView: View {
                 ProgressView(message)
             }
         }
-        .background(
-            gameBackgroundImage
-                .padding(vm.isBackgroundLeadingPadding ? .leading : .trailing, vm.backgroundPadding)
-        )
         .onAppear {
             vm.onAppear()
         }
@@ -115,9 +111,6 @@ struct GameView: View {
     @ViewBuilder var fightersView: some View {
         ZStack {
             ScenekitView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
-//            FighterView(fighter: Fighter(type: .samuel, isEnemy: false)) //fix isEnemy is flipped
-//
-//            FighterView(fighter: Fighter(type: .samuel, isEnemy: true))
         }
         .ignoresSafeArea()
     }
