@@ -11,7 +11,7 @@ struct FighterView: View {
     var fighter: Fighter
     @State var shouldDodge = false
     var verticalPadding: CGFloat {
-        fighter.isFrontFacing ? 240 : 70
+        fighter.isEnemy ? 240 : 70
     }
 
     var body: some View {
@@ -31,7 +31,7 @@ struct FighterView: View {
         .onAppear {
             testAnimations()
         }
-        .padding(.trailing, fighter.isFrontFacing ? 50 : 0)
+        .padding(.trailing, fighter.isEnemy ? 50 : 0)
     }
 
     func getDelay() -> DispatchTime {
@@ -89,6 +89,6 @@ struct FighterView: View {
 
 #Preview {
     return VStack(spacing: 20) {
-        FighterView(fighter: Fighter(isEnemy: false))
+        FighterView(fighter: Fighter(type: .samuel, isEnemy: false))
     }
 }

@@ -36,6 +36,9 @@ let defaultMaxTime: CGFloat = 5
 let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
 
+
+var animationToTest: FighterAnimationType = .punchHighHardRight
+
 //Fonts
 let defaultFontSize: CGFloat = 16
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)

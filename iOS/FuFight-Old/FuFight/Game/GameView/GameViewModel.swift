@@ -10,7 +10,10 @@ import SwiftUI
 @Observable
 class GameViewModel: BaseViewModel {
     var player: Player
+    var fighter: FighterNode!
     var enemyPlayer: Player
+    var enemyFighter: FighterNode!
+    var playerAnimation: FighterAnimationType = animationToTest
     var isGameOver: Bool = false
     ///Note this will not pause the game for online games
     var isGamePaused: Bool = false
@@ -32,6 +35,7 @@ class GameViewModel: BaseViewModel {
         self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
         super.init()
+        populateFighters()
     }
 
     init(enemyPlayer: Player) {
@@ -39,6 +43,12 @@ class GameViewModel: BaseViewModel {
         //TODO: Show enemy
         self.enemyPlayer = enemyPlayer
         super.init()
+        populateFighters()
+    }
+
+    func populateFighters() {
+        self.fighter = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
+        self.enemyFighter = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
     }
 
     override func onAppear() {

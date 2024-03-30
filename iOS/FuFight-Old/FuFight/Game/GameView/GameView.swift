@@ -114,9 +114,10 @@ struct GameView: View {
 
     @ViewBuilder var fightersView: some View {
         ZStack {
-            FighterView(fighter: Fighter(isEnemy: false))
-
-            FighterView(fighter: Fighter(isEnemy: true))
+            ScenekitView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
+//            FighterView(fighter: Fighter(type: .samuel, isEnemy: false)) //fix isEnemy is flipped
+//
+//            FighterView(fighter: Fighter(type: .samuel, isEnemy: true))
         }
         .ignoresSafeArea()
     }
