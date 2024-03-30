@@ -32,7 +32,7 @@ struct GameView: View {
             .padding(.top, 8)
         }
         .background {
-            ScenekitView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
+            GameSceneView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
                 .ignoresSafeArea()
         }
         .alert(title: vm.alertTitle,
@@ -106,13 +106,6 @@ struct GameView: View {
                 vm.defenseSelected(defense, isEnemy: false)
             })
         }
-    }
-
-    @ViewBuilder var fightersView: some View {
-        ZStack {
-            ScenekitView(animation: $vm.playerAnimation, playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
-        }
-        .ignoresSafeArea()
     }
 }
 

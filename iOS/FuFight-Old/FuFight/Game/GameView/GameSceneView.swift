@@ -1,5 +1,5 @@
 //
-//  ScenekitView.swift
+//  GameSceneView.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 3/24/24.
@@ -8,7 +8,8 @@
 import SwiftUI
 import SceneKit
 
-struct ScenekitView: UIViewRepresentable {
+///UIView representable for the GameScene and Fighters
+struct GameSceneView: UIViewRepresentable {
     typealias UIViewType = SCNView
     @Binding var animation: FighterAnimationType
 
@@ -31,29 +32,28 @@ struct ScenekitView: UIViewRepresentable {
         scene.rootNode.addChildNode(playerNode)
 
         scene.rootNode.addChildNode(enemyNode)
-        let scnView = SCNView()
-        return scnView
+
+        let sceneView = SCNView()
+        //TODO: 1 Set allowsCameraControl to false for production
+        // allows the user to manipulate the camera
+        sceneView.allowsCameraControl = true
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.scene = scene
+        return sceneView
     }
 
     func updateUIView(_ sceneView: UIViewType, context: Context) {
-        sceneView.scene = scene
-
-        // allows the user to manipulate the camera
-        //TODO: 1 Set allowsCameraControl to false for production
-        sceneView.allowsCameraControl = true
-        sceneView.autoenablesDefaultLighting = true
-        controlAnimation(animation, node: playerNode)
+//        controlAnimation(animation, node: playerNode)
     }
 
     func controlAnimation(_ animationType: FighterAnimationType, node: FighterNode) {
-//        LOGD("333 Playing \(animationType.rawValue)--")
         if node == playerNode {
             node.playAnimation(animationType) //TODO: Load other animations and test changing animation
         }
     }
 }
 
-private extension ScenekitView {
+private extension GameSceneView {
     func setUpCamera() {
         // create and add a camera to the scene
         cameraNode.camera = SCNCamera()
@@ -96,7 +96,7 @@ private extension ScenekitView {
     @State var playerNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
     @State var enemyNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
 
-    return ScenekitView(animation: $animationType, playerNode: $playerNode, enemyNode: $enemyNode)
+    return GameSceneView(animation: $animationType, playerNode: $playerNode, enemyNode: $enemyNode)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
