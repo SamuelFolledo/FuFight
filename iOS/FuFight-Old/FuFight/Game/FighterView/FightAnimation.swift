@@ -120,6 +120,7 @@ enum FighterAnimationType: String, CaseIterable {
         }
     }
 
+    ///duration in seconds
     var duration: CGFloat {
         switch self {
         case .idleStand:
