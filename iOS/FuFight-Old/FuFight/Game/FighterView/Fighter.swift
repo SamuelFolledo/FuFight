@@ -7,6 +7,18 @@
 
 import Foundation
 
+class Fighter {
+    var isEnemy: Bool
+    var node: FighterNode!
+
+    var name: String { node.type.name }
+
+    init(type: FighterType, isEnemy: Bool) {
+        self.isEnemy = isEnemy
+        self.node = FighterNode(type: type, isEnemy: isEnemy)
+    }
+}
+
 enum FighterType {
     case samuel, bianca
 
@@ -64,15 +76,3 @@ enum FighterType {
     }
 }
 
-class Fighter {
-    var type: FighterType
-    var isEnemy: Bool
-    var animations: [FightAnimation] = []
-
-    var name: String { type.name }
-
-    init(type: FighterType, isEnemy: Bool) {
-        self.type = type
-        self.isEnemy = isEnemy
-    }
-}

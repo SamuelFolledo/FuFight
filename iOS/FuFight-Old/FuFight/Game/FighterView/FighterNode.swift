@@ -9,18 +9,19 @@ import SceneKit
 
 ///3D model of the fighter
 class FighterNode {
+    let type: FighterType
+    let isEnemy: Bool
+    var defaultAnimation: FighterAnimationType
 
-    var fighter: Fighter
-
-    //MARK: Nodes
+    ///Will contain all of the fighter node
     var daeHolderNode = SCNNode()
     ///parent of all animation nodes
     var animationsNode: SCNNode!
-    var defaultAnimation: FighterAnimationType
     var currentAnimation: FighterAnimationType?
 
-    init(fighter: Fighter) {
-        self.fighter = fighter
+    init(type: FighterType, isEnemy: Bool) {
+        self.type = type
+        self.isEnemy = isEnemy
         LOGD("===========================================================================")
         defaultAnimation = .idle
         createNode()
@@ -37,21 +38,20 @@ class FighterNode {
 
     ///Create a dae model with default animation
     private func createNode() {
-        fighter.animations.removeAll()
-        let animationScene = try! SCNScene(url: fighter.type.animationUrl(defaultAnimation)!, options: nil)
+        let animationScene = try! SCNScene(url: type.animationUrl(defaultAnimation)!, options: nil)
         for child in animationScene.rootNode.childNodes {
             daeHolderNode.addChildNode(child)
         }
-        animationsNode = daeHolderNode.childNode(withName: fighter.type.bonesName, recursively: true)!
+        animationsNode = daeHolderNode.childNode(withName: type.bonesName, recursively: true)!
     }
 
     private func positionModel() {
-        daeHolderNode.scale = SCNVector3Make(fighter.type.scale, fighter.type.scale, fighter.type.scale)
-        let xPosition: Float = fighter.isEnemy ? 1.5 : 0    //further
+        daeHolderNode.scale = SCNVector3Make(type.scale, type.scale, type.scale)
+        let xPosition: Float = isEnemy ? 1.5 : 0    //further
         let yPosition: Float = 0.5                          //vertical position
-        let zPosition: Float = fighter.isEnemy ? 2.7 : 3    //horizontal position
+        let zPosition: Float = isEnemy ? 2.7 : 3    //horizontal position
         daeHolderNode.position = SCNVector3Make(xPosition, yPosition, zPosition)
-        let angle: Float = fighter.isEnemy ? -89.5 : 90
+        let angle: Float = isEnemy ? -89.5 : 90
         daeHolderNode.eulerAngles = .init(x: 0, y: angle, z: 0)
 //        skinner = nil
 //        rotation = .init(1, 0, 0, 0)
@@ -61,13 +61,12 @@ class FighterNode {
         for animationType in animations {
             addAnimationPlayer(animationType)
         }
-        LOGD("Loaded animations count: \(fighter.animations.count)")
     }
 
     ///Adds animation player to the animationsNode with the animationType.rawValue as the key
     private func addAnimationPlayer(_ animationType: FighterAnimationType) {
         // Load the dae file for that animation
-        let path = "3DAssets.scnassets/Characters/\(fighter.name)/\(animationType.animationPath)"
+        let path = "3DAssets.scnassets/Characters/\(type.name)/\(animationType.animationPath)"
         let scene = SCNScene(named: path)!
         //Grab the animation from the child or grandchild and add the animation player to the animationsNode
         outerLoop: for child in scene.rootNode.childNodes {
@@ -96,9 +95,7 @@ class FighterNode {
             LOGDE("Missing caAnimation for \(animationType.rawValue) from \(node.name ?? "")")
             return nil
         }
-        let fightAnimation = FightAnimation(animationType, animation: caAnimation)
-        fighter.animations.append(fightAnimation)
-        let animationPlayer = SCNAnimationPlayer(animation: SCNAnimation(caAnimation: fightAnimation.animation))
+        let animationPlayer = SCNAnimationPlayer(animation: SCNAnimation(caAnimation: caAnimation))
         return animationPlayer
     }
 
