@@ -10,26 +10,26 @@ import SceneKit
 
 ///UIView representable for the GameScene and Fighters
 struct GameSceneView: UIViewRepresentable {
-    @Binding var playerNode: FighterNode
-    @Binding var enemyNode: FighterNode
+    @Binding var fighter: Fighter
+    @Binding var enemyFighter: Fighter
 
     typealias UIViewType = SCNView
     let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
 
-    init(playerNode: Binding<FighterNode>, enemyNode: Binding<FighterNode>) {
-        self._playerNode = playerNode
-        self._enemyNode = enemyNode
+    init(fighter: Binding<Fighter>, enemyFighter: Binding<Fighter>) {
+        self._fighter = fighter
+        self._enemyFighter = enemyFighter
     }
 
     func makeUIView(context: Context) -> UIViewType {
         setUpCamera()
         setUpLight()
 
-        scene.rootNode.addChildNode(playerNode.daeHolderNode)
+        scene.rootNode.addChildNode(fighter.node.daeHolderNode)
 
-        scene.rootNode.addChildNode(enemyNode.daeHolderNode)
+        scene.rootNode.addChildNode(enemyFighter.node.daeHolderNode)
 
         let sceneView = SCNView()
         //TODO: 1 Set allowsCameraControl to false for production
@@ -83,11 +83,11 @@ private extension GameSceneView {
 
 #Preview("Game's Preview", traits: .portrait) {
     @State var playerAnimation: FighterAnimationType = animationToTest
-    @State var playerNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
+    @State var fighter = Fighter(type: .samuel, isEnemy: false)
     @State var enemyAnimation: FighterAnimationType = animationToTest
-    @State var enemyNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
+    @State var enemyFighter = Fighter(type: .samuel, isEnemy: true)
 
-    return GameSceneView(playerNode: $playerNode, enemyNode: $enemyNode)
+    return GameSceneView(fighter: $fighter, enemyFighter: $enemyFighter)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
@@ -95,28 +95,28 @@ private extension GameSceneView {
                       attackSelected: { attack in
                           switch attack.move.position {
                           case .leftLight:
-                              playerNode.playAnimation(.punchHighLightLeft)
+                              fighter.node.playAnimation(.punchHighLightLeft)
                           case .rightLight:
-                              playerNode.playAnimation(.punchHighLightRight)
+                              fighter.node.playAnimation(.punchHighLightRight)
                           case .leftMedium:
-                              playerNode.playAnimation(.punchHighMediumLeft)
+                              fighter.node.playAnimation(.punchHighMediumLeft)
                           case .rightMedium:
-                              playerNode.playAnimation(.punchHighMediumRight)
+                              fighter.node.playAnimation(.punchHighMediumRight)
                           case .leftHard:
-                              playerNode.playAnimation(.punchHighHardLeft)
+                              fighter.node.playAnimation(.punchHighHardLeft)
                           case .rightHard:
-                              playerNode.playAnimation(.punchHighHardRight)
+                              fighter.node.playAnimation(.punchHighHardRight)
                           }
                       }, defenseSelected: { defense in
                           switch defense.move.position {
                           case .forward:
-                              playerNode.playAnimation(.idleStand)
+                              fighter.node.playAnimation(.idleStand)
                           case .left:
-                              playerNode.playAnimation(.idle)
+                              fighter.node.playAnimation(.idle)
                           case .backward:
-                              playerNode.playAnimation(.idleStand)
+                              fighter.node.playAnimation(.idleStand)
                           case .right:
-                              playerNode.playAnimation(.idle)
+                              fighter.node.playAnimation(.idle)
                           }
                       })
         )

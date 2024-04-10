@@ -10,9 +10,9 @@ import SwiftUI
 @Observable
 class GameViewModel: BaseViewModel {
     var player: Player
-    var fighter: FighterNode!
+    var fighter: Fighter!
     var enemyPlayer: Player
-    var enemyFighter: FighterNode!
+    var enemyFighter: Fighter!
     var isGameOver: Bool = false
     ///Note this will not pause the game for online games
     var isGamePaused: Bool = false
@@ -43,8 +43,8 @@ class GameViewModel: BaseViewModel {
     }
 
     func populateFighters() {
-        self.fighter = FighterNode(fighter: Fighter(type: .samuel, isEnemy: false))
-        self.enemyFighter = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
+        self.fighter = Fighter(type: .samuel, isEnemy: false)
+        self.enemyFighter = Fighter(type: .samuel, isEnemy: true)
     }
 
     override func onAppear() {
@@ -75,12 +75,8 @@ class GameViewModel: BaseViewModel {
         for (index, attack) in currentRound.attacks.enumerated() {
             if attack.move.id == selectedMove.move.id {
                 currentRound.attacks[index].setStateTo(.selected)
-//                if let move = Punch(rawValue: attack.move.id),
-//                   let animationType = fighter.fighter.animations.first(where: { $0.type == move.animationType })?.type {
-//                    fighter.playAnimation(animationType)
-//                }
                 if let move = Punch(rawValue: selectedMove.move.id) {
-                    fighter.playAnimation(move.animationType)
+                    fighter.node.playAnimation(move.animationType)
                 }
             } else {
                 guard currentRound.attacks[index].state != .cooldown else { continue }
@@ -94,12 +90,8 @@ class GameViewModel: BaseViewModel {
         for (index, defense) in currentRound.defenses.enumerated() {
             if defense.move.id == selectedMove.move.id {
                 currentRound.defenses[index].setStateTo(.selected)
-//                if let move = Dash(rawValue: defense.move.id),
-//                   let animationType = fighter.fighter.animations.first(where: { $0.type == move.animationType })?.type {
-//                    fighter.playAnimation(animationType)
-//                }
                 if let move = Dash(rawValue: selectedMove.move.id) {
-                    fighter.playAnimation(move.animationType)
+                    fighter.node.playAnimation(move.animationType)
                 }
             } else {
                 guard currentRound.defenses[index].state != .cooldown else { continue }
