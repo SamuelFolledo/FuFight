@@ -52,28 +52,6 @@ enum FighterAnimationType: String, CaseIterable {
         }
     }
 
-    ///Expected animation key from the dae file
-//    var animationKey: String? {
-//        switch self {
-//        case .idle:
-//            "keyframedAnimations2" //at "Armature" //or "unnamed_animation__1" at "mixamorig_Hips"
-//        case .punchHighLightRight:
-//            "punchUpMedium" // at "Armature"
-//        case .punchHighMediumRight:
-//            "punchUpMedium-1" // at "Armature"
-//        case .punchHighHardRight:
-//            "punchUpHard-1" // at "Armature"
-//        case .punchHighLightLeft, .punchHighMediumLeft, .punchHighHardLeft:
-//            "punchUpLight-1" // at "Armature"
-//        case .idleTired:
-//            "idleFight-1" // at "Armature"
-//        case .idleStand:
-//            "idleStand-1" // at "Armature"
-//        case .stop:
-//            nil
-//        }
-//    }
-
     var isRemovedFromCompletion: Bool {
         switch self {
         case .idle, .idleStand, .stop:
