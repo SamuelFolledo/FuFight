@@ -11,7 +11,7 @@ class Fighter {
     var isEnemy: Bool
     var node: FighterNode!
 
-    var name: String { node.type.name }
+    var name: String { node.fighterType.name }
 
     init(type: FighterType, isEnemy: Bool) {
         self.isEnemy = isEnemy
