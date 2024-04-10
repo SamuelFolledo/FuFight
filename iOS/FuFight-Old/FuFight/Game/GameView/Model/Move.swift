@@ -7,19 +7,15 @@
 
 import SwiftUI
 
-enum MoveType {
-    case attack
-    case defend
-}
-
 protocol MoveProtocol: Hashable {
     var name: String { get }
     var id: String { get }
-    var backgroundColor: Color { get }
-    var imageName: String { get }
-    var moveType: MoveType { get }
+    var iconName: String { get }
+    var backgroundIconName: String { get }
     var padding: Double { get }
     var cooldown: Int { get }
+    ///animation to play for this attack
+    var animationType: FighterAnimationType { get }
 }
 
 enum MoveButtonState: Int {

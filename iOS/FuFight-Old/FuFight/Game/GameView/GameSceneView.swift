@@ -10,8 +10,6 @@ import SceneKit
 
 ///UIView representable for the GameScene and Fighters
 struct GameSceneView: UIViewRepresentable {
-    @Binding var playerAnimation: FighterAnimationType
-    @Binding var enemyAnimation: FighterAnimationType
     @Binding var playerNode: FighterNode
     @Binding var enemyNode: FighterNode
 
@@ -20,20 +18,18 @@ struct GameSceneView: UIViewRepresentable {
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
 
-    init(playerNode: Binding<FighterNode>, playerAnimation: Binding<FighterAnimationType>, enemyNode: Binding<FighterNode>, enemyAnimation: Binding<FighterAnimationType>) {
+    init(playerNode: Binding<FighterNode>, enemyNode: Binding<FighterNode>) {
         self._playerNode = playerNode
-        self._playerAnimation = playerAnimation
         self._enemyNode = enemyNode
-        self._enemyAnimation = enemyAnimation
     }
 
     func makeUIView(context: Context) -> UIViewType {
         setUpCamera()
         setUpLight()
 
-        scene.rootNode.addChildNode(playerNode)
+        scene.rootNode.addChildNode(playerNode.daeHolderNode)
 
-        scene.rootNode.addChildNode(enemyNode)
+        scene.rootNode.addChildNode(enemyNode.daeHolderNode)
 
         let sceneView = SCNView()
         //TODO: 1 Set allowsCameraControl to false for production
@@ -44,26 +40,14 @@ struct GameSceneView: UIViewRepresentable {
         return sceneView
     }
 
-    func updateUIView(_ sceneView: UIViewType, context: Context) {
-        controlAnimation(playerAnimation, node: playerNode)
-    }
-
-    func controlAnimation(_ animationType: FighterAnimationType, node: FighterNode) {
-        if animationType != .idle {
-            if node == playerNode {
-                node.playAnimation(animationType) {
-                    playerAnimation = .idle
-                }
-            }
-        }
-    }
+    func updateUIView(_ sceneView: UIViewType, context: Context) {}
 }
 
 private extension GameSceneView {
     func setUpCamera() {
         // create and add a camera to the scene
         cameraNode.camera = SCNCamera()
-        cameraNode.position = .init(x: -5, y: 3.5, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
+        cameraNode.position = .init(x: -6, y: 4, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
         cameraNode.eulerAngles = .init(x: 0, y: -89.5, z: 0) //X: zooms in and out, Y: rotates horizontally, Z: rotates vertically
         scene.rootNode.addChildNode(cameraNode)
     }
@@ -103,7 +87,7 @@ private extension GameSceneView {
     @State var enemyAnimation: FighterAnimationType = animationToTest
     @State var enemyNode = FighterNode(fighter: Fighter(type: .samuel, isEnemy: true))
 
-    return GameSceneView(playerNode: $playerNode, playerAnimation: $playerAnimation, enemyNode: $enemyNode, enemyAnimation: $enemyAnimation)
+    return GameSceneView(playerNode: $playerNode, enemyNode: $enemyNode)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
@@ -111,34 +95,30 @@ private extension GameSceneView {
                       attackSelected: { attack in
                           switch attack.move.position {
                           case .leftLight:
-                              playerNode.playAnimation(.punchHighLightLeft, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighLightLeft)
                           case .rightLight:
-                              playerNode.playAnimation(.punchHighLightRight, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighLightRight)
                           case .leftMedium:
-                              playerNode.playAnimation(.punchHighMediumLeft, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighMediumLeft)
                           case .rightMedium:
-                              playerNode.playAnimation(.punchHighMediumRight, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighMediumRight)
                           case .leftHard:
-                              playerNode.playAnimation(.punchHighHardLeft, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighHardLeft)
                           case .rightHard:
-                              playerNode.playAnimation(.punchHighHardRight, completion: goToIdle)
+                              playerNode.playAnimation(.punchHighHardRight)
                           }
                       }, defenseSelected: { defense in
                           switch defense.move.position {
                           case .forward:
-                              playerNode.playAnimation(.idle, completion: goToIdle)
+                              playerNode.playAnimation(.idleStand)
                           case .left:
-                              playerNode.playAnimation(.idleStand, completion: goToIdle)
+                              playerNode.playAnimation(.idle)
                           case .backward:
-                              playerNode.playAnimation(.idleTired, completion: goToIdle)
+                              playerNode.playAnimation(.idleStand)
                           case .right:
-                              playerNode.playAnimation(.idleStand, completion: goToIdle)
+                              playerNode.playAnimation(.idle)
                           }
                       })
         )
         .ignoresSafeArea()
-
-    func goToIdle() {
-        playerAnimation = .idle
-    }
 }

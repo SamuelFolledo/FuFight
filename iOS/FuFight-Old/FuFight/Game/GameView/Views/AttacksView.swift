@@ -44,15 +44,14 @@ struct AttacksView: View {
         ForEach(attacks, id: \.move.id) { move in
             if move.move.position == position {
                 Button(action: {
-//                    selectMove(move)
                     moveSelected?(move)
                 }, label: {
-                    Image(move.move.imageName)
+                    Image(move.move.iconName)
                         .defaultImageModifier()
                         .aspectRatio(1.0, contentMode: .fit)
                         .padding(sourceType == .enemy ? 4 : move.move.padding)
                         .background(
-                            Image(move.move.moveType == .attack ? "moveBackgroundRed" : "moveBackgroundBlue")
+                            Image(move.move.backgroundIconName)
                                 .backgroundImageModifier()
                                 .scaledToFit()
                         )
@@ -85,6 +84,28 @@ struct AttacksView: View {
         }
     }
 
+    var weakRedFire: some View {
+        let width: CGFloat = sourceType == .user ? 800 : 160
+        let height: CGFloat = sourceType == .user ? 420 : 85
+        let bottomPadding: CGFloat = sourceType == .user ? 75 : 16
+        let trailingPadding: CGFloat = sourceType == .user ? 30 : 4
+        return GIFView(type: URLType.name("weakRedFire"))
+            .frame(width: width, height: height)
+            .padding(.bottom, bottomPadding)
+            .padding(.trailing, trailingPadding)
+    }
+
+    var strongRedFire: some View {
+        let width: CGFloat = sourceType == .user ? 800 : 160
+        let height: CGFloat = sourceType == .user ? 420 : 90
+        let bottomPadding: CGFloat = sourceType == .user ? 65 : 16
+        let trailingPadding: CGFloat = sourceType == .user ? 30 : 4
+        return GIFView(type: URLType.name("strongRedFire"))
+            .frame(width: width, height: height)
+            .padding(.bottom, bottomPadding)
+            .padding(.trailing, trailingPadding)
+    }
+
     func getFireView(from move: Attack) -> some View {
         Group {
             if let fireState = move.fireState {
@@ -94,52 +115,16 @@ struct AttacksView: View {
                 case .initial, .unselected, .selected:
                     switch fireState {
                     case .small:
-                        switch sourceType {
-                        case .user:
-                            GIFView(type: URLType.name("weakRedFire"))
-                                .frame(width: 800, height: 420)
-                                .padding(.bottom, 75)
-                                .padding(.trailing, 30)
-                        case .enemy:
-                            GIFView(type: URLType.name("weakRedFire"))
-                                .frame(width: 160, height: 85)
-                                .padding(.bottom, 16)
-                                .padding(.trailing, 4)
-                        }
+                        weakRedFire
                     case .big:
-                        switch sourceType {
-                        case .user:
-                            GIFView(type: URLType.name("strongRedFire"))
-                                .frame(width: 800, height: 420)
-                                .padding(.bottom, 65)
-                                .padding(.trailing, 30)
-                        case .enemy:
-                            GIFView(type: URLType.name("strongRedFire"))
-                                .frame(width: 160, height: 90)
-                                .padding(.bottom, 16)
-                                .padding(.trailing, 4)
-                        }
+                        strongRedFire
                     }
                 }
-            } else {
-                EmptyView()
             }
         }
         .rotationEffect(sourceType.angle)
         .allowsHitTesting(false)
     }
-
-//    func selectMove(_ selectedMove: Attack) {
-//        guard selectedMove.state != .cooldown else { return }
-//        for (index, attack) in attacks.enumerated() {
-//            if attack.move.id == selectedMove.move.id {
-//                attacks[index].setStateTo(.selected)
-//            } else {
-//                guard attacks[index].state != .cooldown else { continue }
-//                attacks[index].setStateTo(.unselected)
-//            }
-//        }
-//    }
 }
 
 #Preview {

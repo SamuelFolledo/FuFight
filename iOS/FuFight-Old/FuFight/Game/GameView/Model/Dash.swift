@@ -26,10 +26,7 @@ enum Dash: String, CaseIterable, DefendProtocol {
         }
     }
     var id: String { rawValue }
-    var backgroundColor: Color {
-        Color.blue
-    }
-    var imageName: String {
+    var iconName: String {
         switch self {
         case .left:
             "defendLeft"
@@ -41,7 +38,10 @@ enum Dash: String, CaseIterable, DefendProtocol {
             "defendRight"
         }
     }
-    var moveType: MoveType { .defend }
+
+    var backgroundIconName: String {
+        "moveBackgroundBlue"
+    }
 
     var damageMultiplier: Double {
         switch self {
@@ -94,5 +94,18 @@ enum Dash: String, CaseIterable, DefendProtocol {
 
     var cooldown: Int {
         1
+    }
+
+    var animationType: FighterAnimationType {
+        switch self {
+        case .forward:
+            .idleStand
+        case .backward:
+            .idleStand
+        case .left:
+            .idle
+        case .right:
+            .idle
+        }
     }
 }
