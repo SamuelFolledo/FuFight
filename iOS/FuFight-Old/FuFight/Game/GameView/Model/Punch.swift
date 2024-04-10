@@ -16,51 +16,23 @@ enum Punch: String, CaseIterable {
     case rightPunchHard
 }
 
-//MARK: MoveProtocol extension 
+//MARK: - MoveProtocol extension
 extension Punch {
     var id: String {
         rawValue
     }
 
     var name: String {
-        switch self {
-        case .leftPunchLight:
-            "Light Left Punch"
-        case .leftPunchMedium:
-            "Medium Left Punch"
-        case .leftPunchHard:
-            "Hard Left Punch"
-        case .rightPunchLight:
-            "Light Right Punch"
-        case .rightPunchMedium:
-            "Medium Right Punch"
-        case .rightPunchHard:
-            "Hard Right Punch"
-        }
+        animationType.rawValue
     }
 
-    var backgroundColor: Color {
-        Color.red
+    var iconName: String {
+        animationType.iconName ?? ""
     }
 
-    var imageName: String {
-        switch self {
-        case .leftPunchLight:
-            "punchLeftLight"
-        case .leftPunchMedium:
-            "punchLeftMedium"
-        case .leftPunchHard:
-            "punchLeftHard"
-        case .rightPunchLight:
-            "punchRightLight"
-        case .rightPunchMedium:
-            "punchRightMedium"
-        case .rightPunchHard:
-            "punchRightHard"
-        }
+    var backgroundIconName: String {
+        "moveBackgroundRed"
     }
-
-    var moveType: MoveType { .attack }
 
     var padding: Double {
         switch self {
@@ -83,9 +55,26 @@ extension Punch {
             3
         }
     }
+
+    var animationType: FighterAnimationType {
+        switch self {
+        case .leftPunchLight:
+                .punchHighLightLeft
+        case .leftPunchMedium:
+                .punchHighMediumLeft
+        case .leftPunchHard:
+                .punchHighHardLeft
+        case .rightPunchLight:
+                .punchHighLightRight
+        case .rightPunchMedium:
+                .punchHighMediumRight
+        case .rightPunchHard:
+                .punchHighHardRight
+        }
+    }
 }
 
-//MARK: AttackProtocol extension
+//MARK: - AttackProtocol extension
 extension Punch: AttackProtocol {
     var damage: Double {
         switch self {

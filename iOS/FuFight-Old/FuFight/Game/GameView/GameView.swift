@@ -32,7 +32,7 @@ struct GameView: View {
             .padding(.top, 8)
         }
         .background {
-            GameSceneView(playerNode: $vm.fighter, playerAnimation: $vm.playerAnimation, enemyNode: $vm.enemyFighter, enemyAnimation: $vm.enemyAnimation)
+            GameSceneView(playerNode: $vm.fighter, enemyNode: $vm.enemyFighter)
                 .ignoresSafeArea()
         }
         .alert(title: vm.alertTitle,

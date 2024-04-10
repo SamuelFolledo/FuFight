@@ -30,15 +30,14 @@ struct DefensesView: View {
         ForEach(defenses, id: \.move.id) { move in
             if move.move.position == position {
                 Button(action: {
-//                    selectMove(move)
                     moveSelected?(move)
                 }, label: {
-                    Image(move.move.imageName)
+                    Image(move.move.iconName)
                         .defaultImageModifier()
                         .aspectRatio(1.0, contentMode: .fit)
                         .padding(sourceType == .enemy ? 4 : move.move.padding)
                         .background(
-                            Image(move.move.moveType == .attack ? "moveBackgroundRed" : "moveBackgroundBlue")
+                            Image(move.move.backgroundIconName)
                                 .backgroundImageModifier()
                                 .scaledToFit()
                         )
@@ -63,18 +62,6 @@ struct DefensesView: View {
             }
         }
     }
-
-//    func selectMove(_ selectedMove: Defend) {
-//        guard selectedMove.state != .cooldown else { return }
-//        for (index, defense) in defenses.enumerated() {
-//            if defense.move.id == selectedMove.move.id {
-//                defenses[index].setStateTo(.selected)
-//            } else {
-//                guard defenses[index].state != .cooldown else { continue }
-//                defenses[index].setStateTo(.unselected)
-//            }
-//        }
-//    }
 }
 
 #Preview {
