@@ -36,9 +36,17 @@ class FighterNode {
         fatalError("init(coder:) has not been implemented")
     }
 
-    ///Create a dae model with default animation
+    ///Create node from default animation
     private func createNode() {
         daeHolderNode = SCNNode(daePath: fighterType.defaultDaePath)
+        //Add materials and images programmatically
+        for child in daeHolderNode.childNodes {
+            if let partName = child.name,
+               let part = FighterBodyPartType(rawValue: partName) {
+                child.geometry?.firstMaterial = part.material
+            }
+        }
+        //Assign the daeHolderNode's bones as the node to animate
         animationsNode = daeHolderNode.childNode(withName: fighterType.bonesName, recursively: true)!
     }
 
