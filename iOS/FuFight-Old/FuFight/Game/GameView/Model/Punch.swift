@@ -56,20 +56,20 @@ extension Punch {
         }
     }
 
-    var animationType: FighterAnimationType {
+    var animationType: AnimationType {
         switch self {
         case .leftPunchLight:
-                .punchHighLightLeft
+                .punchHeadLeftLight
         case .leftPunchMedium:
-                .punchHighMediumLeft
+                .punchHeadLeftMedium
         case .leftPunchHard:
-                .punchHighHardLeft
+                .punchHeadLeftHard
         case .rightPunchLight:
-                .punchHighLightRight
+                .punchHeadRightLight
         case .rightPunchMedium:
-                .punchHighMediumRight
+                .punchHeadRightMedium
         case .rightPunchHard:
-                .punchHighHardRight
+                .punchHeadRightHard
         }
     }
 }

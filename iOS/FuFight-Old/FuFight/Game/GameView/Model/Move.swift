@@ -15,7 +15,7 @@ protocol MoveProtocol: Hashable {
     var padding: Double { get }
     var cooldown: Int { get }
     ///animation to play for this attack
-    var animationType: FighterAnimationType { get }
+    var animationType: AnimationType { get }
 }
 
 enum MoveButtonState: Int {

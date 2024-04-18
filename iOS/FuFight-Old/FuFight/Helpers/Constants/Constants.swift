@@ -37,7 +37,7 @@ let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
 
 
-var animationToTest: FighterAnimationType = .punchHighHardRight
+var animationToTest: AnimationType = .punchHeadRightHard
 
 //Fonts
 let defaultFontSize: CGFloat = 16

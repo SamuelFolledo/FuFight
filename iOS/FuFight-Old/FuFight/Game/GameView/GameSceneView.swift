@@ -26,10 +26,7 @@ struct GameSceneView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIViewType {
         setUpCamera()
         setUpLight()
-
-        scene.rootNode.addChildNode(fighter.node.daeHolderNode)
-
-        scene.rootNode.addChildNode(enemyFighter.node.daeHolderNode)
+        setUpFighters()
 
         let sceneView = SCNView()
         //TODO: 1 Set allowsCameraControl to false for production
@@ -44,6 +41,13 @@ struct GameSceneView: UIViewRepresentable {
 }
 
 private extension GameSceneView {
+    func setUpFighters() {
+        scene.rootNode.addChildNode(fighter.daeHolderNode)
+        fighter.positionNode(asEnemy: false)
+        scene.rootNode.addChildNode(enemyFighter.daeHolderNode)
+        enemyFighter.positionNode(asEnemy: true)
+    }
+
     func setUpCamera() {
         // create and add a camera to the scene
         cameraNode.camera = SCNCamera()
@@ -82,9 +86,9 @@ private extension GameSceneView {
 }
 
 #Preview("Game's Preview", traits: .portrait) {
-    @State var playerAnimation: FighterAnimationType = animationToTest
+    @State var playerAnimation: AnimationType = animationToTest
     @State var fighter = Fighter(type: .samuel, isEnemy: false)
-    @State var enemyAnimation: FighterAnimationType = animationToTest
+    @State var enemyAnimation: AnimationType = animationToTest
     @State var enemyFighter = Fighter(type: .samuel, isEnemy: true)
 
     return GameSceneView(fighter: $fighter, enemyFighter: $enemyFighter)
@@ -95,28 +99,28 @@ private extension GameSceneView {
                       attackSelected: { attack in
                           switch attack.move.position {
                           case .leftLight:
-                              fighter.node.playAnimation(.punchHighLightLeft)
+                              fighter.playAnimation(.punchHeadLeftLight)
                           case .rightLight:
-                              fighter.node.playAnimation(.punchHighLightRight)
+                              fighter.playAnimation(.punchHeadRightLight)
                           case .leftMedium:
-                              fighter.node.playAnimation(.punchHighMediumLeft)
+                              fighter.playAnimation(.punchHeadLeftMedium)
                           case .rightMedium:
-                              fighter.node.playAnimation(.punchHighMediumRight)
+                              fighter.playAnimation(.punchHeadRightMedium)
                           case .leftHard:
-                              fighter.node.playAnimation(.punchHighHardLeft)
+                              fighter.playAnimation(.punchHeadLeftHard)
                           case .rightHard:
-                              fighter.node.playAnimation(.punchHighHardRight)
+                              fighter.playAnimation(.punchHeadRightHard)
                           }
                       }, defenseSelected: { defense in
                           switch defense.move.position {
                           case .forward:
-                              fighter.node.playAnimation(.idleStand)
+                              fighter.playAnimation(.idleStand)
                           case .left:
-                              fighter.node.playAnimation(.idle)
+                              fighter.playAnimation(.idle)
                           case .backward:
-                              fighter.node.playAnimation(.idleStand)
+                              fighter.playAnimation(.idleStand)
                           case .right:
-                              fighter.node.playAnimation(.idle)
+                              fighter.playAnimation(.idle)
                           }
                       })
         )
