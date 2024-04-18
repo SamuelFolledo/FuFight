@@ -15,7 +15,7 @@ struct HomeView: View {
             GeometryReader { proxy in
                 ScrollView {
                     ZStack {
-                        FighterPreview()
+                        DaePreview()
                             .frame(width: proxy.size.width, height: proxy.size.height)
 
                         VStack {

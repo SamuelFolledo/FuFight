@@ -96,7 +96,7 @@ enum Dash: String, CaseIterable, DefendProtocol {
         1
     }
 
-    var animationType: FighterAnimationType {
+    var animationType: AnimationType {
         switch self {
         case .forward:
             .idleStand

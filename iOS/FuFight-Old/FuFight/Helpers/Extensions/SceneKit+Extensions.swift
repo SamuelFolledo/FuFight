@@ -9,7 +9,7 @@ import SceneKit
 
 extension CAAnimation {
     ///Convert a grouped SCNAnimation into CAAnimation. Used on creating animation player
-    class func getCaAnimation(for type: FighterAnimationType, from full: SCNAnimation) {
+    class func getCaAnimation(for type: AnimationType, from full: SCNAnimation) -> CAAnimation {
         let animation = CAAnimationGroup()
         let sub = full.copy() as! SCNAnimation
         sub.timeOffset = 0
@@ -20,6 +20,7 @@ extension CAAnimation {
         animation.fadeOutDuration = type.fadeOutDuration
         animation.usesSceneTimeBase = type.usesSceneTimeBase
         animation.repeatCount = type.repeatCount
+        return animation as CAAnimation
     }
 }
 
@@ -33,7 +34,7 @@ extension SCNNode {
 }
 
 extension SCNAnimationPlayer {
-    class func loadAnimation(_ animationType: FighterAnimationType, fighterType: FighterType, from node: SCNNode) -> SCNAnimationPlayer? {
+    class func loadAnimation(_ animationType: AnimationType, fighterType: FighterType, from node: SCNNode) -> SCNAnimationPlayer? {
         let path = fighterType.animationPath(animationType)
         // Load the dae file for that animation
         guard let url = Bundle.main.url(forResource: path, withExtension: "dae"),
@@ -57,13 +58,13 @@ extension SCNAnimationPlayer {
     }
 
     ///Returns the animation from the node as CAAnimation
-    private class func getCaAnimation(for animationType: FighterAnimationType, from node: SCNNode) -> CAAnimation? {
+    private class func getCaAnimation(for animationType: AnimationType, from node: SCNNode) -> CAAnimation? {
         guard let animationKey = node.animationKeys.first,
               let player = node.animationPlayer(forKey: animationKey) else {
             LOGDE("Failed to add animation player for \(animationType.rawValue) from \(node.name ?? "")")
             return nil
         }
         player.stop()
-        return SceneKitUtility.animation(for: animationType, from: player.animation)
+        return CAAnimation.getCaAnimation(for: animationType, from: player.animation)
     }
 }

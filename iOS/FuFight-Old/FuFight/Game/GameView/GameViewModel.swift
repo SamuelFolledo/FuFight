@@ -76,7 +76,7 @@ class GameViewModel: BaseViewModel {
             if attack.move.id == selectedMove.move.id {
                 currentRound.attacks[index].setStateTo(.selected)
                 if let move = Punch(rawValue: selectedMove.move.id) {
-                    fighter.node.playAnimation(move.animationType)
+                    fighter.playAnimation(move.animationType)
                 }
             } else {
                 guard currentRound.attacks[index].state != .cooldown else { continue }
@@ -91,7 +91,18 @@ class GameViewModel: BaseViewModel {
             if defense.move.id == selectedMove.move.id {
                 currentRound.defenses[index].setStateTo(.selected)
                 if let move = Dash(rawValue: selectedMove.move.id) {
-                    fighter.node.playAnimation(move.animationType)
+                    //TODO: Removed switch statements and then uncomment when done testing animations
+                    switch move.position {
+                    case .forward:
+                        fighter.playAnimation(.dodgeHead)
+                    case .left:
+                        fighter.playAnimation(.hitHead)
+                    case .backward:
+                        fighter.playAnimation(.killHead)
+                    case .right:
+                        fighter.playAnimation(.idleStand)
+                    }
+//                    fighter.playAnimation(move.animationType)
                 }
             } else {
                 guard currentRound.defenses[index].state != .cooldown else { continue }
