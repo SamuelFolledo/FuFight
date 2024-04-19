@@ -22,13 +22,11 @@ class Fighter {
     init(type: FighterType, isEnemy: Bool) {
         self.fighterType = type
         self.isEnemy = isEnemy
-        LOGD("===========================================================================")
         defaultAnimation = .idle
         createNode()
         let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
         let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
         loadAnimations(animations: otherAnimations + attacks)
-        LOGD("===========================================================================\n\n")
     }
 
     required init?(coder: NSCoder) {
@@ -58,6 +56,16 @@ class Fighter {
         }
         player.play()
         currentAnimation = nil
+        if animationType == .killHead {
+            //Pause animation after playing kill animation
+            DispatchQueue.main.asyncAfter(deadline: .now() + (player.animation.duration - 0.2)) {
+                self.pauseAnimations()
+            }
+        }
+    }
+
+    func pauseAnimations() {
+        animationsNode.isPaused = true
     }
 
     func stopAnimations() {

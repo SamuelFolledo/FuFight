@@ -109,21 +109,8 @@ extension Punch: AttackProtocol {
         }
     }
 
-    var position: AttackPosition {
-        switch self {
-        case .leftPunchLight:
-                .leftLight
-        case .leftPunchMedium:
-                .leftMedium
-        case .leftPunchHard:
-                .leftHard
-        case .rightPunchLight:
-                .rightLight
-        case .rightPunchMedium:
-                .rightMedium
-        case .rightPunchHard:
-                .rightHard
-        }
+    var position: AttackPosition? {
+        animationType.position
     }
 
     var canBoost: Bool {

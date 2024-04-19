@@ -9,8 +9,13 @@ import SwiftUI
 
 struct GameView: View {
     @Binding var path: NavigationPath
-    @State var vm = GameViewModel()
+    @State var vm: GameViewModel
     @Environment(\.scenePhase) var scenePhase
+
+    init(path: Binding<NavigationPath>, vm: GameViewModel) {
+        self._path = path
+        self.vm = vm
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -113,6 +118,6 @@ struct GameView: View {
     @State var path: NavigationPath = NavigationPath()
 
     return NavigationView {
-        GameView(path: $path)
+        GameView(path: $path, vm: GameViewModel(isPracticeMode: true))
     }
 }

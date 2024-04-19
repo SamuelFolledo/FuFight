@@ -8,49 +8,30 @@
 import SwiftUI
 
 enum AnimationType: String, CaseIterable {
-    case stop
-    //    case deathBackLight
-    //    case deathBackMedium
-    //    case deathUpHard
-    //    case dodgeRight
-    //    case dodgeUp
-    //    case hitBodyHard
-    //    case hitBodyMedium
-    //    case hitHeadHard
-    //    case hitHeadMedium
-    case idle
-    case idleStand
-    case dodgeHead
-//    case dodgeBody
-    case hitHead
-//    case hitHeadHard
-//    case hitBody
-//    case hitBodyHard
-    case killHead
-//    case killHeadHard
-//    case killBody
-//    case idleTired
-    //    case kickFlying
-    //    case kickMMA
-    //    case kickDownHard
-    //    case kickDownMedium
-    //    case kickDownLight
-    //    case kickUpHard
-    //    case kickUpMedium
-    //    case kickUpLight
+    //MARK: Punches
     case punchHeadRightLight
     case punchHeadRightMedium
     case punchHeadRightHard
     case punchHeadLeftLight
     case punchHeadLeftMedium
     case punchHeadLeftHard
-    //    case dashForward
-    //    case dashBackward
+
+    //MARK: Defensive moves
+    case dodgeHead
+    case hitHead
+    case killHead
+
+    //MARK: Non attack or defensive moves
+    case stop
+    case idle
+    case idleStand
+
+    //MARK: - Properties
 
     ///name of the folder containing the animation name
     var subfolder: String {
         if let isHigh {
-            return isHigh ? "head/" : "body/"
+            return isHigh ? "head" : "body"
         }
         return ""
     }
@@ -87,10 +68,10 @@ enum AnimationType: String, CaseIterable {
             "leftLight"
         case .punchHeadLeftMedium:
             //TODO: Figure out what to do with left attacks, maybe rotate?
-//            "leftMedium"
+            //            "leftMedium"
             "leftLight"
         case .punchHeadLeftHard:
-//            "leftHard"
+            //            "leftHard"
             "leftLight"
         }
     }
@@ -98,20 +79,20 @@ enum AnimationType: String, CaseIterable {
     var animationPath: String {
         switch self {
         case .idle, .idleStand:
-            "animations/idle/\(subfolder)\(animationName)"
+            "animations/idle/\(subfolder)/\(animationName)"
         case .stop:
             ""
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight:
-            "animations/punch/\(subfolder)\(animationName)"
+            "animations/punch/\(subfolder)/\(animationName)"
         case .punchHeadLeftMedium, .punchHeadLeftHard:
             //TODO: Needs to have a left medium and hard attack. Maybe flip/rotate other attacks?
-            "animations/punch/\(subfolder)\(animationName)"
+            "animations/punch/\(subfolder)/\(animationName)"
         case .dodgeHead:
-            "animations/dodge/\(subfolder)\(animationName)"
+            "animations/dodge/\(subfolder)/\(animationName)"
         case .hitHead:
-            "animations/hit/\(subfolder)\(animationName)"
+            "animations/hit/\(subfolder)/\(animationName)"
         case .killHead:
-            "animations/kill/\(subfolder)\(animationName)"
+            "animations/kill/\(subfolder)/\(animationName)"
         }
     }
 
@@ -136,14 +117,12 @@ enum AnimationType: String, CaseIterable {
         return endTime - startTime
     }
 
-    ///duration in seconds
+    ///the entire animation's duration in seconds
     private var duration: CGFloat {
         switch self {
         case .idleStand:
             4.466670036315918
-//        case .idleTired:
-//            3.6333301067352295
-        case .idle, .stop, .dodgeHead, .hitHead, .killHead:
+        case .idle, .stop:
             0
         case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //TODO: Fix duration when left attacks is figured out
@@ -154,6 +133,39 @@ enum AnimationType: String, CaseIterable {
             1.466670036315918
         case .punchHeadRightHard:
             1.36667001247406
+        case .hitHead:
+            0.9333329796791077
+        case .dodgeHead:
+            1.100000023841858
+        case .killHead:
+            2.5999999046325684
+        }
+    }
+
+    ///the animation's duration when attack lands or when to play the defense animation in seconds
+    private var hitDuration: CGFloat {
+        //Note: these values are estimate and manually inputted after testing animations
+        switch self {
+        //MARK: Idle moves
+        case .idleStand, .idle, .stop:
+            0
+        //MARK: Defense moves
+        case .hitHead:
+            0.2 //0.9333329796791077
+        case .dodgeHead:
+            0.2 //1.100000023841858
+        case .killHead:
+            0.2 //2.5999999046325684
+        //MARK: Attacks moves
+        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            //TODO: Fix duration when left attacks is figured out
+            0.4 //0.699999988079071
+        case .punchHeadRightLight:
+            0.4 //1.0666699409484863
+        case .punchHeadRightMedium:
+            0.8 //1.466670036315918
+        case .punchHeadRightHard:
+            0.9 //1.36667001247406
         }
     }
 
@@ -175,5 +187,49 @@ enum AnimationType: String, CaseIterable {
         case .punchHeadRightHard:
             "punchRightHard"
         }
+    }
+
+    var position: AttackPosition? {
+        switch self {
+        case .stop, .idle, .idleStand, .dodgeHead:
+            nil
+        case .hitHead:
+            nil
+        case .killHead:
+            nil
+        case .punchHeadRightLight:
+            .rightLight
+        case .punchHeadRightMedium:
+            .rightMedium
+        case .punchHeadRightHard:
+            .rightHard
+        case .punchHeadLeftLight:
+            .leftLight
+        case .punchHeadLeftMedium:
+            .leftMedium
+        case .punchHeadLeftHard:
+            .leftHard
+        }
+    }
+
+    //MARK: - Public Methods
+
+    ///Returns the duration in seconds how long it takes for the current animation type to land based on the defender's animation
+    ///Used to figure out the slight delay before playing the defender's animation
+    func delayForDefendingAnimation(_ defenderAnimationType: AnimationType) -> CGFloat {
+//        let didDodge = defenderAnimationType.position?.isLeft
+        switch defenderAnimationType {
+        case .stop, .idle, .idleStand:
+            break
+        case .dodgeHead, .hitHead, .killHead:
+            //Defense moves
+            let delay = hitDuration - defenderAnimationType.hitDuration
+            LOGD("delayForDefendingAnimation's current anim \(rawValue):\(hitDuration) \tAND defender's anim \(defenderAnimationType.rawValue):\(defenderAnimationType.hitDuration) \tIS \(delay)")
+            return delay
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            //Attack moves
+            break
+        }
+        return 0
     }
 }
