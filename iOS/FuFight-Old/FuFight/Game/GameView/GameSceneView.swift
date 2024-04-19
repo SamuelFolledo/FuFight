@@ -97,7 +97,8 @@ private extension GameSceneView {
                       defenses: defaultAllDashDefenses,
                       sourceType: .user,
                       attackSelected: { attack in
-                          switch attack.move.position {
+                          guard let attackPosition = attack.move.position else { return }
+                          switch attackPosition {
                           case .leftLight:
                               fighter.playAnimation(.punchHeadLeftLight)
                           case .rightLight:

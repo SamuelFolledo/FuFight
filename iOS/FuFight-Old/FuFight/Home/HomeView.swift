@@ -43,7 +43,9 @@ struct HomeView: View {
             .navigationDestination(for: GameRoute.self) { route in
                 switch route {
                 case .game:
-                    GameView(path: $vm.path)
+                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false))
+                case .practice:
+                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: true))
                 }
             }
             .background(
@@ -51,7 +53,11 @@ struct HomeView: View {
                     .padding(.leading, 30)
             )
             .safeAreaInset(edge: .bottom) {
-                playButton
+                VStack {
+                    playButton
+
+                    practiceButton
+                }
             }
             .navigationBarHidden(true)
             .frame(maxWidth: .infinity)
@@ -87,6 +93,22 @@ struct HomeView: View {
             Image("playButton")
                 .frame(width: 200)
         }
+    }
+
+    var practiceButton: some View {
+        Button {
+            vm.path.append(GameRoute.practice)
+        } label: {
+            Text("Practice")
+                .padding(6)
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .font(.title)
+                .background(Color(uiColor: .label))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 4)
     }
 }
 

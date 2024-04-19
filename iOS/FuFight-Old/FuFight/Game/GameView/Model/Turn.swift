@@ -43,8 +43,9 @@ class Turn {
     ///Returns false if the selected defense position can
     func didDodge(_ enemyAttack: Attack?) -> Bool {
         guard let enemyAttack else { return true }
-        guard let defend else { return false }
-        return defend.didDodge(enemyAttack.move.position)
+        guard let defend,
+              let attackPosition = enemyAttack.move.position else { return false }
+        return defend.didDodge(attackPosition)
     }
 }
 

@@ -28,7 +28,7 @@ protocol AttackProtocol: MoveProtocol {
     ///The percentage amount of damage reduction this attack will apply to the enemy. 0 will not reduce any attack, 1 will fully remove the damage of the next attack
     var damageReduction: Double { get }
     ///Position of the attack in the view
-    var position: AttackPosition { get }
+    var position: AttackPosition? { get }
     ///Returns true if attack can increase next attack's damage. If true, these attacks can be slightly boosted indicated with small fire
     var canBoost: Bool { get }
 }
