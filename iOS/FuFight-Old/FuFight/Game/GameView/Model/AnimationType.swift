@@ -82,11 +82,11 @@ enum AnimationType: String, CaseIterable {
             "animations/idle/\(subfolder)/\(animationName)"
         case .stop:
             ""
-        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight:
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
             "animations/punch/\(subfolder)/\(animationName)"
-        case .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //TODO: Needs to have a left medium and hard attack. Maybe flip/rotate other attacks?
-            "animations/punch/\(subfolder)/\(animationName)"
+            "animations/punch/\(AnimationType.punchHeadRightMedium.subfolder)/\(AnimationType.punchHeadRightMedium.animationName)"
         case .dodgeHead:
             "animations/dodge/\(subfolder)/\(animationName)"
         case .hitHead:
@@ -117,7 +117,7 @@ enum AnimationType: String, CaseIterable {
         return endTime - startTime
     }
 
-    ///the entire animation's duration in seconds
+    ///the animation's total duration in seconds
     private var duration: CGFloat {
         switch self {
         case .idleStand:
@@ -144,7 +144,7 @@ enum AnimationType: String, CaseIterable {
 
     ///the animation's duration when attack lands or when to play the defense animation in seconds
     private var hitDuration: CGFloat {
-        //Note: these values are estimate and manually inputted after testing animations
+        //Note: these values are estimate and manually inputted after testing animations. The smaller the number, the more sooner the animation will get played
         switch self {
         //MARK: Idle moves
         case .idleStand, .idle, .stop:
@@ -153,13 +153,13 @@ enum AnimationType: String, CaseIterable {
         case .hitHead:
             0.2 //0.9333329796791077
         case .dodgeHead:
-            0.2 //1.100000023841858
+            0.3 //1.100000023841858
         case .killHead:
             0.2 //2.5999999046325684
         //MARK: Attacks moves
         case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //TODO: Fix duration when left attacks is figured out
-            0.4 //0.699999988079071
+            0.45 //0.699999988079071
         case .punchHeadRightLight:
             0.4 //1.0666699409484863
         case .punchHeadRightMedium:

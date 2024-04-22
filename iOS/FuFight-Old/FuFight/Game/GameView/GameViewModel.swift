@@ -36,8 +36,13 @@ class GameViewModel: BaseViewModel {
     }
 
     func populateFighters() {
-        self.fighter = Fighter(type: .samuel, isEnemy: false)
-        self.enemyFighter = Fighter(type: .samuel, isEnemy: true)
+        let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
+        let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
+        fighter = Fighter(type: .bianca, isEnemy: false)
+        fighter.loadAnimations(animations: otherAnimations + attacks)
+
+        enemyFighter = Fighter(type: .samuel, isEnemy: true)
+        enemyFighter.loadAnimations(animations: otherAnimations + attacks)
     }
 
     override func onAppear() {

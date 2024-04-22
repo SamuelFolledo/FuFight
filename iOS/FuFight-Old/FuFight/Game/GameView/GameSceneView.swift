@@ -12,15 +12,17 @@ import SceneKit
 struct GameSceneView: UIViewRepresentable {
     @Binding var fighter: Fighter
     @Binding var enemyFighter: Fighter
+    let isPracticeMode: Bool
 
     typealias UIViewType = SCNView
     let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
 
-    init(fighter: Binding<Fighter>, enemyFighter: Binding<Fighter>) {
+    init(fighter: Binding<Fighter>, enemyFighter: Binding<Fighter>, isPracticeMode: Bool) {
         self._fighter = fighter
         self._enemyFighter = enemyFighter
+        self.isPracticeMode = isPracticeMode
     }
 
     func makeUIView(context: Context) -> UIViewType {
@@ -43,15 +45,15 @@ struct GameSceneView: UIViewRepresentable {
 private extension GameSceneView {
     func setUpFighters() {
         scene.rootNode.addChildNode(fighter.daeHolderNode)
-        fighter.positionNode(asEnemy: false)
+        fighter.positionNode(asEnemy: false, asHorizontal: isPracticeMode)
         scene.rootNode.addChildNode(enemyFighter.daeHolderNode)
-        enemyFighter.positionNode(asEnemy: true)
+        enemyFighter.positionNode(asEnemy: true, asHorizontal: isPracticeMode)
     }
 
     func setUpCamera() {
         // create and add a camera to the scene
         cameraNode.camera = SCNCamera()
-        cameraNode.position = .init(x: -6, y: 4, z: 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
+        cameraNode.position = .init(x: -6, y: 4, z: isPracticeMode ? 2.5 : 3.2) //X: zooms in and out, Y: shifts vertically, Z: horizontal changes
         cameraNode.eulerAngles = .init(x: 0, y: -89.5, z: 0) //X: zooms in and out, Y: rotates horizontally, Z: rotates vertically
         scene.rootNode.addChildNode(cameraNode)
     }
@@ -91,7 +93,7 @@ private extension GameSceneView {
     @State var enemyAnimation: AnimationType = animationToTest
     @State var enemyFighter = Fighter(type: .samuel, isEnemy: true)
 
-    return GameSceneView(fighter: $fighter, enemyFighter: $enemyFighter)
+    return GameSceneView(fighter: $fighter, enemyFighter: $enemyFighter, isPracticeMode: true)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
