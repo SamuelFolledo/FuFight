@@ -82,11 +82,11 @@ enum AnimationType: String, CaseIterable {
             "animations/idle/\(subfolder)/\(animationName)"
         case .stop:
             ""
-        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight:
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
             "animations/punch/\(subfolder)/\(animationName)"
-        case .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //TODO: Needs to have a left medium and hard attack. Maybe flip/rotate other attacks?
-            "animations/punch/\(subfolder)/\(animationName)"
+            "animations/punch/\(AnimationType.punchHeadRightMedium.subfolder)/\(AnimationType.punchHeadRightMedium.animationName)"
         case .dodgeHead:
             "animations/dodge/\(subfolder)/\(animationName)"
         case .hitHead:

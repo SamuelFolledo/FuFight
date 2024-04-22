@@ -48,11 +48,6 @@ private extension GameSceneView {
         fighter.positionNode(asEnemy: false, asHorizontal: isPracticeMode)
         scene.rootNode.addChildNode(enemyFighter.daeHolderNode)
         enemyFighter.positionNode(asEnemy: true, asHorizontal: isPracticeMode)
-
-        let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
-        let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
-        fighter.loadAnimations(animations: otherAnimations + attacks)
-        enemyFighter.loadAnimations(animations: otherAnimations + attacks)
     }
 
     func setUpCamera() {
