@@ -24,25 +24,33 @@ class Fighter {
         self.isEnemy = isEnemy
         defaultAnimation = .idle
         createNode()
-        let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
-        let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
-        loadAnimations(animations: otherAnimations + attacks)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func positionNode(asEnemy: Bool) {
+    func positionNode(asEnemy: Bool, asHorizontal: Bool = false) {
         daeHolderNode.scale = SCNVector3Make(fighterType.scale, fighterType.scale, fighterType.scale)
-        let xPosition: Float = isEnemy ? 1.5 : 0    //further
+        var xPosition: Float = isEnemy ? 1.5 : 0    //further
         let yPosition: Float = 0.5                  //vertical position
-        let zPosition: Float = isEnemy ? 2.7 : 3    //horizontal position
+        var zPosition: Float = isEnemy ? 2.7 : 3    //horizontal position
+        var angle: Float = isEnemy ? -89.5 : 90
+        if asHorizontal {
+            xPosition = 2
+            zPosition = isEnemy ? 3 : 1.5
+            angle = isEnemy ? 180 : 0
+        }
         daeHolderNode.position = SCNVector3Make(xPosition, yPosition, zPosition)
-        let angle: Float = isEnemy ? -89.5 : 90
         daeHolderNode.eulerAngles = .init(x: 0, y: angle, z: 0)
 //        skinner = nil
 //        rotation = .init(1, 0, 0, 0)
+    }
+
+    func loadAnimations(animations: [AnimationType]) {
+        for animationType in animations {
+            addAnimationPlayer(animationType)
+        }
     }
 
     ///Plays an animation if animationType is new
@@ -109,12 +117,6 @@ private extension Fighter {
                     }
                 }
             }
-        }
-    }
-
-    func loadAnimations(animations: [AnimationType]) {
-        for animationType in animations {
-            addAnimationPlayer(animationType)
         }
     }
 }

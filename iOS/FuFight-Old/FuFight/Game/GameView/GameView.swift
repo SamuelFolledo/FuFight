@@ -37,7 +37,7 @@ struct GameView: View {
             .padding(.top, 8)
         }
         .background {
-            GameSceneView(fighter: $vm.fighter, enemyFighter: $vm.enemyFighter)
+            GameSceneView(fighter: $vm.fighter, enemyFighter: $vm.enemyFighter, isPracticeMode: vm.isPracticeMode)
                 .ignoresSafeArea()
         }
         .alert(title: vm.alertTitle,
