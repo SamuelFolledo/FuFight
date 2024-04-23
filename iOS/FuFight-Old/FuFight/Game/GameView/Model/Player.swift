@@ -13,6 +13,8 @@ class Player {
     private(set) var username: String
     private(set) var hp: CGFloat
     let maxHp: CGFloat
+    let fighter: Fighter
+
     private(set) var turns: [Turn] = []
     var currentTurn: Turn {
         return turns.last!
@@ -23,7 +25,7 @@ class Player {
     private(set) var isEnemy: Bool = true
 
     ///Round 1 initializer
-    init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, attacks: [Attack], defenses: [Defend], turns: [Turn] = [], hasSpeedBoost: Bool = false, boostLevel: Int = 0) {
+    init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, attacks: [Attack], defenses: [Defend], turns: [Turn] = [], hasSpeedBoost: Bool = false, boostLevel: Int = 0, fighter: Fighter) {
         self.photoUrl = photoUrl
         self.username = username
         self.hp = hp
@@ -33,6 +35,7 @@ class Player {
         if let currentUsername = Account.current?.username {
             self.isEnemy = username != currentUsername
         }
+        self.fighter = fighter
     }
 
     func createTurn(from currentRound: Round) {

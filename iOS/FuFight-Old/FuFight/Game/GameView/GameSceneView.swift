@@ -10,20 +10,14 @@ import SceneKit
 
 ///UIView representable for the GameScene and Fighters
 struct GameSceneView: UIViewRepresentable {
-    @Binding var fighter: Fighter
-    @Binding var enemyFighter: Fighter
+    let fighter: Fighter
+    let enemyFighter: Fighter
     let isPracticeMode: Bool
 
     typealias UIViewType = SCNView
     let scene = SCNScene(named: "3DAssets.scnassets/GameScene.scn")!
     let cameraNode = SCNNode()
     let lightNode = SCNNode()
-
-    init(fighter: Binding<Fighter>, enemyFighter: Binding<Fighter>, isPracticeMode: Bool) {
-        self._fighter = fighter
-        self._enemyFighter = enemyFighter
-        self.isPracticeMode = isPracticeMode
-    }
 
     func makeUIView(context: Context) -> UIViewType {
         setUpCamera()
@@ -89,11 +83,11 @@ private extension GameSceneView {
 
 #Preview("Game's Preview", traits: .portrait) {
     @State var playerAnimation: AnimationType = animationToTest
-    @State var fighter = Fighter(type: .samuel, isEnemy: false)
+    let fighter = Fighter(type: .samuel, isEnemy: false)
     @State var enemyAnimation: AnimationType = animationToTest
-    @State var enemyFighter = Fighter(type: .samuel, isEnemy: true)
+    let enemyFighter = Fighter(type: .samuel, isEnemy: true)
 
-    return GameSceneView(fighter: $fighter, enemyFighter: $enemyFighter, isPracticeMode: true)
+    return GameSceneView(fighter: fighter, enemyFighter: enemyFighter, isPracticeMode: true)
         .overlay(
             MovesView(attacks: defaultAllPunchAttacks,
                       defenses: defaultAllDashDefenses,
