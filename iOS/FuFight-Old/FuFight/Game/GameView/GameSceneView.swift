@@ -89,37 +89,41 @@ private extension GameSceneView {
 
     return GameSceneView(fighter: fighter, enemyFighter: enemyFighter, isPracticeMode: true)
         .overlay(
-            MovesView(attacks: defaultAllPunchAttacks,
-                      defenses: defaultAllDashDefenses,
-                      sourceType: .user,
-                      attackSelected: { attack in
-                          guard let attackPosition = attack.move.position else { return }
-                          switch attackPosition {
-                          case .leftLight:
-                              fighter.playAnimation(.punchHeadLeftLight)
-                          case .rightLight:
-                              fighter.playAnimation(.punchHeadRightLight)
-                          case .leftMedium:
-                              fighter.playAnimation(.punchHeadLeftMedium)
-                          case .rightMedium:
-                              fighter.playAnimation(.punchHeadRightMedium)
-                          case .leftHard:
-                              fighter.playAnimation(.punchHeadLeftHard)
-                          case .rightHard:
-                              fighter.playAnimation(.punchHeadRightHard)
-                          }
-                      }, defenseSelected: { defense in
-                          switch defense.move.position {
-                          case .forward:
-                              fighter.playAnimation(.idleStand)
-                          case .left:
-                              fighter.playAnimation(.idle)
-                          case .backward:
-                              fighter.playAnimation(.idleStand)
-                          case .right:
-                              fighter.playAnimation(.idle)
-                          }
-                      })
+            MovesView(
+                attacksView: AttacksView(
+                    attacks: defaultAllPunchAttacks,
+                    sourceType: .enemy) { attack in
+                        guard let attackPosition = attack.move.position else { return }
+                        switch attackPosition {
+                        case .leftLight:
+                            fighter.playAnimation(.punchHeadLeftLight)
+                        case .rightLight:
+                            fighter.playAnimation(.punchHeadRightLight)
+                        case .leftMedium:
+                            fighter.playAnimation(.punchHeadLeftMedium)
+                        case .rightMedium:
+                            fighter.playAnimation(.punchHeadRightMedium)
+                        case .leftHard:
+                            fighter.playAnimation(.punchHeadLeftHard)
+                        case .rightHard:
+                            fighter.playAnimation(.punchHeadRightHard)
+                        }
+                    },
+                defensesView: DefensesView(
+                    defenses: defaultAllDashDefenses,
+                    sourceType: .enemy) { defense in
+                        switch defense.move.position {
+                        case .forward:
+                            fighter.playAnimation(.idleStand)
+                        case .left:
+                            fighter.playAnimation(.idle)
+                        case .backward:
+                            fighter.playAnimation(.idleStand)
+                        case .right:
+                            fighter.playAnimation(.idle)
+                        }
+                    },
+                sourceType: .enemy)
         )
         .ignoresSafeArea()
 }

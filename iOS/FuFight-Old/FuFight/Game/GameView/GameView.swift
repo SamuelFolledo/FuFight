@@ -92,9 +92,16 @@ struct GameView: View {
 
     @ViewBuilder var enemyMovesView: some View {
         if !vm.rounds.isEmpty {
-            MovesView(attacks: vm.currentRound.enemyAttacks,
-                      defenses: vm.currentRound.enemyDefenses,
-                      sourceType: .enemy)
+            MovesView(
+                attacksView: AttacksView(
+                    attacks: vm.currentRound.attacks,
+                    sourceType: .enemy) {
+                        vm.attackSelected($0, isEnemy: true)
+                    },
+                defensesView: DefensesView(
+                    defenses: vm.currentRound.defenses, 
+                    sourceType: .enemy),
+                sourceType: .enemy)
             .frame(width: 100, height: 120)
             .padding(.trailing)
         }
@@ -102,14 +109,18 @@ struct GameView: View {
 
     @ViewBuilder var playerMovesView: some View {
         if !vm.rounds.isEmpty {
-            MovesView(attacks: vm.currentRound.attacks,
-                      defenses: vm.currentRound.defenses,
-                      sourceType: .user,
-                      attackSelected: { attack in
-                vm.attackSelected(attack, isEnemy: false)
-            }, defenseSelected: { defense in
-                vm.defenseSelected(defense, isEnemy: false)
-            })
+            MovesView(
+                attacksView: AttacksView(
+                    attacks: vm.currentRound.attacks,
+                    sourceType: .user) {
+                        vm.attackSelected($0, isEnemy: false)
+                    },
+                defensesView: DefensesView(
+                    defenses: vm.currentRound.defenses,
+                    sourceType: .user) {
+                        vm.defenseSelected($0, isEnemy: false)
+                    },
+                sourceType: .user)
         }
     }
 }

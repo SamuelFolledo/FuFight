@@ -29,6 +29,7 @@ struct Defend {
     private(set) var move: any DefendProtocol
     private(set) var cooldown: Int = 0
     private(set) var state: MoveButtonState = .initial
+    var name: String { move.name }
 
     init(_ move: any DefendProtocol) {
         self.move = move

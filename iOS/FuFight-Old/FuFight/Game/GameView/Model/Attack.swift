@@ -40,9 +40,8 @@ struct Attack {
     private(set) var cooldown: Int = 0
     private(set) var state: MoveButtonState = .initial
     private(set) var fireState: FireState? = nil
-    var isAvailableNextTurn: Bool {
-        return cooldown <= 1
-    }
+    var isAvailableNextTurn: Bool { cooldown <= 1 }
+    var name: String { move.name }
 
     init(_ move: any AttackProtocol) {
         self.move = move

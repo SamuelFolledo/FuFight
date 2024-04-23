@@ -39,22 +39,16 @@ enum MovesViewSourceType {
     }
 }
 
-struct MovesView: View {
-    var attacks: [Attack]
-    var defenses: [Defend]
+struct MovesView<AttacksView: View, DefensesView: View>: View {
+    var attacksView: AttacksView
+    var defensesView: DefensesView
     var sourceType: MovesViewSourceType
-    var attackSelected: ((Attack) -> Void)?
-    var defenseSelected: ((Defend) -> Void)?
 
     var body: some View {
         VStack {
-            AttacksView(attacks: attacks, sourceType: sourceType) {
-                attackSelected?($0)
-            }
+            attacksView
 
-            DefensesView(defenses: defenses, sourceType: sourceType) {
-                defenseSelected?($0)
-            }
+            defensesView
         }
         .scaleEffect(x: sourceType.shouldFlip ? -1 : 1, y: sourceType.shouldFlip ? -1 : 1) // flip vertically and horizontally
         .background(
@@ -75,5 +69,16 @@ struct MovesView: View {
 }
 
 #Preview {
-    MovesView(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, sourceType: .enemy)
+    MovesView(
+        attacksView: AttacksView(
+            attacks: defaultAllPunchAttacks,
+            sourceType: .enemy) { move in
+                LOGD("MovesView Attack is selected \(move.name)")
+            },
+        defensesView: DefensesView(
+            defenses: defaultAllDashDefenses,
+            sourceType: .enemy) { move in
+                LOGD("MovesView Defense is selected \(move.name)")
+            },
+        sourceType: .enemy)
 }

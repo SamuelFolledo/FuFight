@@ -51,7 +51,7 @@ class Player {
             for (index, attack) in currentRound.enemyAttacks.enumerated() {
                 if attack.move.id == randomAttack.id {
                     if attack.cooldown <= 0 {
-//                        LOGD("Randomly generated enemy attack is \(attack.move.name)")
+//                        LOGD("Randomly generated enemy attack is \(attack.name)")
                         currentRound.enemyAttacks[index].setStateTo(.selected)
                         turn.update(attack: currentRound.enemyAttacks[index])
                     }
@@ -63,7 +63,7 @@ class Player {
             for (index, defend) in currentRound.enemyDefenses.enumerated() {
                 if defend.move.id == randomDefend.id {
                     if defend.cooldown <= 0 {
-//                        LOGD("Randomly generated enemy defend is \(defend.move.name)")
+//                        LOGD("Randomly generated enemy defend is \(defend.name)")
                         currentRound.enemyDefenses[index].setStateTo(.selected)
                         turn.update(defend: currentRound.enemyDefenses[index])
                     }
