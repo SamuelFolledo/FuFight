@@ -10,9 +10,7 @@ import SwiftUI
 @Observable
 class GameViewModel: BaseViewModel {
     var player: Player
-    var fighter: Fighter!
     var enemyPlayer: Player
-    var enemyFighter: Fighter!
     var isGameOver: Bool = false
     ///Note this will not pause the game for online games
     var isGamePaused: Bool = false
@@ -29,20 +27,17 @@ class GameViewModel: BaseViewModel {
     init(isPracticeMode: Bool) {
         self.isPracticeMode = isPracticeMode
         let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
-        self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: Fighter(type: .bianca, isEnemy: false))
+        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: Fighter(type: .samuel, isEnemy: true))
         super.init()
-        populateFighters()
+        loadAnimations()
     }
 
-    func populateFighters() {
+    func loadAnimations() {
         let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
         let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
-        fighter = Fighter(type: .bianca, isEnemy: false)
-        fighter.loadAnimations(animations: otherAnimations + attacks)
-
-        enemyFighter = Fighter(type: .samuel, isEnemy: true)
-        enemyFighter.loadAnimations(animations: otherAnimations + attacks)
+        player.fighter.loadAnimations(animations: otherAnimations + attacks)
+        enemyPlayer.fighter.loadAnimations(animations: otherAnimations + attacks)
     }
 
     override func onAppear() {
@@ -74,9 +69,9 @@ class GameViewModel: BaseViewModel {
             if attack.move.id == selectedMove.move.id {
                 currentRound.attacks[index].setStateTo(.selected)
                 //TODO: Remove when done testing animations
-                if isPracticeMode,
-                   let move = Punch(rawValue: selectedMove.move.id) {
-//                    fighter.playAnimation(move.animationType)
+                if isPracticeMode, let punch = Punch(rawValue: selectedMove.move.id) {
+                    playAnimation(attack: punch, defenderAnimation: .hitHead, isAttackerEnemy: false)
+                } else if isPracticeMode {
                     playAnimation(attack: selectedMove.move, defenderAnimation: .hitHead, isAttackerEnemy: false)
                 }
             } else {
@@ -92,20 +87,20 @@ class GameViewModel: BaseViewModel {
             if defense.move.id == selectedMove.move.id {
                 currentRound.defenses[index].setStateTo(.selected)
                 //TODO: Remove when done testing animations
-//                fighter.playAnimation(.killHead)
+//                player.fighter.playAnimation(.killHead)
                 if isPracticeMode,
                    let move = Dash(rawValue: selectedMove.move.id) {
                     switch move.position {
                     case .forward:
-                        fighter.playAnimation(.dodgeHead)
+                        player.fighter.playAnimation(.dodgeHead)
                     case .left:
-                        fighter.playAnimation(.hitHead)
+                        player.fighter.playAnimation(.hitHead)
                     case .backward:
-                        fighter.playAnimation(.killHead)
+                        player.fighter.playAnimation(.killHead)
                     case .right:
-                        fighter.playAnimation(.idleStand)
+                        player.fighter.playAnimation(.idleStand)
                     }
-//                    fighter.playAnimation(move.animationType)
+//                    player.fighter.playAnimation(move.animationType)
                 }
             } else {
                 guard currentRound.defenses[index].state != .cooldown else { continue }
@@ -219,8 +214,8 @@ private extension GameViewModel {
         let secondPlayer = isCurrentFirst ? enemyPlayer : player
         let firstTurn = firstPlayer.currentTurn
         let secondTurn = secondPlayer.currentTurn
-        let firstFighter = isCurrentFirst ? fighter! : enemyFighter!
-        let secondFighter = isCurrentFirst ? enemyFighter! : fighter!
+        let firstFighter = isCurrentFirst ? player.fighter : enemyPlayer.fighter
+        let secondFighter = isCurrentFirst ? enemyPlayer.fighter : player.fighter
         var nextAttackDelayDuration: CGFloat = 0
         ///2) Apply first attacker's damage
         var secondAttackDamageReduction: CGFloat = 0
@@ -276,15 +271,15 @@ private extension GameViewModel {
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
     func playAnimation(attack: any AttackProtocol, defenderAnimation: AnimationType, isAttackerEnemy: Bool) {
-        let attackingFighter = isAttackerEnemy ? enemyFighter : fighter
-        let defendingFighter = isAttackerEnemy ? fighter : enemyFighter
+        let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
+        let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
         DispatchQueue.main.async {
-            attackingFighter?.playAnimation(attack.animationType)
+            attackingFighter.playAnimation(attack.animationType)
         }
         //get delay before playing defender's animation
         //play the defender's animation based on when the attack lands
         DispatchQueue.main.asyncAfter(deadline: .now() + attack.animationType.delayForDefendingAnimation(defenderAnimation)) {
-            defendingFighter?.playAnimation(defenderAnimation)
+            defendingFighter.playAnimation(defenderAnimation)
         }
     }
 
