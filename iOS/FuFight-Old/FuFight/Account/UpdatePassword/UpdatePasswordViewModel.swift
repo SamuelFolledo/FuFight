@@ -68,7 +68,7 @@ private extension UpdatePasswordViewModel {
                 updateLoadingMessage(to: Str.updatingPassword)
                 try await AccountNetworkManager.updatePassword(password)
                 updateError(nil)
-                LOGD("Finished updating password for \(auth.currentUser!.displayName!)")
+                LOGD("Finished updating password for \(auth.currentUser!.displayName!)", from: AccountManager.self)
                 dismissView()
             } catch {
                 updateError(MainError(type: .reauthenticatingUser, message: error.localizedDescription))

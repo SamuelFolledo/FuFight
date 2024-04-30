@@ -194,7 +194,7 @@ private extension AccountViewModel {
                 try await AccountManager.saveCurrent(account)
             }
             try await auth.currentUser?.reload()
-            LOGD("Successfully editted user with \(auth.currentUser!.displayName!) and \(auth.currentUser!.email!)")
+            LOGD("Successfully editted user with \(auth.currentUser!.displayName!) and \(auth.currentUser!.email!)", from: AccountViewModel.self)
             updateError(nil)
             selectedImage = nil
             isViewingMode = true

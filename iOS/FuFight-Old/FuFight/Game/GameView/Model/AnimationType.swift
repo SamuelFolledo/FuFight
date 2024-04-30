@@ -224,7 +224,6 @@ enum AnimationType: String, CaseIterable {
         case .dodgeHead, .hitHead, .killHead:
             //Defense moves
             let delay = hitDuration - defenderAnimationType.hitDuration
-            LOGD("delayForDefendingAnimation's current anim \(rawValue):\(hitDuration) \tAND defender's anim \(defenderAnimationType.rawValue):\(defenderAnimationType.hitDuration) \tIS \(delay)")
             return delay
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //Attack moves

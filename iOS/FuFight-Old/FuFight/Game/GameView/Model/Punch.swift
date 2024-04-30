@@ -101,11 +101,11 @@ extension Punch: AttackProtocol {
     var damageReduction: Double {
         switch self {
         case .leftPunchLight, .rightPunchLight:
-            0.15
+            0.85
         case .leftPunchMedium, .rightPunchMedium:
-            0.25
+            0.75
         case .leftPunchHard, .rightPunchHard:
-            0.35
+            0.65
         }
     }
 

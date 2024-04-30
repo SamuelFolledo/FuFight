@@ -103,11 +103,11 @@ extension AccountNetworkManager {
         let hasPhotoUrl = !photoUrlString.isEmpty
         let changeRequest = auth.currentUser?.createProfileChangeRequest()
         if hasUsername {
-            LOGD("Updating authenticated user's username to \(username)")
+            LOGD("Updating authenticated user's username to \(username)", from: self)
             changeRequest?.displayName = username
         }
         if hasPhotoUrl {
-            LOGD("Updating authenticated user's photoUrl to \(photoUrlString)")
+            LOGD("Updating authenticated user's photoUrl to \(photoUrlString)", from: self)
             changeRequest?.photoURL = photoUrl
         }
         do {

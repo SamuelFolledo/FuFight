@@ -20,8 +20,7 @@ struct GameView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .trailing) {
-                PlayerView(player: vm.enemyPlayer, rounds: vm.rounds)
-                    .padding(.horizontal)
+                enemyView
 
                 enemyMovesView
             }
@@ -30,11 +29,7 @@ struct GameView: View {
 
             playerMovesView
 
-            PlayerView(player: vm.player, rounds: vm.rounds, onImageTappedAction: {
-                vm.isGamePaused = true
-            })
-            .padding(.horizontal)
-            .padding(.top, 8)
+            playerView
         }
         .background {
             GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemyPlayer.fighter, isPracticeMode: vm.isPracticeMode)
@@ -46,7 +41,7 @@ struct GameView: View {
         .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
                secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
-               isPresented: $vm.isGameOver)
+               isPresented: .constant(vm.state == .gameOver))
         .alert(title: "Game is paused",
                primaryButton: AlertButton(title: "Resume", action: {}),
                secondaryButton: AlertButton(title: "Exit", action: { path.removeLast(path.count) }),
@@ -68,15 +63,7 @@ struct GameView: View {
         .allowsHitTesting(vm.loadingMessage == nil)
         .navigationBarBackButtonHidden()
         .onChange(of: scenePhase) {
-            switch scenePhase {
-            case .background, .inactive:
-                LOGD("Scene phase is \(scenePhase)")
-                vm.isTimerActive = false
-            case .active:
-                vm.isTimerActive = true
-            @unknown default:
-                LOGDE("Unknown scene phase \(scenePhase)")
-            }
+            vm.scenePhaseChangedHandler(scenePhase)
         }
         .onReceive(vm.timer) { time in
             vm.decrementTimeByOneSecond()
@@ -84,44 +71,50 @@ struct GameView: View {
     }
 
     var timerView: some View {
-        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.rounds.count)
+        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.player.rounds.count + 1)
             .frame(width: 160)
             .padding(.bottom, 400)
     }
 
 
-    @ViewBuilder var enemyMovesView: some View {
-        if !vm.rounds.isEmpty {
-            MovesView(
-                attacksView: AttacksView(
-                    attacks: vm.currentRound.attacks,
-                    sourceType: .enemy) {
-                        vm.attackSelected($0, isEnemy: true)
-                    },
-                defensesView: DefensesView(
-                    defenses: vm.currentRound.defenses, 
-                    sourceType: .enemy),
-                sourceType: .enemy)
-            .frame(width: 100, height: 120)
-            .padding(.trailing)
-        }
+    var enemyMovesView: some View {
+        MovesView(
+            attacksView: AttacksView(attacks: vm.enemyPlayer.moves.attacks, sourceType: .enemy),
+            defensesView: DefensesView(defenses: vm.enemyPlayer.moves.defenses, sourceType: .enemy),
+            sourceType: .enemy)
+        .frame(width: 100, height: 120)
+        .padding(.trailing)
     }
 
-    @ViewBuilder var playerMovesView: some View {
-        if !vm.rounds.isEmpty {
-            MovesView(
-                attacksView: AttacksView(
-                    attacks: vm.currentRound.attacks,
-                    sourceType: .user) {
-                        vm.attackSelected($0, isEnemy: false)
-                    },
-                defensesView: DefensesView(
-                    defenses: vm.currentRound.defenses,
-                    sourceType: .user) {
-                        vm.defenseSelected($0, isEnemy: false)
-                    },
-                sourceType: .user)
-        }
+    var enemyView: some View {
+        let player = vm.enemyPlayer
+        let enemyPlayer = vm.player
+        return PlayerView(player: player,
+                   enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead))
+            .padding(.horizontal)
+    }
+
+    var playerMovesView: some View {
+        MovesView(
+            attacksView: AttacksView(attacks: vm.player.moves.attacks, sourceType: .user) {
+                vm.attackSelected($0, isEnemy: false)
+            },
+            defensesView: DefensesView(defenses: vm.player.moves.defenses, sourceType: .user) {
+                vm.defenseSelected($0, isEnemy: false)
+            },
+            sourceType: .user)
+    }
+
+    var playerView: some View {
+        let player = vm.player
+        let enemyPlayer = vm.enemyPlayer
+        return PlayerView(player: player,
+                          enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
+                   onImageTappedAction: {
+            vm.isGamePaused = true
+        })
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
 }
 

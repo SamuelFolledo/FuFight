@@ -14,7 +14,7 @@ import SwiftUI
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
 
-let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
+let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FAh7dI1GyI2N4IUVkVUDbqTmvHro2.jpg?alt=media&token=7946e8c2-6812-4b70-b63a-53082f7b0cb1")!
 let fakeAccount = Account()
 
 
@@ -108,3 +108,9 @@ let validImage: some View = Image(systemName: "checkmark.circle.fill")
 
 let defaultAllPunchAttacks: [Attack] = Punch.allCases.map { Attack($0) }
 let defaultAllDashDefenses: [Defend] = Dash.allCases.map { Defend($0) }
+
+///Speed multiplier for the player that has the speed boost
+let speedBoostMultiplier: CGFloat = 1.1
+
+let fakePlayer = Player(photoUrl: fakePhotoUrl, username: "Samuel", hp: 100, maxHp: 100, fighter: Fighter(type: .bianca, isEnemy: false), attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+let fakeEnemyPlayer = Player(photoUrl: fakePhotoUrl, username: "Zoro", hp: 100, maxHp: 100, fighter: Fighter(type: .samuel, isEnemy: true), attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)

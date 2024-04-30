@@ -48,7 +48,7 @@ struct DefensesView: View {
                 .overlay {
                     switch move.state {
                     case .cooldown:
-                        Text("\(move.cooldown)")
+                        Text("\(move.currentCooldown)")
                             .font(sourceType.font)
                             .foregroundStyle(.white)
                             .rotationEffect(sourceType.angle)
