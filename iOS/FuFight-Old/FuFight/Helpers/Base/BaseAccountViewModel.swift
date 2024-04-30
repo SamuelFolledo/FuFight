@@ -35,7 +35,7 @@ private extension BaseAccountViewModel {
         authChangesListener = auth.addStateDidChangeListener { (authDataResult, user) in
             if let user {
                 let updatedAccount = Account(user)
-                LOGD("Auth ACCOUNT changes handler for \(user.displayName ?? "")")
+                LOGD("Auth ACCOUNT changes handler for \(user.displayName ?? "")", from: BaseAccountViewModel.self)
                 self.account.update(with: updatedAccount)
                 AccountManager.saveCurrent(self.account)
             }

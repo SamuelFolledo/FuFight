@@ -32,11 +32,11 @@ private extension HomeViewModel {
         Task {
             do {
                 if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
-                    LOGD("Account verified")
+                    LOGD("Account verified", from: HomeViewModel.self)
                     isAccountVerified = true
                     return
                 }
-                LOGE("Account is invalid \(account.displayName) with id \(account.userId)")
+                LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
                 AccountManager.deleteCurrent()
                 updateError(nil)
                 account.reset()

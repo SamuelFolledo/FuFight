@@ -7,87 +7,94 @@
 
 import SwiftUI
 
+enum GameState {
+    case starting
+    case gaming
+    case gameOver
+
+    var isGameOver: Bool {
+        switch self {
+        case .starting, .gaming:
+            false
+        case .gameOver:
+            true
+        }
+    }
+}
+
 @Observable
 class GameViewModel: BaseViewModel {
+    var state: GameState
     var player: Player
     var enemyPlayer: Player
-    var isGameOver: Bool = false
-    ///Note this will not pause the game for online games
-    var isGamePaused: Bool = false
-    var timeRemaining = defaultMaxTime
-    var isTimerActive: Bool = false
+    let isPracticeMode: Bool
+
     let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
-    ///Contains each round's information. New round is created at the beginning of each round. Meanwhile a turn gets created at the end of the round
-    var rounds: [Round] = []
-    var currentRound: Round { rounds.last! }
-    ///Keeps track of which player gets the speed boost next round. True if current player attacked first and landed it
-    var hasSpeedBoostNextRound = Int.random(in: 0...1) == 0 //TODO: Multiplayer game mode should be synced between games
-    var isPracticeMode = false
+    var isCountingDown: Bool = false
+    var timeRemaining = defaultMaxTime
+    var isGamePaused: Bool = false
+    var secondAttackerDamageDealtReduction: CGFloat = 0
+    ///Delay before the second attacker's animation is played
+    var secondAttackerDelay: CGFloat = 0
 
     init(isPracticeMode: Bool) {
+        self.state = .starting
         self.isPracticeMode = isPracticeMode
-        let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
-        self.player = Player(photoUrl: photoUrl, username: Account.current?.username ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: Fighter(type: .bianca, isEnemy: false))
-        self.enemyPlayer = Player(photoUrl: photoUrl, username: "Brandon", hp: defaultEnemyHp, maxHp: defaultEnemyHp, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: Fighter(type: .samuel, isEnemy: true))
-        super.init()
-        loadAnimations()
-    }
+        let photoUrl = Account.current?.photoUrl ?? fakePhotoUrl
 
-    func loadAnimations() {
-        let attacks: [AnimationType] = [.punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard]
-        let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
-        player.fighter.loadAnimations(animations: otherAnimations + attacks)
-        enemyPlayer.fighter.loadAnimations(animations: otherAnimations + attacks)
+        self.player = Player(photoUrl: photoUrl, username: Account.current?.displayName ?? "", hp: defaultMaxHp, maxHp: defaultMaxHp, fighter: Fighter(type: .bianca, isEnemy: false), attacks: Punch.allCases.map { Attack($0) }, defenses: defaultAllDashDefenses)
+        self.enemyPlayer = Player(photoUrl: fakePhotoUrl, username: "Zoro", hp: defaultMaxHp, maxHp: defaultMaxHp, fighter: Fighter(type: .samuel, isEnemy: true), attacks: Punch.allCases.map { Attack($0) }, defenses: defaultAllDashDefenses)
+        super.init()
     }
 
     override func onAppear() {
         super.onAppear()
-        startNewGame()
+        updateState(.starting)
     }
 
     //MARK: - Public Methods
     func decrementTimeByOneSecond() {
-        guard isTimerActive else { return }
+        //Only countdown when game's state is .gaming and timer is active
+        guard isCountingDown else { return }
+        guard state == .gaming else { return }
         if timeRemaining > 0.01 {
             timeRemaining -= 0.1
         } else {
             endOfRoundHandler()
-            timeRemaining = defaultMaxTime
         }
     }
 
     func rematch() {
         player.prepareForRematch()
         enemyPlayer.prepareForRematch()
-        rounds.removeAll()
-        startNewGame()
+        updateState(.starting)
     }
 
     func attackSelected(_ selectedMove: Attack, isEnemy: Bool) {
         guard selectedMove.state != .cooldown else { return }
-        for (index, attack) in currentRound.attacks.enumerated() {
+        for (index, attack) in player.moves.attacks.enumerated() {
             if attack.move.id == selectedMove.move.id {
-                currentRound.attacks[index].setStateTo(.selected)
+                player.moves.attacks[index].setStateTo(.selected)
                 //TODO: Remove when done testing animations
                 if isPracticeMode, let punch = Punch(rawValue: selectedMove.move.id) {
-                    playAnimation(attack: punch, defenderAnimation: .hitHead, isAttackerEnemy: false)
+                    playFightersAnimation(attackAnimation: punch.animationType, defenderAnimation: .hitHead, isAttackerEnemy: false)
                 } else if isPracticeMode {
-                    playAnimation(attack: selectedMove.move, defenderAnimation: .hitHead, isAttackerEnemy: false)
+                    playFightersAnimation(attackAnimation: selectedMove.move.animationType, defenderAnimation: .hitHead, isAttackerEnemy: false)
                 }
             } else {
-                guard currentRound.attacks[index].state != .cooldown else { continue }
-                currentRound.attacks[index].setStateTo(.unselected)
+                guard player.moves.attacks[index].state != .cooldown else { continue }
+                player.moves.attacks[index].setStateTo(.unselected)
             }
         }
     }
 
     func defenseSelected(_ selectedMove: Defend, isEnemy: Bool) {
         guard selectedMove.state != .cooldown else { return }
-        for (index, defense) in currentRound.defenses.enumerated() {
+        for (index, defense) in player.moves.defenses.enumerated() {
             if defense.move.id == selectedMove.move.id {
-                currentRound.defenses[index].setStateTo(.selected)
+                player.moves.defenses[index].setStateTo(.selected)
                 //TODO: Remove when done testing animations
-//                player.fighter.playAnimation(.killHead)
+//                player.fighter.playAnimation(move.animationType)
                 if isPracticeMode,
                    let move = Dash(rawValue: selectedMove.move.id) {
                     switch move.position {
@@ -100,12 +107,39 @@ class GameViewModel: BaseViewModel {
                     case .right:
                         player.fighter.playAnimation(.idleStand)
                     }
-//                    player.fighter.playAnimation(move.animationType)
                 }
             } else {
-                guard currentRound.defenses[index].state != .cooldown else { continue }
-                currentRound.defenses[index].setStateTo(.unselected)
+                guard player.moves.defenses[index].state != .cooldown else { continue }
+                player.moves.defenses[index].setStateTo(.unselected)
             }
+        }
+    }
+
+    func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
+        if isTestingEnvironment {
+            switch scenePhase {
+            case .background, .inactive:
+                isCountingDown = false
+            case .active:
+                LOGD("Restarting timer now that scene phase is active")
+                isCountingDown = true
+            @unknown default:
+                LOGDE("Unknown scene phase \(scenePhase)")
+            }
+        }
+    }
+
+    func updateState(_ newState: GameState) {
+        self.state = newState
+        switch newState {
+        case .starting:
+            player.loadAnimations()
+            enemyPlayer.loadAnimations()
+            updateState(.gaming)
+        case .gaming:
+            startNewGame()
+        case .gameOver:
+            gameOver()
         }
     }
 }
@@ -113,156 +147,106 @@ class GameViewModel: BaseViewModel {
 //MARK: - Private Methods
 private extension GameViewModel {
     func startNewGame() {
-        createNewRound(isFirstRound: true)
-        isTimerActive = true
+        let hasSpeedBoost = Bool.random()
+        player.state.hasSpeedBoost = hasSpeedBoost
+        enemyPlayer.state.hasSpeedBoost = !hasSpeedBoost
+        createNewRound()
+    }
+
+    func createNewRound() {
+        print("\n\n=================================== Round \(self.player.rounds.count + 1) ============================================")
+        timeRemaining = defaultMaxTime
+        player.prepareForNewRound()
+        enemyPlayer.prepareForNewRound()
+        isCountingDown = true
     }
 
     func endOfRoundHandler() {
-        isTimerActive = false
-        //1. Create a turn from current user's selection
-        player.createTurn(from: currentRound)
-        //2. Get/Fetch enemy's turn
-        enemyPlayer.createTurn(from: currentRound)
-        //TODO: Remove this auto generated enemy turn
-        enemyPlayer.generateEnemyTurnIfNeeded(currentRound: currentRound)
-        //3. Apply damages
+        isCountingDown = false
+        //TODO: Get enemy's selected attack and move for this round that just ended
+        //TODO: Remove this auto generated enemy round
+        if isTestingEnvironment {
+            enemyPlayer.generateEnemyRoundIfNeeded()
+        }
+        enemyPlayer.populateSelectedMovesAndSpeed()
+        player.populateSelectedMovesAndSpeed()
         if !isPracticeMode {
-            calculateDamages()
-        }
-        if enemyPlayer.hp <= 0 {
-            LOGD("Player won")
-            isGameOver = true
-            enemyPlayer.gameOver()
-        } else if player.hp <= 0 {
-            LOGD("Enemy won")
-            isGameOver = true
-            player.gameOver()
-        } else {
-            createNewRound()
-            isTimerActive = true
+            damageAndAnimate()
         }
     }
 
-    func createNewRound(isFirstRound: Bool = false) {
-        var nextRound: Round
-        if isFirstRound {
-            nextRound = Round(round: rounds.count + 1, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, hasSpeedBoost: hasSpeedBoostNextRound, enemyAttacks: defaultAllPunchAttacks, enemyDefenses: defaultAllDashDefenses)
-        } else {
-            nextRound = Round(previousRound: currentRound, hasSpeedBoost: hasSpeedBoostNextRound)
-            updateAttacksWithFireForNextRound(previousRound: currentRound, attacksToUpdate: &nextRound.attacks, player: player)
-            updateAttacksWithFireForNextRound(previousRound: currentRound, attacksToUpdate: &nextRound.enemyAttacks, player: enemyPlayer)
-        }
-        rounds.append(nextRound)
-    }
-    
-    ///Update attacks's fire state based on previous round and boost level
-    func updateAttacksWithFireForNextRound(previousRound: Round, attacksToUpdate: inout [Attack], player: Player) {
-        let isEnemy = player.isEnemy
-        let didLand: Bool
-        let didAttack: Bool
-        if isEnemy {
-            didLand = previousRound.enemyDamage != nil
-            didAttack = previousRound.selectedEnemyAttack != nil
-        } else {
-            didLand = previousRound.damage != nil
-            didAttack = previousRound.selectedAttack != nil
-        }
-        for index in attacksToUpdate.indices {
-            if !didLand || !didAttack {
-                //If previous attack is nil or missed, do not boost
-                attacksToUpdate[index].setFireTo(nil)
-                continue
-            }
-            let previousAttack = isEnemy ? previousRound.selectedEnemyAttack! : previousRound.selectedAttack!
-            if !previousAttack.move.canBoost {
-                //If previous attack cannot boost, do not boost
-                attacksToUpdate[index].setFireTo(nil)
-                continue
-            }
-            //If previous attack landed and can boost, set fire depending on the boost level
-            switch player.boostLevel {
-            case 0:
-                attacksToUpdate[index].setFireTo(nil)
-            case 1:
-                //Do not boost the hard attacks on stage 1 boost
-                let hardAttackPositions: [AttackPosition] = [.rightHard, .leftHard]
-                if let position = attacksToUpdate[index].move.position,
-                   !hardAttackPositions.contains(position) {
-                    if attacksToUpdate[index].move.canBoost {
-                        //If light or medium attack can boost, set it to small fire
-                        attacksToUpdate[index].setFireTo(.small)
-                    } else {
-                        //If light or medium attack cannot boost, then set it to big fire
-                        attacksToUpdate[index].setFireTo(.big)
-                    }
-                } else {
-                    attacksToUpdate[index].setFireTo(nil)
-                }
-            case 2:
-                attacksToUpdate[index].setFireTo(.big)
-            default:
-                attacksToUpdate[index].setFireTo(nil)
-                LOGE("Invalid boost level")
-            }
-        }
-    }
+    ///Handles both player's attack and defend damages and animations
+    func damageAndAnimate() {
+        //1. Apply and play first attacker's animations
+        var isFirstDefenderAlive = true
+        attackingHandler(isFasterAttacker: true)
 
-    func calculateDamages() {
-        ///1) Check which player  is faster to see who goes first
-        let isCurrentFirst = player.currentTurn.speed > enemyPlayer.currentTurn.speed
-        let firstPlayer = isCurrentFirst ? player : enemyPlayer
-        let secondPlayer = isCurrentFirst ? enemyPlayer : player
-        let firstTurn = firstPlayer.currentTurn
-        let secondTurn = secondPlayer.currentTurn
-        let firstFighter = isCurrentFirst ? player.fighter : enemyPlayer.fighter
-        let secondFighter = isCurrentFirst ? enemyPlayer.fighter : player.fighter
-        var nextAttackDelayDuration: CGFloat = 0
-        ///2) Apply first attacker's damage
-        var secondAttackDamageReduction: CGFloat = 0
-        if let firstAttack = firstTurn.attack {
-            nextAttackDelayDuration = firstAttack.move.animationType.animationDuration
-                //TODO: Get the delay from first attack before playing the second fighter's defense animation
-            if secondTurn.didDodge(firstAttack) {
-                applyDamage(nil, to: secondPlayer)
-                playAnimation(attack: firstAttack.move, defenderAnimation: .dodgeHead, isAttackerEnemy: firstFighter.isEnemy)
+        //2. Apply and play second attacker's animations after a delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + secondAttackerDelay) {
+            if isFirstDefenderAlive {
+                attackingHandler(isFasterAttacker: false)
+                self.createNewRound()
             } else {
-                let totalDamage = getTotalDamage(attackerTurn: firstTurn, defenderTurn: secondTurn)
-                applyDamage(totalDamage, to: secondPlayer)
-                if enemyPlayer.isDead || player.isDead {
-                    playAnimation(attack: firstAttack.move, defenderAnimation: .killHead, isAttackerEnemy: firstFighter.isEnemy)
-                    return
-                } else {
-                    playAnimation(attack: firstAttack.move, defenderAnimation: .hitHead, isAttackerEnemy: firstFighter.isEnemy)
-                }
-                ///Additional damage reduction for the second attacker
-                secondAttackDamageReduction = firstAttack.move.damageReduction
+                self.updateState(.gameOver)
             }
-        } else {
-            applyDamage(0, to: secondPlayer)
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + (nextAttackDelayDuration + 0.2)) {
-            ///3) Apply second attacker's damage
-            if let secondAttack = secondTurn.attack {
-                if firstTurn.didDodge(secondAttack) {
-                    self.applyDamage(nil, to: firstPlayer)
-                    self.playAnimation(attack: secondAttack.move, defenderAnimation: .dodgeHead, isAttackerEnemy: secondFighter.isEnemy)
+        func attackingHandler(isFasterAttacker: Bool) {
+            //Get the attacker and defender
+            let attacker: Player
+            let defender: Player
+            if isFasterAttacker {
+                attacker = player.speed > enemyPlayer.speed ? player : enemyPlayer
+                defender = player.speed > enemyPlayer.speed ? enemyPlayer : player
+                //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
+                secondAttackerDelay = attacker.currentRound.attack?.move.animationType.animationDuration ?? 0
+                secondAttackerDamageDealtReduction = attacker.currentRound.attack?.move.damageReduction ?? 0
+
+            } else {
+                attacker = player.speed > enemyPlayer.speed ? enemyPlayer : player
+                defender = player.speed > enemyPlayer.speed ? player : enemyPlayer
+                secondAttackerDelay = 0
+                secondAttackerDamageDealtReduction = 0
+            }
+
+            //Get the damage results
+            let attackResult = GameService.getAttackResult(attackerRound: attacker.currentRound, defenderRound: defender.currentRound, defenderHp: defender.hp, damageReduction: secondAttackerDamageDealtReduction)
+
+//            LOGD("AttackingHandler speed \(attacker.speed) vs \(defender.speed) ATTACKER \(attacker.username) \t\t\(attackResult)")
+
+            //Update attacker based on results
+            if attackResult.didAttackLand {
+                attacker.state.upgradeBoost()
+                //First attacker that landed an attack this round will have speedBoost next round
+                if isFasterAttacker {
+                    attacker.state.hasSpeedBoost = !attacker.isEnemy
+                    defender.state.hasSpeedBoost = attacker.isEnemy
                 } else {
-                    let totalDamage = self.getTotalDamage(attackerTurn: secondTurn, defenderTurn: firstTurn, secondAttackDamageReduction: secondAttackDamageReduction)
-                    self.applyDamage(totalDamage, to: firstPlayer)
-                    if self.enemyPlayer.isDead || self.player.isDead {
-                        self.playAnimation(attack: secondAttack.move, defenderAnimation: .killHead, isAttackerEnemy: secondFighter.isEnemy)
-                        return
-                    } else {
-                        self.playAnimation(attack: secondAttack.move, defenderAnimation: .hitHead, isAttackerEnemy: secondFighter.isEnemy)
+                    if defender.state.hasSpeedBoost == false {
+                        attacker.state.hasSpeedBoost = true
                     }
                 }
             } else {
-                self.applyDamage(0, to: firstPlayer)
+                attacker.state.resetBoost()
             }
-            ///4) For the next turn, give the speed boost to whoever went first
-            //TODO: Fix who gets the speed boost if dodged here
-            self.hasSpeedBoostNextRound = isCurrentFirst
+            if !attackResult.isDefenderAlive {
+                isFirstDefenderAlive = false
+            }
+
+            //Play attacker and defender's animations
+            if let attack = attacker.currentRound.attack,
+               let defenderAnimation = attackResult.defenderAnimation {
+                playFightersAnimation(attackAnimation: attack.move.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: attacker.isEnemy)
+            }
+
+            //Update attacker's moves for next round
+            let selectedAttackCanBoost: Bool = attacker.currentRound.attack?.move.canBoost ?? false
+            attacker.moves.updateAttacksForNextRound(attackLanded: attackResult.didAttackLand, previousAttackCanBoost: selectedAttackCanBoost, boostLevel: attacker.state.boostLevel)
+            attacker.moves.updateDefensesForNextRound()
+
+            //Set attacker and defender's round results
+            attacker.setCurrentRoundAttackResult(attackResult)
+            defender.setCurrentRoundDefendResult(attackResult)
         }
     }
 
@@ -270,44 +254,24 @@ private extension GameViewModel {
     ///   - attack: attacker's attack choice
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
-    func playAnimation(attack: any AttackProtocol, defenderAnimation: AnimationType, isAttackerEnemy: Bool) {
+    func playFightersAnimation(attackAnimation: AnimationType, defenderAnimation: AnimationType, isAttackerEnemy: Bool) {
         let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
         let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
-        DispatchQueue.main.async {
-            attackingFighter.playAnimation(attack.animationType)
-        }
+        attackingFighter.playAnimation(attackAnimation)
         //get delay before playing defender's animation
-        //play the defender's animation based on when the attack lands
-        DispatchQueue.main.asyncAfter(deadline: .now() + attack.animationType.delayForDefendingAnimation(defenderAnimation)) {
+        //play the defender's animation based on when the attack and defense's delay duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + attackAnimation.delayForDefendingAnimation(defenderAnimation)) {
             defendingFighter.playAnimation(defenderAnimation)
         }
     }
 
-    /// Returns the attacker's total damage based on defender's defend choice
-    /// - Parameters:
-    ///   - attackerTurn: attacker's attack
-    ///   - defenderTurn: defender's defend choice
-    ///   - secondAttackDamageReduction: only pass a value if attacker is going second
-    func getTotalDamage(attackerTurn: Turn, defenderTurn: Turn, secondAttackDamageReduction: CGFloat = 0) -> CGFloat {
-        let baseDamage = attackerTurn.attack?.move.damage ?? 0
-        let defenseDamageMultiplier = attackerTurn.defend?.move.damageMultiplier ?? 0
-        let boostDamageMultiplier = attackerTurn.attack?.fireState?.boostMultiplier ?? 0
-        let enemyDamageReduction = defenderTurn.defend?.move.defenseMultiplier ?? 0
-        let totalDamage = baseDamage * (defenseDamageMultiplier + boostDamageMultiplier + 1) * (1 - enemyDamageReduction - secondAttackDamageReduction)
-        return totalDamage
-    }
-
-    ///Applies damage to player and update the attacker's boost level
-    func applyDamage(_ damage: CGFloat?, to playerToDamage: Player) {
-        playerToDamage.damage(amount: damage)
-        let didDodge = damage == nil || (damage ?? 0) == 0
-        if playerToDamage.isEnemy {
-            currentRound.damage = damage
-            //Increment boost level if attack landed, or set to 0
-            player.setBoostLevel(to: didDodge ? 0 : player.boostLevel + 1)
-        } else {
-            currentRound.enemyDamage = damage
-            enemyPlayer.setBoostLevel(to: didDodge ? 0 : enemyPlayer.boostLevel + 1)
+    func gameOver() {
+        if enemyPlayer.isDead {
+            LOGD("Player won", from: GameViewModel.self)
+            enemyPlayer.defeated()
+        } else if player.isDead {
+            LOGD("Enemy won", from: GameViewModel.self)
+            player.defeated()
         }
     }
 }

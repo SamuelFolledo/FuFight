@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct PlayerView: View {
+struct PlayerView<DamagesListView: View>: View {
     var player: Player
-    var rounds: [Round]
+    var enemyDamagesList: DamagesListView
     var onImageTappedAction: (()->Void)?
 
     var body: some View {
@@ -62,7 +62,7 @@ struct PlayerView: View {
                         .foregroundColor(self.calculateBarColor())
                 }
                 .overlay(
-                    Text("\(Int(player.hp)) / \(Int(player.maxHp))")
+                    Text("\(player.hpText) / \(Int(player.maxHp))")
                         .font(mediumTextFont)
                         .foregroundStyle(.white)
                         .padding()
@@ -93,11 +93,11 @@ struct PlayerView: View {
     var nameView: some View {
         HStack {
             if player.isEnemy {
-                if !player.turns.isEmpty {
-                    damagesList
+                if !player.rounds.isEmpty {
+                    enemyDamagesList
                 }
 
-                if !rounds.isEmpty, !rounds.last!.hasSpeedBoost {
+                if player.state.hasSpeedBoost {
                     plusImage
                         .frame(width: 20, height: 20)
                 }
@@ -108,39 +108,13 @@ struct PlayerView: View {
                 .foregroundStyle(.white)
 
             if !player.isEnemy {
-                if !rounds.isEmpty, rounds.last!.hasSpeedBoost {
+                if player.state.hasSpeedBoost {
                     plusImage
                         .frame(width: 20, height: 20)
                 }
 
-                if !player.turns.isEmpty {
-                    damagesList
-                }
-            }
-        }
-    }
-
-    var damagesList: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
-                let rounds = player.hp > 0 ? rounds.dropLast().reversed() : rounds.reversed()
-                ForEach(Array(zip(rounds.indices, rounds)), id: \.1) { index, round in
-                    Group {
-                        let totalDamage = player.isEnemy ? rounds[index].damage : rounds[index].enemyDamage
-                        if let totalDamage {
-                            if totalDamage <= 0 {
-                                Text("Round \(round.id): N/A")
-                                    .foregroundStyle(.white)
-                            } else {
-                                Text("Round \(round.id): \(totalDamage.intString)")
-                                    .foregroundStyle(.red)
-                            }
-                        } else {
-                            Text("Round \(round.id): Dodged")
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    .font(mediumTextFont)
+                if !player.rounds.isEmpty {
+                    enemyDamagesList
                 }
             }
         }
@@ -148,12 +122,7 @@ struct PlayerView: View {
 }
 
 #Preview {
-    let photoUrl = Account.current?.photoUrl ?? URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FS4L442FyMoNRfJEV05aFCHFMC7R2.jpg?alt=media&token=0f185bff-4d16-450d-84c6-5d7645a97fb9")!
     return VStack(spacing: 20) {
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 100, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: .init(type: .samuel, isEnemy: false)), rounds: [])
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 80, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: .init(type: .samuel, isEnemy: false)), rounds: [])
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Samuel", hp: 50, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: .init(type: .samuel, isEnemy: false)), rounds: [])
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 20, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: .init(type: .samuel, isEnemy: false)), rounds: [])
-        PlayerView(player: Player(photoUrl: photoUrl, username: "Brandon", hp: 0, maxHp: 100, attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses, fighter: .init(type: .samuel, isEnemy: false)), rounds: [])
+        PlayerView(player: fakePlayer, enemyDamagesList: DamagesListView(enemyRounds: fakeEnemyPlayer.rounds, isPlayerDead: false))
     }
 }

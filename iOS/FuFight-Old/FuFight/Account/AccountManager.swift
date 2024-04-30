@@ -17,7 +17,7 @@ class AccountManager {
             do {
                 try await saveCurrent(account)
             } catch {
-                LOGE("ACCOUNT: Failed to save current locally")
+                LOGE("ACCOUNT: Failed to save current locally", from: AccountManager.self)
             }
         }
     }
@@ -26,7 +26,7 @@ class AccountManager {
         do {
             let encoder = JSONEncoder()
             let data = try encoder.encode(account)
-            LOGD("ACCOUNT: Locally saving \(account.displayName) with status of \(account.status)")
+            LOGD("ACCOUNT: Locally saving \(account.displayName) with status of \(account.status)", from: AccountManager.self)
             defaults.set(data, forKey: kCURRENTACCOUNT)
         } catch {
             throw error
@@ -37,10 +37,10 @@ class AccountManager {
         guard let data = defaults.data(forKey: kCURRENTACCOUNT) else { return nil }
         do {
             let account = try JSONDecoder().decode(Account.self, from: data)
-            LOGD("ACCOUNT: Locally getting \(account.displayName) with status of \(account.status)")
+            LOGD("ACCOUNT: Locally getting \(account.displayName) with status of \(account.status)", from: AccountManager.self)
             return account
         } catch {
-            LOGE("Error decoding current account \(error.localizedDescription)")
+            LOGE("Error decoding current account \(error.localizedDescription)", from: AccountManager.self)
             return nil
         }
     }

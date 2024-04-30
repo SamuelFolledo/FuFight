@@ -67,7 +67,7 @@ struct AttacksView: View {
                     Group {
                         switch move.state {
                         case .cooldown:
-                            Text("\(move.cooldown)")
+                            Text("\(move.currentCooldown)")
                                 .font(sourceType.font)
                                 .foregroundStyle(.white)
                         case .selected:

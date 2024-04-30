@@ -59,7 +59,7 @@ class Fighter {
         guard isNewAnimation else { return }
         currentAnimation = animationType
         guard let player = animationsNode.animationPlayer(forKey: animationType.rawValue) else {
-            LOGDE("No player found to play for \(animationType)")
+            LOGDE("No player found to play for \(animationType)", from: Fighter.self)
             return
         }
         player.play()

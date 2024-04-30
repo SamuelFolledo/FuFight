@@ -46,27 +46,29 @@ enum Dash: String, CaseIterable, DefendProtocol {
     var damageMultiplier: Double {
         switch self {
         case .forward:
-            0.5
+            1.35
         case .left, .backward, .right:
-            0
+            1
         }
     }
     var speedMultiplier: Double {
         switch self {
         case .left, .right:
-            0
+            1
         case .forward:
             1.5
         case .backward:
             0.5
         }
     }
-    var defenseMultiplier: Double {
+    var incomingDamageMultiplier: Double {
         switch self {
-        case .left, .right, .forward:
-            0
+        case .forward:
+            1.1
+        case .left, .right:
+            1
         case .backward:
-            0.4
+            0.6
         }
     }
 

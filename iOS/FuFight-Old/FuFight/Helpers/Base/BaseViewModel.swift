@@ -39,7 +39,7 @@ class BaseViewModel: ViewModel {
         updateLoadingMessage(to: nil)
         DispatchQueue.main.async {
             if let error {
-                LOGE(error.fullMessage)
+                LOGE(error.fullMessage, from: BaseViewModel.self)
                 self.error = error
                 self.isAlertPresented = true
             } else {
