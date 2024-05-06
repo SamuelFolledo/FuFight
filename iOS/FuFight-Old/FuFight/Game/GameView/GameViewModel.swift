@@ -33,7 +33,7 @@ class GameViewModel: BaseViewModel {
     var timeRemaining = defaultMaxTime
     var isCountingDown: Bool = false
     var isGamePaused: Bool = false
-    var isSecondAttackerAlive = true
+    var isDefenderAlive = true
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
 
@@ -124,7 +124,7 @@ private extension GameViewModel {
         let hasSpeedBoost = Bool.random()
         player.state.setSpeedBoost(to: hasSpeedBoost)
         enemyPlayer.state.setSpeedBoost(to: !hasSpeedBoost)
-        isSecondAttackerAlive = true
+        isDefenderAlive = true
         createNewRound()
     }
 
@@ -134,7 +134,7 @@ private extension GameViewModel {
         enemyPlayer.prepareForNewRound()
         secondAttackerDelay = 0
         secondAttackerDamageDealtReduction = 0
-        isSecondAttackerAlive = true
+        isDefenderAlive = true
         isCountingDown = true
     }
 
@@ -158,12 +158,15 @@ private extension GameViewModel {
 
         //2. Apply and play second attacker's animations after a delay
         runAfterDelay(delay: secondAttackerDelay) {
-            if self.isSecondAttackerAlive {
+            if self.isDefenderAlive {
                 self.attackingHandler(isFasterAttacker: false)
-                self.createNewRound()
-            } else {
-                self.updateState(.gameOver)
+
+                if self.isDefenderAlive {
+                    self.createNewRound()
+                    return
+                }
             }
+            self.updateState(.gameOver)
         }
     }
 
@@ -206,9 +209,8 @@ private extension GameViewModel {
         } else {
             attacker.state.resetBoost()
         }
-        if !attackResult.isDefenderAlive {
-            isSecondAttackerAlive = false
-        }
+
+        isDefenderAlive = attackResult.isDefenderAlive
 
         //Set attacker and defender's round results
         attacker.setCurrentRoundAttackResult(attackResult)
