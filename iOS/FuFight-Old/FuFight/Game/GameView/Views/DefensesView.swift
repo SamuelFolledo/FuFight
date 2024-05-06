@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct DefensesView: View {
-    var defenses: [Defend]
-    var sourceType: MovesViewSourceType
-    var moveSelected: ((Defend) -> Void)?
+    var defenses: [Defense]
+    var playerType: PlayerType
+    var moveSelected: ((Defense) -> Void)?
+
+    init(defenses: [Defense], playerType: PlayerType, moveSelected: ((Defense) -> Void)? = nil) {
+        self.defenses = defenses
+        self.playerType = playerType
+        self.moveSelected = moveSelected
+    }
 
     var body: some View {
         HStack(alignment: .bottom) {
@@ -26,35 +32,35 @@ struct DefensesView: View {
         }
     }
 
-    @ViewBuilder func createButtonFrom(_ position: DefendPosition) -> some View {
-        ForEach(defenses, id: \.move.id) { move in
-            if move.move.position == position {
+    @ViewBuilder func createButtonFrom(_ position: DefensePosition) -> some View {
+        ForEach(defenses, id: \.id) { move in
+            if move.position == position {
                 Button(action: {
                     moveSelected?(move)
                 }, label: {
-                    Image(move.move.iconName)
+                    Image(move.iconName)
                         .defaultImageModifier()
                         .aspectRatio(1.0, contentMode: .fit)
-                        .padding(sourceType == .enemy ? 4 : move.move.padding)
+                        .padding(playerType.isEnemy ? 4 : move.padding)
                         .background(
-                            Image(move.move.backgroundIconName)
+                            Image(move.backgroundIconName)
                                 .backgroundImageModifier()
                                 .scaledToFit()
                         )
                 })
-                .frame(width: sourceType.shouldFlip ? 18 : 100)
+                .frame(width: playerType.shouldFlip ? 18 : 100)
                 .blur(radius: move.state.blurRadius, opaque: false)
                 .opacity(move.state.opacity)
                 .overlay {
                     switch move.state {
                     case .cooldown:
                         Text("\(move.currentCooldown)")
-                            .font(sourceType.font)
+                            .font(playerType.font)
                             .foregroundStyle(.white)
-                            .rotationEffect(sourceType.angle)
+                            .rotationEffect(playerType.angle)
                     case .selected:
                         Circle()
-                            .stroke(.green, lineWidth: sourceType.shouldFlip ? 2 : 4)
+                            .stroke(.green, lineWidth: playerType.shouldFlip ? 2 : 4)
                     case .initial, .unselected:
                         EmptyView()
                     }
@@ -65,5 +71,5 @@ struct DefensesView: View {
 }
 
 #Preview {
-    DefensesView(defenses: defaultAllDashDefenses, sourceType: .enemy)
+    DefensesView(defenses: defaultAllDashDefenses, playerType: .enemy)
 }

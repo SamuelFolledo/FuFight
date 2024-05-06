@@ -8,91 +8,180 @@
 import SwiftUI
 
 struct Moves {
-    var attacks: [Attack]
-    var defenses: [Defend]
-    var leftLightAttack: Attack
-    var rightLightAttack: Attack
-    var leftMediumAttack: Attack
-    var rightMediumAttack: Attack
-    var leftHardAttack: Attack
-    var rightHardAttack: Attack
+    private(set) var leftLightAttack: Attack
+    private(set) var rightLightAttack: Attack
+    private(set) var leftMediumAttack: Attack
+    private(set) var rightMediumAttack: Attack
+    private(set) var leftHardAttack: Attack
+    private(set) var rightHardAttack: Attack
+
+    private(set) var forwardDefense: Defense
+    private(set) var leftDefense: Defense
+    private(set) var backwardDefense: Defense
+    private(set) var rightDefense: Defense
 
     let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
-
-    var animationTypes: [AnimationType] {
-        attacks.compactMap { $0.move.animationType } +
-        defenses.compactMap { $0.move.animationType } +
-        otherAnimations
+    let animationTypes: [AnimationType]
+    var attacks: [Attack] {
+        [leftLightAttack, leftMediumAttack, leftHardAttack, rightLightAttack, rightMediumAttack, rightHardAttack]
     }
+    var defenses: [Defense] {
+        [forwardDefense, leftDefense, rightDefense, backwardDefense]
+    }
+    var availableAttacks: [Attack] { attacks.filter{ $0.state != .cooldown } }
+    var unavailableAttacks: [Attack] { attacks.filter{ $0.state == .cooldown } }
+    var availableDefenses: [Defense] { defenses.filter{ $0.state != .cooldown } }
+    var unavailableDefenses: [Defense] { defenses.filter{ $0.state == .cooldown } }
+    var selectedAttack: Attack? { attacks.first { $0.state == .selected } }
+    var selectedDefense: Defense? { defenses.first { $0.state == .selected } }
 
     //MARK: Initializers
-    init(attacks: [Attack], defenses: [Defend]) {
-        self.attacks = attacks
-        self.defenses = defenses
-        self.leftLightAttack = attacks.first { $0.move.position == .leftLight }!
-        self.rightLightAttack = attacks.first { $0.move.position == .rightLight }!
-        self.leftMediumAttack = attacks.first { $0.move.position == .leftMedium }!
-        self.rightMediumAttack = attacks.first { $0.move.position == .rightMedium }!
-        self.leftHardAttack = attacks.first { $0.move.position == .leftHard }!
-        self.rightHardAttack = attacks.first { $0.move.position == .rightHard }!
+    init(attacks: [Attack], defenses: [Defense]) {
+        self.leftLightAttack = attacks.first { $0.position == .leftLight }!
+        self.rightLightAttack = attacks.first { $0.position == .rightLight }!
+        self.leftMediumAttack = attacks.first { $0.position == .leftMedium }!
+        self.rightMediumAttack = attacks.first { $0.position == .rightMedium }!
+        self.leftHardAttack = attacks.first { $0.position == .leftHard }!
+        self.rightHardAttack = attacks.first { $0.position == .rightHard }!
+
+        self.forwardDefense = defenses.first { $0.position == .forward }!
+        self.leftDefense = defenses.first { $0.position == .left }!
+        self.backwardDefense = defenses.first { $0.position == .backward }!
+        self.rightDefense = defenses.first { $0.position == .right }!
+
+        self.animationTypes = attacks.compactMap { $0.animationType } + defenses.compactMap { $0.animationType } + otherAnimations
     }
 
     //MARK: - Public Methods
-
-    mutating func resetMoves() {
-        for index in attacks.indices {
-            attacks[index].setStateTo(.initial)
-        }
-        for index in defenses.indices {
-            defenses[index].setStateTo(.initial)
-        }
+    mutating func randomlySelectMoves() {
+        //TODO: Remove this auto generated enemy round
+        guard let randomAttack = availableAttacks.randomElement() else { return }
+        updateSelected(randomAttack.position)
+//        let randomDefense: Defense = availableDefenses.randomElement()!
+        let randomDefense: Defense = availableDefenses.filter { $0.state != .cooldown }.filter { $0.position == .left || $0.position == .right }.randomElement()!
+        updateSelected(randomDefense.position)
     }
 
-    mutating func updateAttacksForNextRound(attackLanded: Bool, previousAttackCanBoost: Bool, boostLevel: BoostLevel) {
-        for index in attacks.indices {
-            if !attackLanded {
-                //If previous attack is nil or missed, do not boost
-                attacks[index].setFireTo(nil)
-                continue
-            }
+    mutating func resetMoves() {
+        leftLightAttack.reset()
+        leftLightAttack.setFireState(to: .initial)
+        leftMediumAttack.reset()
+        leftMediumAttack.setFireState(to: .initial)
+        leftHardAttack.reset()
+        leftHardAttack.setFireState(to: .initial)
+        rightLightAttack.reset()
+        rightLightAttack.setFireState(to: .initial)
+        rightMediumAttack.reset()
+        rightMediumAttack.setFireState(to: .initial)
+        rightHardAttack.reset()
+        rightHardAttack.setFireState(to: .initial)
 
-            if !previousAttackCanBoost {
-                //If previous attack cannot boost, do not boost
-                attacks[index].setFireTo(nil)
-                continue
-            }
-            //If previous attack landed and can boost, set fire depending on the boost level
-            switch boostLevel {
-            case .none:
-                attacks[index].setFireTo(nil)
-            case .small:
-                //Do not boost the hard attacks on small boost
-                let hardAttackPositions: [AttackPosition] = [.rightHard, .leftHard]
-                if let position = attacks[index].move.position,
-                   !hardAttackPositions.contains(position) {
-                    if attacks[index].move.canBoost {
-                        //If light or medium attack can boost, set it to small fire
-                        attacks[index].setFireTo(.small)
-                    } else {
-                        //If light or medium attack cannot boost, then set it to big fire
-                        attacks[index].setFireTo(.big)
-                    }
-                } else {
-                    attacks[index].setFireTo(nil)
-                }
-            case .big:
-                attacks[index].setFireTo(.big)
-            }
+        forwardDefense.reset()
+        backwardDefense.reset()
+        leftDefense.reset()
+        rightDefense.reset()
+    }
+
+    mutating func updateAttacksForNextRound(attackLanded: Bool, boostLevel: BoostLevel) {
+        if !attackLanded {
+            setAttacksFireState(to: .initial)
+            setAttacksStateForNextRound()
+            return
         }
 
-        for index in attacks.indices {
-            GameService.updateMoveStatesForNextRound(&attacks[index])
+        let selectedAttackCanBoost: Bool = selectedAttack?.canBoost ?? false
+        if !selectedAttackCanBoost {
+            setAttacksFireState(to: .initial)
+            setAttacksStateForNextRound()
+            return
+        }
+
+        setAttacksStateForNextRound()
+        switch boostLevel {
+        case .none:
+            setAttacksFireState(to: .initial)
+        case .small:
+            setAttacksToSmallFireState()
+        case .big:
+            setAttacksFireState(to: .big)
         }
     }
 
     mutating func updateDefensesForNextRound() {
-        for index in defenses.indices {
-            GameService.updateMoveStatesForNextRound(&defenses[index])
+        forwardDefense.updateStateForNextRound()
+        backwardDefense.updateStateForNextRound()
+        leftDefense.updateStateForNextRound()
+        rightDefense.updateStateForNextRound()
+    }
+
+    mutating func updateSelected(_ position: AttackPosition) {
+        if leftLightAttack.isAvailable() {
+            leftLightAttack.setState(to: leftLightAttack.position == position ? .selected : .unselected)
         }
+        if rightLightAttack.isAvailable() {
+            rightLightAttack.setState(to: rightLightAttack.position == position ? .selected : .unselected)
+        }
+        if leftMediumAttack.isAvailable() {
+            leftMediumAttack.setState(to: leftMediumAttack.position == position ? .selected : .unselected)
+        }
+        if rightMediumAttack.isAvailable() {
+            rightMediumAttack.setState(to: rightMediumAttack.position == position ? .selected : .unselected)
+        }
+        if leftHardAttack.isAvailable() {
+            leftHardAttack.setState(to: leftHardAttack.position == position ? .selected : .unselected)
+        }
+        if rightHardAttack.isAvailable() {
+            rightHardAttack.setState(to: rightHardAttack.position == position ? .selected : .unselected)
+        }
+    }
+
+    mutating func updateSelected(_ position: DefensePosition) {
+        if leftDefense.isAvailable() {
+            leftDefense.setState(to: leftDefense.position == position ? .selected : .unselected)
+        }
+        if rightDefense.isAvailable() {
+            rightDefense.setState(to: rightDefense.position == position ? .selected : .unselected)
+        }
+        if forwardDefense.isAvailable() {
+            forwardDefense.setState(to: forwardDefense.position == position ? .selected : .unselected)
+        }
+        if backwardDefense.isAvailable() {
+            backwardDefense.setState(to: backwardDefense.position == position ? .selected : .unselected)
+        }
+    }
+}
+
+private extension Moves {
+    mutating func setAttacksStateForNextRound() {
+        leftLightAttack.updateStateForNextRound()
+        leftMediumAttack.updateStateForNextRound()
+        leftHardAttack.updateStateForNextRound()
+        rightLightAttack.updateStateForNextRound()
+        rightMediumAttack.updateStateForNextRound()
+        rightHardAttack.updateStateForNextRound()
+    }
+
+    mutating func setAttacksFireState(to fireState: FireState) {
+        if fireState == .small {
+            setAttacksToSmallFireState()
+            return
+        }
+        leftLightAttack.setFireState(to: fireState)
+        leftMediumAttack.setFireState(to: fireState)
+        leftHardAttack.setFireState(to: fireState)
+        rightLightAttack.setFireState(to: fireState)
+        rightMediumAttack.setFireState(to: fireState)
+        rightHardAttack.setFireState(to: fireState)
+    }
+
+    mutating func setAttacksToSmallFireState() {
+        //If attack can boost, set it to small fire, else big fire
+        leftLightAttack.setFireState(to: leftLightAttack.canBoost ? .small : .big)
+        leftMediumAttack.setFireState(to: leftMediumAttack.canBoost ? .small : .big)
+        rightLightAttack.setFireState(to: rightLightAttack.canBoost ? .small : .big)
+        rightMediumAttack.setFireState(to: rightMediumAttack.canBoost ? .small : .big)
+        //Do not boost the hard attacks on small boost
+        leftHardAttack.setFireState(to: .initial)
+        rightHardAttack.setFireState(to: .initial)
     }
 }

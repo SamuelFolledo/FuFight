@@ -11,13 +11,13 @@ import SceneKit
 class Fighter {
     let fighterType: FighterType
     let isEnemy: Bool
-    var defaultAnimation: AnimationType
+    private(set) var defaultAnimation: AnimationType
 
     ///Will contain all of the fighter node
-    var daeHolderNode = SCNNode()
+    private(set) var daeHolderNode = SCNNode()
     ///parent of all animation nodes
-    var animationsNode: SCNNode!
-    var currentAnimation: AnimationType?
+    private(set) var animationsNode: SCNNode!
+    private(set) var currentAnimation: AnimationType?
 
     init(type: FighterType, isEnemy: Bool) {
         self.fighterType = type
@@ -65,11 +65,15 @@ class Fighter {
         player.play()
         currentAnimation = nil
         if animationType == .killHead {
-            //Pause animation after playing kill animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + (player.animation.duration - 0.2)) {
+            //Pause fighter's animations after playing the kill animation. Reduce duration by 0.2 to not let the fighter stand back up
+            runAfterDelay(delay: player.animation.duration - 0.2) {
                 self.pauseAnimations()
             }
         }
+    }
+
+    func resumeAnimations() {
+        animationsNode.isPaused = false
     }
 
     func pauseAnimations() {

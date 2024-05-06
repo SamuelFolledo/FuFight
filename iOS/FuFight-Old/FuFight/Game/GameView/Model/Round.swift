@@ -11,7 +11,7 @@ import Foundation
 struct Round {
     private(set) var round: Int
     var attack: Attack?
-    var defend: Defend?
+    var defend: Defense?
     var attackResult: AttackResult?
 
     var resultValue: String {

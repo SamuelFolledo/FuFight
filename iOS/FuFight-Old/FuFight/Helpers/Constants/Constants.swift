@@ -32,7 +32,7 @@ let accountPhotoCompressionQuality: Double = 0.3
 let smallerHorizontalPadding: CGFloat = 18
 let horizontalPadding: CGFloat = 36
 let accountImagePickerHeight: CGFloat = 160
-let defaultMaxTime: CGFloat = 10
+let defaultMaxTime: CGFloat = 5
 let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
 
@@ -106,11 +106,39 @@ let invalidImage: some View = Image(systemName: "xmark.circle.fill")
 let validImage: some View = Image(systemName: "checkmark.circle.fill")
     .foregroundColor(Color.systemGreen)
 
-let defaultAllPunchAttacks: [Attack] = Punch.allCases.map { Attack($0) }
-let defaultAllDashDefenses: [Defend] = Dash.allCases.map { Defend($0) }
+let defaultAllPunchAttacks: [Attack] = Punch.allCases.compactMap { Attack($0) }
+let defaultAllDashDefenses: [Defense] = Dash.allCases.compactMap { Defense($0) }
 
 ///Speed multiplier for the player that has the speed boost
 let speedBoostMultiplier: CGFloat = 1.1
 
-let fakePlayer = Player(photoUrl: fakePhotoUrl, username: "Samuel", hp: 100, maxHp: 100, fighter: Fighter(type: .bianca, isEnemy: false), attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
-let fakeEnemyPlayer = Player(photoUrl: fakePhotoUrl, username: "Zoro", hp: 100, maxHp: 100, fighter: Fighter(type: .samuel, isEnemy: true), attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+//let fakePlayer = Player(photoUrl: fakePhotoUrl,
+//                        username: "Samuel",
+//                        hp: defaultMaxHp,
+//                        maxHp: defaultMaxHp,
+//                        fighter: Fighter(type: .bianca, isEnemy: false),
+//                        state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+//                        moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+let fakeEnemyPlayer = Player(photoUrl: fakePhotoUrl,
+                             username: "Zoro",
+                             hp: defaultEnemyHp,
+                             maxHp: defaultEnemyHp,
+                             fighter: Fighter(type: .samuel, isEnemy: true),
+                             state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+                             moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+
+//MARK: - Constant Methods
+///Run action after a delayed time in seconds
+func runAfterDelay(delay: TimeInterval, action: @escaping () -> Void) {
+    Task {
+        do {
+            try await Task.sleep(delay)
+        } catch { // Task canceled
+            return
+        }
+
+        await MainActor.run {
+            action()
+        }
+    }
+}

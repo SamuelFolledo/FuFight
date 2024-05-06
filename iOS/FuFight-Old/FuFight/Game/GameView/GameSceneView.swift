@@ -92,9 +92,8 @@ private extension GameSceneView {
             MovesView(
                 attacksView: AttacksView(
                     attacks: defaultAllPunchAttacks,
-                    sourceType: .enemy) { attack in
-                        guard let attackPosition = attack.move.position else { return }
-                        switch attackPosition {
+                    playerType: .enemy) { attack in
+                        switch attack.position {
                         case .leftLight:
                             fighter.playAnimation(.punchHeadLeftLight)
                         case .rightLight:
@@ -111,8 +110,8 @@ private extension GameSceneView {
                     },
                 defensesView: DefensesView(
                     defenses: defaultAllDashDefenses,
-                    sourceType: .enemy) { defense in
-                        switch defense.move.position {
+                    playerType: .enemy) { defense in
+                        switch defense.position {
                         case .forward:
                             fighter.playAnimation(.idleStand)
                         case .left:
@@ -123,7 +122,7 @@ private extension GameSceneView {
                             fighter.playAnimation(.idle)
                         }
                     },
-                sourceType: .enemy)
+                playerType: .enemy)
         )
         .ignoresSafeArea()
 }

@@ -7,42 +7,10 @@
 
 import SwiftUI
 
-enum MovesViewSourceType {
-    ///Current user's MovesView
-    case user
-    ///Enemy's MovesView which is mini and mirrored at the top
-    case enemy
-
-    var font: Font {
-        switch self {
-        case .user:
-            largeTitleFont
-        case .enemy:
-            smallTitleFont
-        }
-    }
-    var angle: Angle {
-        switch self {
-        case .user:
-                .radians(.zero)
-        case .enemy:
-                .radians(.pi)
-        }
-    }
-    var shouldFlip: Bool {
-        switch self {
-        case .user:
-            false
-        case .enemy:
-            true
-        }
-    }
-}
-
 struct MovesView<AttacksView: View, DefensesView: View>: View {
     var attacksView: AttacksView
     var defensesView: DefensesView
-    var sourceType: MovesViewSourceType
+    var playerType: PlayerType
 
     var body: some View {
         VStack {
@@ -50,16 +18,9 @@ struct MovesView<AttacksView: View, DefensesView: View>: View {
 
             defensesView
         }
-        .scaleEffect(x: sourceType.shouldFlip ? -1 : 1, y: sourceType.shouldFlip ? -1 : 1) // flip vertically and horizontally
+        .scaleEffect(x: playerType.shouldFlip ? -1 : 1, y: playerType.shouldFlip ? -1 : 1) // flip vertically and horizontally
         .background(
-            Group {
-                switch sourceType {
-                case .user:
-                    Color.clear
-                case .enemy:
-                    Color.systemGray
-                }
-            }
+            playerType.background
                 .cornerRadius(16)
                 .opacity(0.5)
                 .padding(.horizontal, 2)
@@ -69,16 +30,14 @@ struct MovesView<AttacksView: View, DefensesView: View>: View {
 }
 
 #Preview {
-    MovesView(
-        attacksView: AttacksView(
-            attacks: defaultAllPunchAttacks,
-            sourceType: .enemy) { move in
-                LOGD("MovesView Attack is selected \(move.name)")
-            },
-        defensesView: DefensesView(
-            defenses: defaultAllDashDefenses,
-            sourceType: .enemy) { move in
-                LOGD("MovesView Defense is selected \(move.name)")
-            },
-        sourceType: .enemy)
+    let playerType: PlayerType = .user
+
+    return MovesView(
+        attacksView: AttacksView(attacks: defaultAllPunchAttacks, playerType: playerType) {
+            LOGD("Selected attack is \($0.name)")
+        },
+        defensesView: DefensesView(defenses: defaultAllDashDefenses, playerType: playerType) {
+            LOGD("Selected defense is \($0.name)")
+        },
+        playerType: playerType)
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum Punch: String, CaseIterable {
+enum Punch: String, CaseIterable, AttackTypeProtocol {
     case leftPunchLight
     case leftPunchMedium
     case leftPunchHard
@@ -75,7 +75,7 @@ extension Punch {
 }
 
 //MARK: - AttackProtocol extension
-extension Punch: AttackProtocol {
+extension Punch {
     var damage: Double {
         switch self {
         case .leftPunchLight, .rightPunchLight:
@@ -109,8 +109,21 @@ extension Punch: AttackProtocol {
         }
     }
 
-    var position: AttackPosition? {
-        animationType.position
+    var position: AttackPosition {
+        switch self {
+        case .leftPunchLight:
+            .leftLight
+        case .leftPunchMedium:
+            .leftMedium
+        case .leftPunchHard:
+            .leftHard
+        case .rightPunchLight:
+            .rightLight
+        case .rightPunchMedium:
+            .rightMedium
+        case .rightPunchHard:
+            .rightHard
+        }
     }
 
     var canBoost: Bool {
@@ -120,5 +133,9 @@ extension Punch: AttackProtocol {
         case .leftPunchMedium, .leftPunchHard, .rightPunchHard:
             false
         }
+    }
+
+    var isAttack: Bool {
+        true
     }
 }

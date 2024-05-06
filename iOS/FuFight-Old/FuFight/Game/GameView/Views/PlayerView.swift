@@ -123,6 +123,6 @@ struct PlayerView<DamagesListView: View>: View {
 
 #Preview {
     return VStack(spacing: 20) {
-        PlayerView(player: fakePlayer, enemyDamagesList: DamagesListView(enemyRounds: fakeEnemyPlayer.rounds, isPlayerDead: false))
+        PlayerView(player: fakeEnemyPlayer, enemyDamagesList: DamagesListView(enemyRounds: fakeEnemyPlayer.rounds, isPlayerDead: false))
     }
 }

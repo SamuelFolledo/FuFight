@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum Dash: String, CaseIterable, DefendProtocol {
+enum Dash: String, CaseIterable, DefenseTypeProtocol {
     case left
     case forward
     case backward
@@ -81,7 +81,7 @@ enum Dash: String, CaseIterable, DefendProtocol {
         }
     }
 
-    var position: DefendPosition {
+    var position: DefensePosition {
         switch self {
         case .left:
                 .left
@@ -110,4 +110,6 @@ enum Dash: String, CaseIterable, DefendProtocol {
             .idle
         }
     }
+
+    var isAttack: Bool { return false }
 }

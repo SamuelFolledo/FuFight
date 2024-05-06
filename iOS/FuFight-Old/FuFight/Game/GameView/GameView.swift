@@ -20,16 +20,16 @@ struct GameView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .trailing) {
-                enemyView
+                createPlayerView(for: .enemy)
 
-                enemyMovesView
+                createMovesView(for: .enemy)
             }
 
             Spacer()
 
-            playerMovesView
+            createMovesView(for: .user)
 
-            playerView
+            createPlayerView(for: .user)
         }
         .background {
             GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemyPlayer.fighter, isPracticeMode: vm.isPracticeMode)
@@ -76,45 +76,35 @@ struct GameView: View {
             .padding(.bottom, 400)
     }
 
-
-    var enemyMovesView: some View {
-        MovesView(
-            attacksView: AttacksView(attacks: vm.enemyPlayer.moves.attacks, sourceType: .enemy),
-            defensesView: DefensesView(defenses: vm.enemyPlayer.moves.defenses, sourceType: .enemy),
-            sourceType: .enemy)
-        .frame(width: 100, height: 120)
-        .padding(.trailing)
-    }
-
-    var enemyView: some View {
-        let player = vm.enemyPlayer
-        let enemyPlayer = vm.player
-        return PlayerView(player: player,
-                   enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead))
-            .padding(.horizontal)
-    }
-
-    var playerMovesView: some View {
-        MovesView(
-            attacksView: AttacksView(attacks: vm.player.moves.attacks, sourceType: .user) {
-                vm.attackSelected($0, isEnemy: false)
-            },
-            defensesView: DefensesView(defenses: vm.player.moves.defenses, sourceType: .user) {
-                vm.defenseSelected($0, isEnemy: false)
-            },
-            sourceType: .user)
-    }
-
-    var playerView: some View {
-        let player = vm.player
-        let enemyPlayer = vm.enemyPlayer
-        return PlayerView(player: player,
-                          enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
+    ///Returns the player's view including player's name, photo, and HP, and damages
+    @ViewBuilder func createPlayerView(for playerType: PlayerType) -> some View {
+        let player = playerType.isEnemy ? vm.enemyPlayer : vm.player
+        let enemyPlayer = playerType.isEnemy ? vm.player : vm.enemyPlayer
+        PlayerView(player: player,
+                   enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
                    onImageTappedAction: {
-            vm.isGamePaused = true
+            if playerType == .user {
+                vm.isGamePaused = true
+            }
         })
         .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.top, playerType.isEnemy ? 0 : 8)
+    }
+
+    ///Returns the attacks and defenses view for a player
+    ///Note: For some reason attacks and defenses view is required to be inside an @ViewBuilder function to refresh its state and fire state
+    @ViewBuilder func createMovesView(for playerType: PlayerType) -> some View {
+        let player = playerType.isEnemy ? vm.enemyPlayer : vm.player
+        MovesView(
+            attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType) {
+                vm.attackSelected($0, isEnemy: playerType.isEnemy)
+            },
+            defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
+                vm.defenseSelected($0, isEnemy: playerType.isEnemy)
+            },
+            playerType: playerType)
+        .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
+        .padding(playerType.isEnemy ? [.trailing] : [])
     }
 }
 
