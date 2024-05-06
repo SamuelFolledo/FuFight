@@ -20,8 +20,9 @@ struct Moves {
     private(set) var backwardDefense: Defense
     private(set) var rightDefense: Defense
 
-    let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
     let animationTypes: [AnimationType]
+
+    let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
     var attacks: [Attack] {
         [leftLightAttack, leftMediumAttack, leftHardAttack, rightLightAttack, rightMediumAttack, rightHardAttack]
     }
@@ -63,48 +64,33 @@ struct Moves {
     }
 
     mutating func resetMoves() {
-        leftLightAttack.reset()
-        leftLightAttack.setFireState(to: .initial)
-        leftMediumAttack.reset()
-        leftMediumAttack.setFireState(to: .initial)
-        leftHardAttack.reset()
-        leftHardAttack.setFireState(to: .initial)
-        rightLightAttack.reset()
-        rightLightAttack.setFireState(to: .initial)
-        rightMediumAttack.reset()
-        rightMediumAttack.setFireState(to: .initial)
-        rightHardAttack.reset()
-        rightHardAttack.setFireState(to: .initial)
-
-        forwardDefense.reset()
-        backwardDefense.reset()
-        leftDefense.reset()
-        rightDefense.reset()
+        setStates(to: .initial, shouldForce: true)
+        setFireStates(to: .initial)
     }
 
     mutating func updateAttacksForNextRound(attackLanded: Bool, boostLevel: BoostLevel) {
         if !attackLanded {
-            setAttacksFireState(to: .initial)
+            setFireStates(to: .initial)
             setAttacksStateForNextRound()
             return
         }
 
         let selectedAttackCanBoost: Bool = selectedAttack?.canBoost ?? false
         if !selectedAttackCanBoost {
-            setAttacksFireState(to: .initial)
+            setFireStates(to: .initial)
             setAttacksStateForNextRound()
             return
         }
 
-        setAttacksStateForNextRound()
         switch boostLevel {
         case .none:
-            setAttacksFireState(to: .initial)
+            setFireStates(to: .initial)
         case .small:
-            setAttacksToSmallFireState()
+            setFireStates(to: .small)
         case .big:
-            setAttacksFireState(to: .big)
+            setFireStates(to: .big)
         }
+        setAttacksStateForNextRound()
     }
 
     mutating func updateDefensesForNextRound() {
@@ -114,6 +100,7 @@ struct Moves {
         rightDefense.updateStateForNextRound()
     }
 
+    ///Set the selected attack based on the position, the remaining available attacks will become unselected
     mutating func updateSelected(_ position: AttackPosition) {
         if leftLightAttack.isAvailable() {
             leftLightAttack.setState(to: leftLightAttack.position == position ? .selected : .unselected)
@@ -135,6 +122,7 @@ struct Moves {
         }
     }
 
+    ///Set the selected defense based on the position, the remaining available defense will become unselected
     mutating func updateSelected(_ position: DefensePosition) {
         if leftDefense.isAvailable() {
             leftDefense.setState(to: leftDefense.position == position ? .selected : .unselected)
@@ -161,20 +149,77 @@ private extension Moves {
         rightHardAttack.updateStateForNextRound()
     }
 
-    mutating func setAttacksFireState(to fireState: FireState) {
-        if fireState == .small {
-            setAttacksToSmallFireState()
-            return
-        }
-        leftLightAttack.setFireState(to: fireState)
-        leftMediumAttack.setFireState(to: fireState)
-        leftHardAttack.setFireState(to: fireState)
-        rightLightAttack.setFireState(to: fireState)
-        rightMediumAttack.setFireState(to: fireState)
-        rightHardAttack.setFireState(to: fireState)
+    /// - parameter shouldForce: if true, forces the states to the newState.
+    mutating func setStates(to newState: MoveButtonState, shouldForce: Bool = false) {
+        setAttackStates(to: newState, shouldForce: shouldForce)
+        setDefenseStates(to: newState, shouldForce: shouldForce)
     }
 
-    mutating func setAttacksToSmallFireState() {
+    /// - parameter shouldForce: if true, forces the states to the newState.
+    mutating func setDefenseStates(to newState: MoveButtonState, shouldForce: Bool = false) {
+        if shouldForce || forwardDefense.isAvailable() {
+            forwardDefense.setState(to: .initial)
+        }
+        if shouldForce || backwardDefense.isAvailable() {
+            backwardDefense.setState(to: .initial)
+        }
+        if shouldForce || leftDefense.isAvailable() {
+            leftDefense.setState(to: .initial)
+        }
+        if shouldForce || rightDefense.isAvailable() {
+            rightDefense.setState(to: .initial)
+        }
+    }
+
+    /// - parameter shouldForce: if true, forces the states to the newState.
+    mutating func setAttackStates(to newState: MoveButtonState, shouldForce: Bool = false) {
+        if shouldForce || leftLightAttack.isAvailable() {
+            leftLightAttack.setState(to: .initial)
+        }
+        if shouldForce || rightLightAttack.isAvailable() {
+            rightLightAttack.setState(to: .initial)
+        }
+        if shouldForce || leftMediumAttack.isAvailable() {
+            leftMediumAttack.setState(to: .initial)
+        }
+        if shouldForce || rightMediumAttack.isAvailable() {
+            rightMediumAttack.setState(to: .initial)
+        }
+        if shouldForce || leftHardAttack.isAvailable() {
+            leftHardAttack.setState(to: .initial)
+        }
+        if shouldForce || rightHardAttack.isAvailable() {
+            rightHardAttack.setState(to: .initial)
+        }
+    }
+
+    mutating func setFireStates(to fireState: FireState) {
+        switch fireState {
+        case .initial, .big:
+            if leftLightAttack.isAvailableNextRound {
+                leftLightAttack.setFireState(to: fireState)
+            }
+            if leftMediumAttack.isAvailableNextRound {
+                leftMediumAttack.setFireState(to: fireState)
+            }
+            if leftHardAttack.isAvailableNextRound {
+                leftHardAttack.setFireState(to: fireState)
+            }
+            if rightLightAttack.isAvailableNextRound {
+                rightLightAttack.setFireState(to: fireState)
+            }
+            if rightMediumAttack.isAvailableNextRound {
+                rightMediumAttack.setFireState(to: fireState)
+            }
+            if rightHardAttack.isAvailableNextRound {
+                rightHardAttack.setFireState(to: fireState)
+            }
+        case .small:
+            setToSmallFireStates()
+        }
+    }
+
+    mutating func setToSmallFireStates() {
         //If attack can boost, set it to small fire, else big fire
         leftLightAttack.setFireState(to: leftLightAttack.canBoost ? .small : .big)
         leftMediumAttack.setFireState(to: leftMediumAttack.canBoost ? .small : .big)

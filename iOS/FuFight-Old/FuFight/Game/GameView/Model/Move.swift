@@ -59,14 +59,15 @@ protocol MoveProtocol: Move {
 
     mutating func setState(to newState: MoveButtonState)
     mutating func updateStateForNextRound()
-    mutating func reset()
     func isAvailable() -> Bool
 }
 
 extension MoveProtocol {
     mutating func updateStateForNextRound() {
         switch state {
-        case .initial, .unselected:
+        case .initial:
+            break
+        case .unselected:
             setState(to: .initial)
         case .selected:
             setState(to: .cooldown)
@@ -77,10 +78,6 @@ extension MoveProtocol {
                 currentCooldown -= 1
             }
         }
-    }
-
-    mutating func reset() {
-        setState(to: .initial)
     }
 
     mutating func setState(to newState: MoveButtonState) {
