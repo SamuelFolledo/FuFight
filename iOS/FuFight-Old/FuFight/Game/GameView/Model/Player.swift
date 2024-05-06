@@ -94,12 +94,8 @@ class Player {
 
     func prepareForNewRound() {
         speed = 0
-        if rounds.isEmpty {
-            rounds.append(Round(round: 1))
-        } else {
-            let newRound = Round(round: rounds.count + 1)
-            rounds.append(newRound)
-        }
+        let newRound = Round(round: rounds.count + 1)
+        rounds.append(newRound)
     }
 
     func defeated() {
