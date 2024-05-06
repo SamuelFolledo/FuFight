@@ -10,7 +10,7 @@ import SwiftUI
 struct AttacksView: View {
     let attacks: [Attack]
     let playerType: PlayerType
-    var moveSelected: ((Attack) -> Void)?
+    var moveSelected: ((any MoveProtocol) -> Void)?
 
     var body: some View {
         VStack {

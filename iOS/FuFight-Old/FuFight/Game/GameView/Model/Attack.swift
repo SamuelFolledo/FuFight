@@ -69,8 +69,16 @@ struct Attack: MoveProtocol, AttackProtocol {
     var isAvailableNextRound: Bool { currentCooldown <= 1 }
 
     //MARK: - Initializers
-    init(_ move: any AttackTypeProtocol) {
-        self.move = move
+    init(_ attack: any AttackTypeProtocol) {
+        self.move = attack
+    }
+
+    init?(move: any Move) {
+        if let move = Punch(rawValue: move.id) {
+            self.move = move
+        } else {
+            return nil
+        }
     }
 
     //MARK: - Hashable Required Methods

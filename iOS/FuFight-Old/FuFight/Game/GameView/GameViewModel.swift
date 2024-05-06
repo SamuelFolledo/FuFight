@@ -77,14 +77,16 @@ class GameViewModel: BaseViewModel {
         updateState(.starting)
     }
 
-    func attackSelected(_ selectedMove: Attack, isEnemy: Bool) {
-        guard selectedMove.state != .cooldown else { return }
-        isEnemy ? enemyPlayer.moves.updateSelected(selectedMove.position) : player.moves.updateSelected(selectedMove.position)
+    func attackSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
+        guard selectedMove.state != .cooldown,
+            let selectedAttack = Attack(move: selectedMove) else { return }
+        isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
     }
 
-    func defenseSelected(_ selectedMove: Defense, isEnemy: Bool) {
-        guard selectedMove.state != .cooldown else { return }
-        isEnemy ? enemyPlayer.moves.updateSelected(selectedMove.position) : player.moves.updateSelected(selectedMove.position)
+    func defenseSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
+        guard selectedMove.state != .cooldown,
+              let selectedDefense = Defense(move: selectedMove) else { return }
+        isEnemy ? enemyPlayer.moves.updateSelected(selectedDefense.position) : player.moves.updateSelected(selectedDefense.position)
     }
 
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {

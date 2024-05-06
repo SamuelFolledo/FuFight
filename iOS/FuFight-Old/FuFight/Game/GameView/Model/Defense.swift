@@ -49,8 +49,16 @@ struct Defense: MoveProtocol, DefenseProtocol {
     var position: DefensePosition { move.position }
 
     //MARK: - Initializers
-    init(_ move: any DefenseTypeProtocol) {
-        self.move = move
+    init(_ defense: any DefenseTypeProtocol) {
+        self.move = defense
+    }
+
+    init?(move: any Move) {
+        if let move = Dash(rawValue: move.id) {
+            self.move = move
+        } else {
+            return nil
+        }
     }
 
     //MARK: - Hashable Required Methods
