@@ -92,25 +92,13 @@ private extension GameSceneView {
             MovesView(
                 attacksView: AttacksView(
                     attacks: defaultAllPunchAttacks,
-                    playerType: .enemy) { attack in
-                        switch attack.position {
-                        case .leftLight:
-                            fighter.playAnimation(.punchHeadLeftLight)
-                        case .rightLight:
-                            fighter.playAnimation(.punchHeadRightLight)
-                        case .leftMedium:
-                            fighter.playAnimation(.punchHeadLeftMedium)
-                        case .rightMedium:
-                            fighter.playAnimation(.punchHeadRightMedium)
-                        case .leftHard:
-                            fighter.playAnimation(.punchHeadLeftHard)
-                        case .rightHard:
-                            fighter.playAnimation(.punchHeadRightHard)
-                        }
+                    playerType: .enemy) { move in
+                        fighter.playAnimation(move.animationType)
                     },
                 defensesView: DefensesView(
                     defenses: defaultAllDashDefenses,
-                    playerType: .enemy) { defense in
+                    playerType: .enemy) { move in
+                        guard let defense = Defense(move: move) else { return }
                         switch defense.position {
                         case .forward:
                             fighter.playAnimation(.idleStand)
