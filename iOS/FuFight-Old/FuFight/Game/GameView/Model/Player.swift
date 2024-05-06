@@ -7,22 +7,26 @@
 
 import Foundation
 
-class PlayerState {
+struct PlayerState {
     private(set) var boostLevel: BoostLevel
     ///Keeps track of which player gets the speed boost next round. True if current player attacked first and landed it
-    var hasSpeedBoost: Bool //TODO: Multiplayer game mode should be synced between games
+    private(set) var hasSpeedBoost: Bool //TODO: Multiplayer game mode should be synced between games
 
     init(boostLevel: BoostLevel, hasSpeedBoost: Bool) {
         self.boostLevel = boostLevel
         self.hasSpeedBoost = hasSpeedBoost
     }
 
-    func upgradeBoost() {
+    mutating func upgradeBoost() {
         boostLevel = boostLevel.nextLevel
     }
 
-    func resetBoost() {
+    mutating func resetBoost() {
         boostLevel = .none
+    }
+
+    mutating func setSpeedBoost(to shouldBoost: Bool) {
+        hasSpeedBoost = shouldBoost
     }
 }
 
@@ -34,7 +38,7 @@ class Player {
     private(set) var maxHp: CGFloat
     private(set) var isEnemy: Bool
     private(set) var fighter: Fighter
-    private(set) var state: PlayerState
+    var state: PlayerState
     var moves: Moves
     var rounds: [Round]
 
@@ -44,17 +48,17 @@ class Player {
     var isDead: Bool { hp <= 0 }
     var hpText: String { String(format: "%.2f", hp) }
 
-    ///Round 1 initializer
-    init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, fighter: Fighter, rounds: [Round] = [], boostLevel: BoostLevel = .none, hasSpeedBoost: Bool = false, attacks: [Attack], defenses: [Defend]) {
+    init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, fighter: Fighter, state: PlayerState, moves: Moves) {
         self.photoUrl = photoUrl
         self.username = username
         self.hp = hp
         self.maxHp = maxHp
-        self.fighter = fighter
-        self.rounds = rounds
-        self.state = PlayerState(boostLevel: boostLevel, hasSpeedBoost: hasSpeedBoost)
         self.isEnemy = username != (Account.current?.username ?? "")
-        self.moves = Moves(attacks: attacks, defenses: defenses)
+        self.fighter = fighter
+        self.state = state
+        self.moves = moves
+        self.rounds = []
+        self.speed = 0
     }
 
     func loadAnimations() {
@@ -67,32 +71,10 @@ class Player {
         rounds[rounds.count - 1].attack = selectedAttack
         rounds[rounds.count - 1].defend = selectedDefend
 
-        let moveSpeed = selectedAttack?.move.speed ?? 0
-        let speedMultiplier = selectedDefend?.move.speedMultiplier ?? 1
+        let moveSpeed = selectedAttack?.speed ?? 0
+        let speedMultiplier = selectedDefend?.speedMultiplier ?? 1
         let speedBoostMultiplier = state.hasSpeedBoost ? speedBoostMultiplier : 1
         speed = (moveSpeed * speedMultiplier * speedBoostMultiplier).roundDecimalUpTo(1)
-    }
-
-    func generateEnemyRoundIfNeeded() {
-        //TODO: Remove this auto generated enemy round
-        let randomAttack = moves.attacks.filter{ $0.state != .cooldown }.randomElement()!
-        for (index, attack) in moves.attacks.enumerated() {
-            if attack.move.id == randomAttack.move.id {
-                if attack.currentCooldown <= 0 {
-//                    LOGD("Randomly generated enemy attack is \(moves.attacks[index].name)")
-                    moves.attacks[index].setStateTo(.selected)
-                }
-            }
-        }
-        let randomDefend: Dash = [Dash.left, Dash.right].randomElement()!
-        for (index, defend) in moves.defenses.enumerated() {
-            if defend.move.id == randomDefend.id {
-                if defend.currentCooldown <= 0 {
-//                    LOGD("Randomly generated enemy defend is \(defend.name)")
-                    moves.defenses[index].setStateTo(.selected)
-                }
-            }
-        }
     }
 
     /// - Parameters:
@@ -102,8 +84,12 @@ class Player {
     }
 
     func setCurrentRoundAttackResult(_ result: AttackResult) {
+        //Populate current round's result
         let currentRoundIndex = rounds.count - 1
         rounds[currentRoundIndex].attackResult = result
+        //Update attacks and defenses for next turn
+        moves.updateAttacksForNextRound(attackLanded: result.didAttackLand, boostLevel: state.boostLevel)
+        moves.updateDefensesForNextRound()
     }
 
     func prepareForNewRound() {
@@ -125,6 +111,7 @@ class Player {
         rounds.removeAll()
         state.resetBoost()
         moves.resetMoves()
+        fighter.resumeAnimations()
     }
 }
 
