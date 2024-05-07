@@ -9,9 +9,9 @@ import SwiftUI
 
 ///View that represents both Attach and Defense moves
 struct MoveButton: View {
-    var move: any MoveProtocol
+    let move: any MoveProtocol
     let playerType: PlayerType
-    var moveSelected: ((any MoveProtocol) -> Void)?
+    let moveSelected: ((any MoveProtocol) -> Void)?
 
     var body: some View {
         Button(action: {
@@ -38,6 +38,7 @@ struct MoveButton: View {
 
 #Preview {
     let attack = Attack(Punch.leftPunchMedium)
+
     return MoveButton(move: attack, playerType: .user) {
         LOGD("Attack selected = \($0.name)")
     }

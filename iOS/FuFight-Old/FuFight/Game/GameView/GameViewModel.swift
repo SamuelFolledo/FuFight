@@ -106,7 +106,6 @@ class GameViewModel: BaseViewModel {
         self.state = newState
         switch newState {
         case .starting:
-            timeRemaining = defaultMaxTime
             timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             player.loadAnimations()
             enemyPlayer.loadAnimations()
@@ -200,10 +199,10 @@ private extension GameViewModel {
             attacker.state.upgradeBoost()
             //First attacker that landed an attack this round will have speedBoost next round
             if isFasterAttacker {
-                attacker.state.setSpeedBoost(to: !attacker.isEnemy)
-                defender.state.setSpeedBoost(to: attacker.isEnemy)
+                attacker.state.setSpeedBoost(to: true)
+                defender.state.setSpeedBoost(to: false)
             } else {
-                if defender.state.hasSpeedBoost == false {
+                if !(defender.currentRound.attackResult?.didAttackLand ?? true) {
                     attacker.state.setSpeedBoost(to: true)
                     defender.state.setSpeedBoost(to: false)
                 }

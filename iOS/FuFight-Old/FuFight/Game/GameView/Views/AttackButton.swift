@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AttackButton: View {
-    var move: Attack
+    let move: Attack
     let playerType: PlayerType
-    var moveSelected: ((any MoveProtocol) -> Void)?
+    let moveSelected: ((any MoveProtocol) -> Void)?
 
     private var width: CGFloat { playerType.isEnemy ? 160 : 800 }
     private var trailingPadding: CGFloat { playerType.isEnemy ? 4 : 30 }
