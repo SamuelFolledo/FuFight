@@ -29,7 +29,7 @@ class GameViewModel: BaseViewModel {
     var enemyPlayer: Player
     let isPracticeMode: Bool
     
-    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+    var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var timeRemaining = defaultMaxTime
     var isCountingDown: Bool = false
     var isGamePaused: Bool = false
@@ -63,11 +63,10 @@ class GameViewModel: BaseViewModel {
         //Only countdown when game's state is .gaming and timer is active
         guard isCountingDown else { return }
         guard state == .gaming else { return }
-        if timeRemaining > 0.01 {
-            timeRemaining -= 0.1
+        if timeRemaining > 0 {
+            timeRemaining -= 1
         } else {
             endOfRoundHandler()
-            timeRemaining = defaultMaxTime
         }
     }
 
@@ -107,6 +106,8 @@ class GameViewModel: BaseViewModel {
         self.state = newState
         switch newState {
         case .starting:
+            timeRemaining = defaultMaxTime
+            timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             player.loadAnimations()
             enemyPlayer.loadAnimations()
             updateState(.gaming)
@@ -132,6 +133,7 @@ private extension GameViewModel {
         player.prepareForNewRound()
         print("\n\n=================================== Round \(self.player.rounds.count) ============================================")
         enemyPlayer.prepareForNewRound()
+        timeRemaining = defaultMaxTime
         secondAttackerDelay = 0
         secondAttackerDamageDealtReduction = 0
         isDefenderAlive = true

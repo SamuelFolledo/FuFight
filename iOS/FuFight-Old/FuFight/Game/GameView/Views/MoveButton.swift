@@ -29,28 +29,15 @@ struct MoveButton: View {
         })
         .blur(radius: move.state.blurRadius, opaque: false)
         .opacity(move.state.opacity)
+        .colorMultiply(move.state == .selected ? Color.systemGray2 : Color.white)
         .overlay {
-            Group {
-                switch move.state {
-                case .cooldown:
-                    Text("\(move.currentCooldown)")
-                        .font(playerType.font)
-                        .foregroundStyle(.white)
-                case .selected:
-                    Circle()
-                        .stroke(.green, lineWidth: playerType.shouldFlip ? 2 : 4)
-                case .initial, .unselected:
-                    EmptyView()
-                }
-            }
-            .rotationEffect(playerType.angle)
-            .allowsHitTesting(false)
+            MoveStateView(state: move.state, cooldown: move.currentCooldown, playerType: playerType)
         }
     }
 }
 
 #Preview {
-    var attack = Attack(Punch.leftPunchMedium)
+    let attack = Attack(Punch.leftPunchMedium)
     return MoveButton(move: attack, playerType: .user) {
         LOGD("Attack selected = \($0.name)")
     }
