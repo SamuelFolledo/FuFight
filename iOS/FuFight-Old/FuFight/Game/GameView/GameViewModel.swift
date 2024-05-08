@@ -217,10 +217,9 @@ private extension GameViewModel {
         attacker.setCurrentRoundAttackResult(attackResult)
         defender.setCurrentRoundDefendResult(attackResult)
 
-        //Play attacker and defender's animations
-        if let attack = attacker.currentRound.attack,
-           let defenderAnimation = attackResult.defenderAnimation {
-            playFightersAnimation(attackAnimation: attack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: attacker.isEnemy)
+        //Play attacker's animations
+        if let attack = attacker.currentRound.attack {
+            playFightersAnimation(attackAnimation: attack.animationType, attackResult: attackResult, isAttackerEnemy: attacker.isEnemy)
         }
     }
 
@@ -228,8 +227,8 @@ private extension GameViewModel {
     ///   - attack: attacker's attack choice
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
-    func playFightersAnimation(attackAnimation: AnimationType, defenderAnimation: AnimationType, isAttackerEnemy: Bool) {
-        Task {
+    func playFightersAnimation(attackAnimation: AnimationType, attackResult: AttackResult, isAttackerEnemy: Bool) {
+        if let defenderAnimation = attackResult.defenderAnimation {
             let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
             let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
             attackingFighter.playAnimation(attackAnimation)
@@ -237,6 +236,11 @@ private extension GameViewModel {
             //play the defender's animation based on when the attack and defense's delay duration
             runAfterDelay(delay: attackAnimation.delayForDefendingAnimation(defenderAnimation)) {
                 defendingFighter.playAnimation(defenderAnimation)
+
+                //Show attack results after a little delay
+                runAfterDelay(delay: 0.3) {
+                    defendingFighter.showResult(attackResult)
+                }
             }
         }
     }
