@@ -29,7 +29,7 @@ class GameViewModel: BaseViewModel {
     var enemyPlayer: Player
     let isPracticeMode: Bool
     
-    let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+    var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var timeRemaining = defaultMaxTime
     var isCountingDown: Bool = false
     var isGamePaused: Bool = false
@@ -63,11 +63,10 @@ class GameViewModel: BaseViewModel {
         //Only countdown when game's state is .gaming and timer is active
         guard isCountingDown else { return }
         guard state == .gaming else { return }
-        if timeRemaining > 0.01 {
-            timeRemaining -= 0.1
+        if timeRemaining > 0 {
+            timeRemaining -= 1
         } else {
             endOfRoundHandler()
-            timeRemaining = defaultMaxTime
         }
     }
 
@@ -107,6 +106,7 @@ class GameViewModel: BaseViewModel {
         self.state = newState
         switch newState {
         case .starting:
+            timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             player.loadAnimations()
             enemyPlayer.loadAnimations()
             updateState(.gaming)
@@ -132,6 +132,7 @@ private extension GameViewModel {
         player.prepareForNewRound()
         print("\n\n=================================== Round \(self.player.rounds.count) ============================================")
         enemyPlayer.prepareForNewRound()
+        timeRemaining = defaultMaxTime
         secondAttackerDelay = 0
         secondAttackerDamageDealtReduction = 0
         isDefenderAlive = true
@@ -198,10 +199,10 @@ private extension GameViewModel {
             attacker.state.upgradeBoost()
             //First attacker that landed an attack this round will have speedBoost next round
             if isFasterAttacker {
-                attacker.state.setSpeedBoost(to: !attacker.isEnemy)
-                defender.state.setSpeedBoost(to: attacker.isEnemy)
+                attacker.state.setSpeedBoost(to: true)
+                defender.state.setSpeedBoost(to: false)
             } else {
-                if defender.state.hasSpeedBoost == false {
+                if !(defender.currentRound.attackResult?.didAttackLand ?? true) {
                     attacker.state.setSpeedBoost(to: true)
                     defender.state.setSpeedBoost(to: false)
                 }
@@ -216,10 +217,9 @@ private extension GameViewModel {
         attacker.setCurrentRoundAttackResult(attackResult)
         defender.setCurrentRoundDefendResult(attackResult)
 
-        //Play attacker and defender's animations
-        if let attack = attacker.currentRound.attack,
-           let defenderAnimation = attackResult.defenderAnimation {
-            playFightersAnimation(attackAnimation: attack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: attacker.isEnemy)
+        //Play attacker's animations
+        if let attack = attacker.currentRound.attack {
+            playFightersAnimation(attackAnimation: attack.animationType, attackResult: attackResult, isAttackerEnemy: attacker.isEnemy)
         }
     }
 
@@ -227,8 +227,8 @@ private extension GameViewModel {
     ///   - attack: attacker's attack choice
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
-    func playFightersAnimation(attackAnimation: AnimationType, defenderAnimation: AnimationType, isAttackerEnemy: Bool) {
-        Task {
+    func playFightersAnimation(attackAnimation: AnimationType, attackResult: AttackResult, isAttackerEnemy: Bool) {
+        if let defenderAnimation = attackResult.defenderAnimation {
             let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
             let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
             attackingFighter.playAnimation(attackAnimation)
@@ -236,6 +236,11 @@ private extension GameViewModel {
             //play the defender's animation based on when the attack and defense's delay duration
             runAfterDelay(delay: attackAnimation.delayForDefendingAnimation(defenderAnimation)) {
                 defendingFighter.playAnimation(defenderAnimation)
+
+                //Show attack results after a little delay
+                runAfterDelay(delay: 0.3) {
+                    defendingFighter.showResult(attackResult)
+                }
             }
         }
     }

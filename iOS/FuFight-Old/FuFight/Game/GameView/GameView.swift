@@ -71,7 +71,7 @@ struct GameView: View {
     }
 
     var timerView: some View {
-        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.player.rounds.count + 1)
+        CountdownTimerView(timeRemaining: vm.timeRemaining, round: vm.player.rounds.count)
             .frame(width: 160)
             .padding(.bottom, 400)
     }
