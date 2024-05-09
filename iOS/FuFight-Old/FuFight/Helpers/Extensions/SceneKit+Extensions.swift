@@ -9,7 +9,7 @@ import SceneKit
 
 extension CAAnimation {
     ///Convert a grouped SCNAnimation into CAAnimation. Used on creating animation player
-    class func getCaAnimation(for type: AnimationType, from full: SCNAnimation) -> CAAnimation {
+    class func createCaAnimation(for type: AnimationType, from full: SCNAnimation) -> CAAnimation {
         let animation = CAAnimationGroup()
         let sub = full.copy() as! SCNAnimation
         sub.timeOffset = 0
@@ -65,6 +65,6 @@ extension SCNAnimationPlayer {
             return nil
         }
         player.stop()
-        return CAAnimation.getCaAnimation(for: animationType, from: player.animation)
+        return CAAnimation.createCaAnimation(for: animationType, from: player.animation)
     }
 }

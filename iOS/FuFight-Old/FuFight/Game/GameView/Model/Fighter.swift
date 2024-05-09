@@ -155,7 +155,7 @@ private extension Fighter {
     ///Adds animation player to the animationsNode with the animationType.rawValue as the key
     private func addAnimationPlayer(_ animationType: AnimationType) {
         // Load the dae file for that animation
-        let path = "3DAssets.scnassets/Characters/\(fighterType.name)/\(animationType.animationPath)"
+        let path = fighterType.animationPath(animationType)
         let scene = SCNScene(named: path)!
         //Grab the animation from the child or grandchild and add the animation player to the animationsNode
         for child in scene.rootNode.childNodes {

@@ -80,6 +80,9 @@ class GameViewModel: BaseViewModel {
         guard selectedMove.state != .cooldown,
             let selectedAttack = Attack(move: selectedMove) else { return }
         isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
+        if isPracticeMode {
+            playFightersAnimation(attackAnimation: selectedAttack.animationType, attackResult: .damage(10), isAttackerEnemy: false)
+        }
     }
 
     func defenseSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
