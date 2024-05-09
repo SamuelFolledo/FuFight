@@ -25,7 +25,7 @@ struct DaePreview: UIViewRepresentable {
         view.defaultCameraController.inertiaEnabled = true
         view.defaultCameraController.maximumVerticalAngle = 89
         view.defaultCameraController.minimumVerticalAngle = -89
-        let path = "3DAssets.scnassets/Characters/\(fighter.name)/\(animationType.animationPath)"
+        let path = fighter.animationPath(animationType)
         view.scene = SCNScene(named: path)
         return view
     }
