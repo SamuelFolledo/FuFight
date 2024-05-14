@@ -46,7 +46,7 @@ class GameViewModel: BaseViewModel {
                              username: Account.current?.displayName ?? "",
                              hp: defaultMaxHp,
                              maxHp: defaultMaxHp,
-                             fighter: Fighter(type: .bianca, isEnemy: false),
+                             fighter: Fighter(type: .samuel, isEnemy: false),
                              state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
         self.enemyPlayer = fakeEnemyPlayer
@@ -80,8 +80,14 @@ class GameViewModel: BaseViewModel {
         guard selectedMove.state != .cooldown,
             let selectedAttack = Attack(move: selectedMove) else { return }
         isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
-        if isPracticeMode {
-            playFightersAnimation(attackAnimation: selectedAttack.animationType, attackResult: .damage(10), isAttackerEnemy: false)
+        let attackResult = AttackResult.damage(20)
+        if isPracticeMode,
+           let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemyPlayer.fighter.fighterType, attackResult: attackResult) {
+            playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
+                runAfterDelay(delay: 0.3) {
+                    self.enemyPlayer.fighter.showResult(attackResult)
+                }
+            }
         }
     }
 
@@ -182,7 +188,7 @@ private extension GameViewModel {
             attacker = player.speed > enemyPlayer.speed ? player : enemyPlayer
             defender = player.speed > enemyPlayer.speed ? enemyPlayer : player
             //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
-            secondAttackerDelay = attacker.currentRound.attack?.animationType.animationDuration ?? 0
+            secondAttackerDelay = attacker.currentRound.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
             secondAttackerDamageDealtReduction = attacker.currentRound.attack?.damageReduction ?? 0
 
         } else {
@@ -220,9 +226,15 @@ private extension GameViewModel {
         attacker.setCurrentRoundAttackResult(attackResult)
         defender.setCurrentRoundDefendResult(attackResult)
 
-        //Play attacker's animations
-        if let attack = attacker.currentRound.attack {
-            playFightersAnimation(attackAnimation: attack.animationType, attackResult: attackResult, isAttackerEnemy: attacker.isEnemy)
+        //Play attacker's and defender's animations
+        if let attack = attacker.currentRound.attack,
+           let defenderAnimation = GameService.getDefenderAnimation(attack: attack, attackerType: attacker.fighter.fighterType, attackResult: attackResult) {
+            playFightersAnimation(attackAnimation: attack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: attacker.isEnemy) {
+                //Show attack result's damage after a little delay
+                runAfterDelay(delay: 0.3) {
+                    defender.fighter.showResult(attackResult)
+                }
+            }
         }
     }
 
@@ -230,21 +242,16 @@ private extension GameViewModel {
     ///   - attack: attacker's attack choice
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
-    func playFightersAnimation(attackAnimation: AnimationType, attackResult: AttackResult, isAttackerEnemy: Bool) {
-        if let defenderAnimation = attackResult.defenderAnimation {
-            let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
-            let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
-            attackingFighter.playAnimation(attackAnimation)
-            //get delay before playing defender's animation
-            //play the defender's animation based on when the attack and defense's delay duration
-            runAfterDelay(delay: attackAnimation.delayForDefendingAnimation(defenderAnimation)) {
-                defendingFighter.playAnimation(defenderAnimation)
-
-                //Show attack results after a little delay
-                runAfterDelay(delay: 0.3) {
-                    defendingFighter.showResult(attackResult)
-                }
-            }
+    func playFightersAnimation(attackAnimation: AnimationType, defenderAnimation: AnimationType, isAttackerEnemy: Bool, completion: (() -> Void)? = nil) {
+        let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
+        let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
+        attackingFighter.playAnimation(attackAnimation)
+        //get delay before playing defender's animation
+        //play the defender's animation based on when the attack and defense's delay duration
+        let delayForDefenderAnimation = attackAnimation.delayForDefendingAnimation(defenderAnimation, defender: defendingFighter.fighterType, attacker: attackingFighter.fighterType)
+        runAfterDelay(delay: delayForDefenderAnimation) {
+            defendingFighter.playAnimation(defenderAnimation)
+            completion?()
         }
     }
 

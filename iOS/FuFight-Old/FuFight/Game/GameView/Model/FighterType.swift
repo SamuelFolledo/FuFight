@@ -8,7 +8,7 @@
 import Foundation
 
 enum FighterType {
-    case samuel, bianca
+    case samuel, clara
 
     var daeUrl: URL? {
         return Bundle.main.url(forResource: defaultDaePath, withExtension: "dae")
@@ -19,7 +19,7 @@ enum FighterType {
         case .samuel:
 //            return "3DAssets.scnassets/Characters/Samuel/assets/samuel"
             animationPath(.idle)
-        case .bianca:
+        case .clara:
             animationPath(.idle)
         }
     }
@@ -28,8 +28,8 @@ enum FighterType {
         switch self {
         case .samuel:
             "Samuel"
-        case .bianca:
-            "Bianca"
+        case .clara:
+            "Clara"
         }
     }
 
@@ -37,7 +37,7 @@ enum FighterType {
         switch self {
         case .samuel:
             "Armature"
-        case .bianca:
+        case .clara:
             "Armature-001"
         }
     }
@@ -46,7 +46,7 @@ enum FighterType {
         switch self {
         case .samuel:
             0.02
-        case .bianca:
+        case .clara:
             0.02
         }
     }

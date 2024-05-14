@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum StrengthType: String {
+    case light, medium, hard
+}
+
 enum AnimationType: String, CaseIterable {
     //MARK: Punches
     case punchHeadRightLight
@@ -17,9 +21,25 @@ enum AnimationType: String, CaseIterable {
     case punchHeadLeftHard
 
     //MARK: Defensive moves
-    case dodgeHead
-    case hitHead
-    case killHead
+    case dodgeHeadRight
+    case dodgeHeadLeft
+
+    case hitHeadRightLight
+    case hitHeadRightMedium
+    case hitHeadRightHard
+    case hitHeadLeftLight
+    case hitHeadLeftMedium
+    case hitHeadLeftHard
+    case hitHeadStraightLight
+    case hitHeadStraightMedium
+    case hitHeadStraightHard
+
+    case killHeadRightLight
+    case killHeadRightMedium
+    case killHeadRightHard
+    case killHeadLeftLight
+    case killHeadLeftMedium
+    case killHeadLeftHard
 
     //MARK: Non attack or defensive moves
     case stop
@@ -27,8 +47,78 @@ enum AnimationType: String, CaseIterable {
     case idleStand
 
     //MARK: - Properties
+    var animationName: String {
+        switch self {
+        case .punchHeadRightLight, .punchHeadLeftLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
+            "light\(nameSuffix)"
+        case .punchHeadRightMedium, .punchHeadLeftMedium,  .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
+            "medium\(nameSuffix)"
+        case .punchHeadRightHard, .punchHeadLeftHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
+            "hard\(nameSuffix)"
+        case .dodgeHeadRight, .dodgeHeadLeft:
+            "dodge\(nameSuffix)"
+        case .stop:
+            ""
+        case .idle, .idleStand:
+            "idle\(nameSuffix)"
+        }
+    }
 
-    ///name of the folder containing the animation name
+    var nameSuffix: String {
+        switch self {
+        case .punchHeadRightLight:
+            ""
+        case .punchHeadRightMedium:
+            ""
+        case .punchHeadRightHard:
+            ""
+        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            "-m"
+        case .dodgeHeadRight:
+            ""
+        case .dodgeHeadLeft:
+            "-m"
+        case .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard:
+            "Right"
+        case .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard:
+            "Left"
+        case .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard:
+            "Straight"
+        case .killHeadRightLight:
+            ""
+        case .killHeadRightMedium:
+            ""
+        case .killHeadRightHard:
+            ""
+        case .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard:
+            "-m"
+        case .stop, .idle:
+            ""
+        case .idleStand:
+            "Stand"
+        }
+    }
+
+    var animationPath: String {
+        "animations/\(folder)/\(subfolder)/\(animationName)"
+    }
+
+    var folder: String {
+        switch self {
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            "punch"
+        case .dodgeHeadRight, .dodgeHeadLeft:
+            "dodge"
+        case .hitHeadRightMedium, .hitHeadRightHard, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard:
+            "hit"
+        case .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard:
+            "kill"
+        case .stop:
+            ""
+        case .idle, .idleStand:
+            "idle"
+        }
+    }
     var subfolder: String {
         if let isHigh {
             return isHigh ? "head" : "body"
@@ -41,60 +131,20 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .stop, .idle, .idleStand:
             nil
-        case .dodgeHead, .hitHead, .killHead, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             true
         }
     }
 
-    var animationName: String {
-        switch self {
-        case .stop:
-            ""
-        case .idle, .idleStand:
-            rawValue
-        case .dodgeHead:
-            "light"
-        case .hitHead:
-            "light"
-        case .killHead:
-            "light"
-        case .punchHeadRightLight:
-            "rightLight"
-        case .punchHeadRightMedium:
-            "rightMedium"
-        case .punchHeadRightHard:
-            "rightHard"
-        case .punchHeadLeftLight:
-            "leftLight"
-        case .punchHeadLeftMedium:
-            //TODO: Figure out what to do with left attacks, maybe rotate?
-            //            "leftMedium"
-            "leftLight"
-        case .punchHeadLeftHard:
-            //            "leftHard"
-            "leftLight"
-        }
-    }
-
-    var animationPath: String {
-        switch self {
-        case .idle, .idleStand:
-            "animations/idle/\(subfolder)/\(animationName)"
-        case .stop:
-            ""
-        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
-            "animations/punch/\(subfolder)/\(animationName)"
-        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
-            //TODO: Needs to have a left medium and hard attack. Maybe flip/rotate other attacks?
-            "animations/punch/\(AnimationType.punchHeadRightMedium.subfolder)/\(AnimationType.punchHeadRightMedium.animationName)"
-        case .dodgeHead:
-            "animations/dodge/\(subfolder)/\(animationName)"
-        case .hitHead:
-            "animations/hit/\(subfolder)/\(animationName)"
-        case .killHead:
-            "animations/kill/\(subfolder)/\(animationName)"
-        }
-    }
+    ///If this animation has a mirrored version denoted with -m on the .dae file. Mirrored animations were used for the left animations
+//    var hasMirroredVersion: Bool {
+//        switch self {
+//        case .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard:
+//            true
+//        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .dodgeHeadRight, .dodgeHeadLeft, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+//            false
+//        }
+//    }
 
     var isRemovedFromCompletion: Bool { false }
     var fadeInDuration: CGFloat { 0.2 }
@@ -105,74 +155,14 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .idle, .idleStand, .stop:
             0
-        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .dodgeHead, .hitHead, .killHead:
+        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             1
-        }
-    }
-
-    ///returns how long a single animation takes
-    var animationDuration: TimeInterval {
-        let startTime = TimeInterval(0)
-        let endTime = TimeInterval(duration)
-        return endTime - startTime
-    }
-
-    ///the animation's total duration in seconds
-    private var duration: CGFloat {
-        switch self {
-        case .idleStand:
-            4.466670036315918
-        case .idle, .stop:
-            0
-        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
-            //TODO: Fix duration when left attacks is figured out
-            0.699999988079071
-        case .punchHeadRightLight:
-            1.0666699409484863
-        case .punchHeadRightMedium:
-            1.466670036315918
-        case .punchHeadRightHard:
-            1.36667001247406
-        case .hitHead:
-            0.9333329796791077
-        case .dodgeHead:
-            1.100000023841858
-        case .killHead:
-            2.5999999046325684
-        }
-    }
-
-    ///the animation's duration when attack lands or when to play the defense animation in seconds
-    private var hitDuration: CGFloat {
-        //Note: these values are estimate and manually inputted after testing animations. The smaller the number, the more sooner the animation will get played
-        switch self {
-        //MARK: Idle moves
-        case .idleStand, .idle, .stop:
-            0
-        //MARK: Defense moves
-        case .hitHead:
-            0.2 //0.9333329796791077
-        case .dodgeHead:
-            0.3 //1.100000023841858
-        case .killHead:
-            0.2 //2.5999999046325684
-        //MARK: Attacks moves
-        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
-            //TODO: Fix duration when left attacks is figured out
-            0.45 //0.699999988079071
-        case .punchHeadRightLight:
-            0.4 //1.0666699409484863
-        case .punchHeadRightMedium:
-            0.8 //1.466670036315918
-        case .punchHeadRightHard:
-            0.9 //1.36667001247406
         }
     }
 
     var iconName: String? {
         switch self {
-        case .stop, .idle, .idleStand, .dodgeHead, .hitHead, .killHead:
-            //TODO: Make defense move's source for icon like Punch
+        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             nil
         case .punchHeadLeftLight:
             "punchLeftLight"
@@ -189,46 +179,198 @@ enum AnimationType: String, CaseIterable {
         }
     }
 
-    var position: AttackPosition? {
+    var isKillAnimationType: Bool {
         switch self {
-        case .stop, .idle, .idleStand, .dodgeHead:
-            nil
-        case .hitHead:
-            nil
-        case .killHead:
-            nil
-        case .punchHeadRightLight:
-            .rightLight
-        case .punchHeadRightMedium:
-            .rightMedium
-        case .punchHeadRightHard:
-            .rightHard
-        case .punchHeadLeftLight:
-            .leftLight
-        case .punchHeadLeftMedium:
-            .leftMedium
-        case .punchHeadLeftHard:
-            .leftHard
+        case .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
+            true
+        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
+            false
         }
     }
 
-    //MARK: - Public Methods
+    ///Direction to attack to, and dodge, hit, or kill from
+    var isRight: Bool {
+        switch self {
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
+            true
+        case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            false
+        case .dodgeHeadRight:
+            true
+        case .dodgeHeadLeft:
+            false
+        case .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard:
+            true
+        case .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard:
+            false
+        case .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard:
+            true
+        case .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+            false
+        }
+    }
+
+    var strength: StrengthType? {
+        switch self {
+        case .punchHeadRightLight, .punchHeadLeftLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
+            .light
+        case .punchHeadRightMedium, .punchHeadLeftMedium, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
+            .medium
+        case .punchHeadRightHard, .punchHeadLeftHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
+            .hard
+        case .dodgeHeadRight, .dodgeHeadLeft, .stop, .idle, .idleStand:
+            nil
+        }
+    }
+
+//    var position: AttackPosition? {
+//        switch self {
+//        case .stop, .idle, .idleStand, .dodgeHead:
+//            nil
+//        case .hitHead:
+//            nil
+//        case .killHead:
+//            nil
+//        case .punchHeadRightLight:
+//            .rightLight
+//        case .punchHeadRightMedium:
+//            .rightMedium
+//        case .punchHeadRightHard:
+//            .rightHard
+//        case .punchHeadLeftLight:
+//            .leftLight
+//        case .punchHeadLeftMedium:
+//            .leftMedium
+//        case .punchHeadLeftHard:
+//            .leftHard
+//        }
+//    }
+
+    ///returns how long a single animation takes
+    func animationDuration(for fighter: FighterType) -> TimeInterval {
+        let startTime = TimeInterval(0)
+        let endTime = TimeInterval(getAnimationDuration(for: fighter))
+        return endTime - startTime
+    }
 
     ///Returns the duration in seconds how long it takes for the current animation type to land based on the defender's animation
     ///Used to figure out the slight delay before playing the defender's animation
-    func delayForDefendingAnimation(_ defenderAnimationType: AnimationType) -> CGFloat {
-//        let didDodge = defenderAnimationType.position?.isLeft
+    func delayForDefendingAnimation(_ defenderAnimationType: AnimationType, defender: FighterType, attacker: FighterType) -> CGFloat {
         switch defenderAnimationType {
         case .stop, .idle, .idleStand:
             break
-        case .dodgeHead, .hitHead, .killHead:
+        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             //Defense moves
-            let delay = hitDuration - defenderAnimationType.hitDuration
-            return delay
+            let delay = getHitDuration(for: attacker) - defenderAnimationType.getHitDuration(for: defender)
+            return delay <= 0 ? 0 : delay
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             //Attack moves
             break
         }
         return 0
+    }
+
+    ///Returns true if the animation's attack is a straight punch. False if attack hits the side
+    func isStraightAttack(for fighter: FighterType) -> Bool {
+        switch self {
+        case .punchHeadRightLight, .punchHeadLeftLight:
+            fighter == .samuel ? true : false
+        case .punchHeadRightMedium, .punchHeadLeftMedium:
+            fighter == .samuel ? false : true
+        case .punchHeadRightHard, .punchHeadLeftHard:
+            fighter == .samuel ? false : true
+        case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+            false
+        }
+    }
+}
+
+//MARK: - Methods
+extension AnimationType {
+    ///the animation's total duration in seconds
+    private func getAnimationDuration(for fighter: FighterType) -> CGFloat {
+        //Note: You can only get these values by getting the animations and printing out the duration
+        switch self {
+        case .idleStand:
+            fighter == .samuel ? 4.46667 : 38.833332
+        case .idle, .stop:
+            0 //fighter == .samuel ? 2.2 : 2.966667
+        case .punchHeadLeftLight, .punchHeadRightLight:
+            fighter == .samuel ? 1.13333 : 1.53333
+        case .punchHeadLeftMedium, .punchHeadRightMedium:
+            fighter == .samuel ? 1.2 : 1.133333
+        case .punchHeadLeftHard, .punchHeadRightHard:
+            fighter == .samuel ? 1.96667 : 1.66667
+        case .dodgeHeadRight, .dodgeHeadLeft:
+            1.433333
+        case .hitHeadRightLight:
+            fighter == .samuel ? 0.833333 : 0.933333
+        case .hitHeadRightMedium:
+            fighter == .samuel ? 1 : 1.166667
+        case .hitHeadRightHard:
+            fighter == .samuel ? 1 : 1.166667
+        case .hitHeadLeftLight:
+            fighter == .samuel ? 0.766667 : 1.066667
+        case .hitHeadLeftMedium:
+            fighter == .samuel ? 1.066667 : 1.233333
+        case .hitHeadLeftHard:
+            fighter == .samuel ? 1.633333 : 1.666667
+        case .hitHeadStraightLight:
+            fighter == .samuel ? 0.8 : 1.066667
+        case .hitHeadStraightMedium:
+            fighter == .samuel ? 0.933333 : 1.233333
+        case .hitHeadStraightHard:
+            fighter == .samuel ? 1.3 : 1.433333
+        case .killHeadRightLight, .killHeadLeftLight:
+            fighter == .samuel ? 2.333333 : 2.6
+        case .killHeadRightMedium, .killHeadLeftMedium:
+            fighter == .samuel ? 2.533333 : 2.2
+        case .killHeadRightHard, .killHeadLeftHard:
+            fighter == .samuel ? 2.233333 : 3.033333
+        }
+    }
+
+    ///the animation's duration when attack lands or when to play the defense animation in seconds
+    private func getHitDuration(for fighter: FighterType) -> CGFloat {
+        //Note: these values are estimate and manually inputted after testing animations. The smaller the number, the more sooner the animation will get played
+        switch self {
+        //MARK: Idle moves
+        case .idleStand, .idle, .stop:
+            0
+        //MARK: Defense moves
+        case .dodgeHeadRight, .dodgeHeadLeft:
+            getAnimationDuration(for: fighter) * 10/43
+        case .hitHeadRightLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/25 : 1/28)
+        case .hitHeadRightMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/30 : 2/35)
+        case .hitHeadRightHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/47 : 2/46)
+        case .hitHeadLeftLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/23 : 2/32)
+        case .hitHeadLeftMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/32 : 2/37)
+        case .hitHeadLeftHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/49 : 2/50)
+        case .hitHeadStraightLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/24 : 2/32)
+        case .hitHeadStraightMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/28 : 2/37)
+        case .hitHeadStraightHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/30 : 2/43)
+        case .killHeadRightLight, .killHeadLeftLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 2/70 : 9/78)
+        case .killHeadRightMedium, .killHeadLeftMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 1/77 : 2/76)
+        case .killHeadRightHard, .killHeadLeftHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 1/68 : 1/91)
+        //MARK: Attacks
+        case .punchHeadLeftLight, .punchHeadRightLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 7/34 : 8/31) //9/46 for clara's light2
+        case .punchHeadLeftMedium, .punchHeadRightMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 16/36 : 22/34) //13/53 for .clara's medium2
+        case .punchHeadLeftHard, .punchHeadRightHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 29/59 : 26/50)
+        }
     }
 }

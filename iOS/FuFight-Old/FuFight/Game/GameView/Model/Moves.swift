@@ -22,7 +22,7 @@ struct Moves {
 
     let animationTypes: [AnimationType]
 
-    let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHead, .hitHead, .killHead]
+    let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
     var attacks: [Attack] {
         [leftLightAttack, leftMediumAttack, leftHardAttack, rightLightAttack, rightMediumAttack, rightHardAttack]
     }
