@@ -9,22 +9,37 @@ import SceneKit
 import SwiftUI
 
 enum GameService {
-    /**
-     Check if current attack selection landed on this player's current defense selection
-     - parameter enemyAttack: attack dealt to this player. Nil will be dodged
-     - returns: Returns false if attacker's attack landed despite of the damage
-     */
-    static func didDodge(_ attackerPosition: AttackPosition?, defenderPosition: DefensePosition?) -> Bool {
-        guard let attackerPosition else { return true }
-        guard let defenderPosition else { return false }
-        switch defenderPosition {
-        case .forward, .backward:
-            return false
-        case .left:
-            return attackerPosition.isLeft
-        case .right:
-            return !attackerPosition.isLeft
+    static func getDefenderAnimation(attack: Attack, attackerType: FighterType, attackResult: AttackResult) -> AnimationType? {
+        switch attackResult {
+        case .noAttack:
+            break
+        case .miss:
+            return attack.animationType.isRight ? .dodgeHeadLeft : .dodgeHeadRight
+        case .damage(_):
+            if let strength = attack.animationType.strength {
+                let isStraightAttack = attack.animationType.isStraightAttack(for: attackerType)
+                switch strength {
+                case .light:
+                    return isStraightAttack ? .hitHeadStraightLight : attack.animationType.isRight ? .hitHeadRightLight : .hitHeadLeftLight
+                case .medium:
+                    return isStraightAttack ? .hitHeadStraightMedium : attack.animationType.isRight ? .hitHeadRightMedium : .hitHeadLeftMedium
+                case .hard:
+                    return isStraightAttack ? .hitHeadStraightHard : attack.animationType.isRight ? .hitHeadRightHard : .hitHeadLeftHard
+                }
+            }
+        case .kill(_):
+            if let strength = attack.animationType.strength {
+                switch strength {
+                case .light:
+                    return attack.animationType.isRight ? .killHeadLeftLight : .killHeadRightLight
+                case .medium:
+                    return attack.animationType.isRight ? .killHeadLeftMedium : .killHeadRightMedium
+                case .hard:
+                    return attack.animationType.isRight ? .killHeadLeftHard : .killHeadRightHard
+                }
+            }
         }
+        return nil
     }
 
     static func getAttackResult(attackerRound: Round, defenderRound: Round, defenderHp: CGFloat, damageReduction: CGFloat = 1) -> AttackResult {
@@ -43,6 +58,24 @@ enum GameService {
 }
 
 private extension GameService {
+    /**
+     Check if current attack selection landed on this player's current defense selection
+     - parameter enemyAttack: attack dealt to this player. Nil will be dodged
+     - returns: Returns false if attacker's attack landed despite of the damage
+     */
+    static func didDodge(_ attackerPosition: AttackPosition?, defenderPosition: DefensePosition?) -> Bool {
+        guard let attackerPosition else { return true }
+        guard let defenderPosition else { return false }
+        switch defenderPosition {
+        case .forward, .backward:
+            return false
+        case .left:
+            return attackerPosition.isLeft
+        case .right:
+            return !attackerPosition.isLeft
+        }
+    }
+
     /// Returns the attacker's total damage based on defender's defend choice
     /// - Parameters:
     ///   - attackerRound: attacker's attack

@@ -11,8 +11,8 @@ import SceneKit
 let isBlackGlasses = true
 
 enum SkeletonType: String {
-    //MARK: Bianca's skeletons
-    case biancaBody = "body-003"
+    //MARK: Clara's skeletons
+    case claraBody = "body-003"
 
     //MARK: Samuel's skeletons
     case samuelFacialHair = "face-001"
@@ -24,8 +24,8 @@ enum SkeletonType: String {
 
     var name: String {
         switch self {
-        case .biancaBody:
-            "bianca body"
+        case .claraBody:
+            "clara body"
         case .samuelFacialHair:
             "facial hair"
         case .samuelBody:
@@ -42,7 +42,7 @@ enum SkeletonType: String {
     }
 
     var diffusedImagePath: String {
-        let fighterName = self == .biancaBody ? "Bianca" : "Samuel"
+        let fighterName = self == .claraBody ? "Clara" : "Samuel"
         let path = "3DAssets.scnassets/Characters/\(fighterName)/assets/"
         switch self {
         case .samuelFacialHair:
@@ -57,8 +57,8 @@ enum SkeletonType: String {
             return path + "samuelHair"
         case .samuelHead:
             return path + "samuelFace"
-        case .biancaBody:
-            return path + "BiancaFullTexture"
+        case .claraBody:
+            return path + "ClaraFullTexture"
         }
     }
 
@@ -74,7 +74,7 @@ enum SkeletonType: String {
         switch self {
         case .samuelGlassesLens:
             isBlackGlasses ? UIColor.black : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
-        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .biancaBody:
+        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .claraBody:
                 .black
         }
     }
@@ -85,7 +85,7 @@ enum SkeletonType: String {
         switch self {
         case .samuelGlassesLens:
             material.diffuse.contents = isBlackGlasses ? UIColor.black : imageMaterial
-        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .biancaBody:
+        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .claraBody:
             material.diffuse.contents = imageMaterial
         }
         material.transparent.contents = transparentMaterial

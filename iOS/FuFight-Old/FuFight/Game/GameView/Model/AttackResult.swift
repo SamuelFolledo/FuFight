@@ -15,19 +15,6 @@ enum AttackResult {
     /// - parameter amount: damage dealt as the killing blow
     case kill(_ amount: CGFloat)
 
-    var defenderAnimation: AnimationType? {
-        switch self {
-        case .noAttack:
-            nil
-        case .miss:
-                .dodgeHead
-        case .damage(_):
-                .hitHead
-        case .kill(_):
-                .killHead
-        }
-    }
-
     var isDefenderAlive: Bool {
         switch self {
         case .noAttack, .miss, .damage(_):
