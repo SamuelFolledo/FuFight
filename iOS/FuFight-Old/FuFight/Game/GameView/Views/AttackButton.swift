@@ -51,6 +51,21 @@ struct AttackButton: View {
             .overlay {
                 MoveStateView(state: move.state, cooldown: move.currentCooldown, playerType: playerType)
             }
+            .overlay {
+                if move.canBoost {
+                    switch move.state {
+                    case .cooldown:
+                        EmptyView()
+                    case .initial, .unselected, .selected:
+                        switch move.fireState {
+                        case .initial:
+                            AttackCanBoostView(playerType: playerType)
+                        case .small, .big:
+                            EmptyView()
+                        }
+                    }
+                }
+            }
     }
 }
 
