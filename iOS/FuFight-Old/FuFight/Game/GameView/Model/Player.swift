@@ -32,7 +32,7 @@ struct PlayerState {
 
 @Observable
 class Player {
-    private(set) var photoUrl: URL
+    private(set) var photoUrl: URL?
     private(set) var username: String
     private(set) var hp: CGFloat
     private(set) var maxHp: CGFloat

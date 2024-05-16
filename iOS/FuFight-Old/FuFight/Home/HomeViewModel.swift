@@ -10,6 +10,7 @@ import FirebaseAuth
 
 @Observable
 class HomeViewModel: BaseAccountViewModel {
+    var player: Player?
     var isAccountVerified = false
     var path = NavigationPath()
 
@@ -34,6 +35,13 @@ private extension HomeViewModel {
                 if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
                     LOGD("Account verified", from: HomeViewModel.self)
                     isAccountVerified = true
+                    self.player = Player(photoUrl: account.photoUrl ?? fakePhotoUrl,
+                                         username: Account.current?.displayName ?? "",
+                                         hp: defaultMaxHp,
+                                         maxHp: defaultMaxHp,
+                                         fighter: Fighter(type: .clara, isEnemy: false),
+                                         state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+                                         moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
                     return
                 }
                 LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)

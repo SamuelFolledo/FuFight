@@ -42,10 +42,16 @@ struct HomeView: View {
             }
             .navigationDestination(for: GameRoute.self) { route in
                 switch route {
-                case .game:
-                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false))
+                case .loading:
+                    if let player = vm.player {
+                        GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player))
+                    }
+                case .onlineGame:
+                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
+                case .offlineGame:
+                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
                 case .practice:
-                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: true))
+                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: true, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
                 }
             }
             .background(
@@ -55,6 +61,8 @@ struct HomeView: View {
             .safeAreaInset(edge: .bottom) {
                 VStack {
                     playButton
+
+                    offlinePlayButton
 
                     practiceButton
                 }
@@ -88,11 +96,27 @@ struct HomeView: View {
 
     var playButton: some View {
         Button {
-            vm.path.append(GameRoute.game)
+            vm.path.append(GameRoute.loading)
         } label: {
             Image("playButton")
                 .frame(width: 200)
         }
+    }
+
+    var offlinePlayButton: some View {
+        Button {
+            vm.path.append(GameRoute.offlineGame)
+        } label: {
+            Text("Offline Play")
+                .padding(6)
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(Color(uiColor: .systemBackground))
+                .font(.title)
+                .background(Color(uiColor: .label))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 4)
     }
 
     var practiceButton: some View {
@@ -102,9 +126,9 @@ struct HomeView: View {
             Text("Practice")
                 .padding(6)
                 .frame(maxWidth: .infinity)
-                .foregroundStyle(Color(uiColor: .systemBackground))
+                .foregroundStyle(Color(uiColor: .label))
                 .font(.title)
-                .background(Color(uiColor: .label))
+                .background(Color(uiColor: .systemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)

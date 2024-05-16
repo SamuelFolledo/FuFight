@@ -37,19 +37,11 @@ class GameViewModel: BaseViewModel {
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
 
-    init(isPracticeMode: Bool) {
+    init(isPracticeMode: Bool, player: Player, enemyPlayer: Player) {
         self.state = .starting
         self.isPracticeMode = isPracticeMode
-        let photoUrl = Account.current?.photoUrl ?? fakePhotoUrl
-
-        self.player = Player(photoUrl: photoUrl,
-                             username: Account.current?.displayName ?? "",
-                             hp: defaultMaxHp,
-                             maxHp: defaultMaxHp,
-                             fighter: Fighter(type: .samuel, isEnemy: false),
-                             state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
-                             moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-        self.enemyPlayer = fakeEnemyPlayer
+        self.player = player
+        self.enemyPlayer = enemyPlayer
         super.init()
     }
 
@@ -201,7 +193,7 @@ private extension GameViewModel {
         //Get the damage results
         let attackResult = GameService.getAttackResult(attackerRound: attacker.currentRound, defenderRound: defender.currentRound, defenderHp: defender.hp, damageReduction: secondAttackerDamageDealtReduction)
 
-        LOGD("AttackingHandler \(attacker.fighter.fighterType.name) (\(attacker.speed)) with \(attacker.currentRound.attack?.name ?? "no attack") \t\t vs \(defender.currentRound.defend?.name ?? "no defense") \t\t\(attackResult)")
+        LOGD("AttackHandler \(attacker.fighter.fighterType.name) (\(attacker.speed)) with \(attacker.currentRound.attack?.name ?? "no attack") \t\t vs \(defender.currentRound.defend?.name ?? "no defense") \t\t\(attackResult)")
 
         //Update attacker based on results
         if attackResult.didAttackLand {
