@@ -78,5 +78,5 @@ private extension GameLoadingView {
 #Preview {
     @State var path: NavigationPath = NavigationPath()
 
-    return GameLoadingView(path: $path, vm: GameLoadingViewModel(player: fakeEnemyPlayer))
+    return GameLoadingView(path: $path, vm: GameLoadingViewModel(player: fakePlayer, account: fakeAccount))
 }

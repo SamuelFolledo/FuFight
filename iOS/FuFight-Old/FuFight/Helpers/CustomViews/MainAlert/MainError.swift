@@ -27,6 +27,7 @@ enum MainErrorType {
     case notUniqueUsername
     case noEmailFromUsername
     case reauthenticatingUser
+    case noOpponentFound
 
     var title: String {
         switch self {
@@ -68,6 +69,8 @@ enum MainErrorType {
             "Error reauthenticating user"
         case .noEmailFromUsername:
             "Could not fetch email from username provided"
+        case .noOpponentFound:
+            "Error finding opponent"
         }
     }
 }

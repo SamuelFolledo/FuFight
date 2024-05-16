@@ -22,6 +22,9 @@ let fakeAccount = Account()
 let db = Firestore.firestore()
 let accountsDb = db.collection(kACCOUNTS)
 let usernamesDb = db.collection(kUSERNAMES)
+let lobbiesDb = db.collection(kLOBBIES)
+let gamesDb = db.collection(kGAMES)
+let historiesDb = db.collection(kHISTORIES)
 
 //MARK: Firebase Storage constants
 let storage = Storage.storage().reference()

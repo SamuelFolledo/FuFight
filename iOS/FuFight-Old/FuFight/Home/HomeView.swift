@@ -42,7 +42,7 @@ struct HomeView: View {
                 switch route {
                 case .loading:
                     if let player = vm.player {
-                        GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player))
+                        GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player, account: vm.account))
                     }
                 case .onlineGame:
                     GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))

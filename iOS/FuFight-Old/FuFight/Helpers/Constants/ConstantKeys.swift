@@ -10,6 +10,8 @@ import Foundation
 //Account Keys
 public let kCURRENTACCOUNT: String = "currentAccount"
 public let kUSERID: String = "userId"
+public let kPLAYERID: String = "playerId"
+public let kENEMYID: String = "enemyId"
 public let kUSERNAME: String = "username"
 public let kPHOTOURL: String = "photoUrl"
 public let kEMAIL: String = "email"
@@ -32,6 +34,9 @@ public let kOPPONENTUID: String = "opponentUid"
 public let kACCOUNTS: String = "Accounts"
 public let kUSERNAMES: String = "Usernames"
 public let kPHOTOS: String = "Photos"
+public let kLOBBIES: String = "Lobbies"
+public let kHISTORIES: String = "Histories"
+public let kGAMES: String = "Games"
 
 //UserDefaults keys
 public let kSHOWPASSWORD: String = "showPassword"
