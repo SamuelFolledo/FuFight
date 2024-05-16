@@ -30,9 +30,7 @@ struct UpdatePasswordView: View {
             .padding(.horizontal, horizontalPadding)
         }
         .overlay {
-            if let message = vm.loadingMessage {
-                ProgressView(message)
-            }
+            LoadingView(message: vm.loadingMessage)
         }
         .onAppear {
             vm.onAppear()

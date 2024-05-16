@@ -23,10 +23,9 @@ struct GameLoadingView: View {
                    isPresented: $vm.isAlertPresented)
             .padding(.horizontal, horizontalPadding)
         }
+        .frame(maxWidth: .infinity)
         .overlay {
-            if let message = vm.loadingMessage {
-                ProgressView(message)
-            }
+            LoadingView(message: vm.loadingMessage)
         }
         .onAppear {
             vm.onAppear()
@@ -45,7 +44,7 @@ struct GameLoadingView: View {
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
         .onAppear(delay: 3) {
-            vm.updateLoadingMessage(to: nil)
+            vm.updateLoadingMessage(to: "Creating match")
 
             runAfterDelay(delay: 0.2) {
                 self.path.append(GameRoute.onlineGame)
@@ -62,7 +61,7 @@ struct GameLoadingView: View {
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(Color(uiColor: .systemBackground))
                 .font(.title)
-                .background(Color(uiColor: .label))
+                .background(Color(uiColor: .systemRed))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)

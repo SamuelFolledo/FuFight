@@ -22,7 +22,7 @@ class GameLoadingViewModel: BaseViewModel {
 
     override func onAppear() {
         super.onAppear()
-        updateLoadingMessage(to: "Finding")
+        updateLoadingMessage(to: "Finding Opponent")
     }
 
     //MARK: - Public Methods

@@ -28,7 +28,7 @@ struct AccountImage: View {
                     .frame(width: squareSide, height: squareSide)
                     .clipShape(Circle())
             } placeholder: {
-                ProgressView()
+                LoadingIndicator()
             }
         }
     }
