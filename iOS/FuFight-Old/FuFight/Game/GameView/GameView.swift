@@ -50,9 +50,7 @@ struct GameView: View {
             timerView
         }
         .overlay {
-            if let message = vm.loadingMessage {
-                ProgressView(message)
-            }
+            LoadingView(message: vm.loadingMessage)
         }
         .onAppear {
             vm.onAppear()

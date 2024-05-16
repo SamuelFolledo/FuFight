@@ -28,7 +28,7 @@ struct AccountImagePicker: View {
                                 image
                                     .resizable()
                             } placeholder: {
-                                ProgressView()
+                                LoadingIndicator()
                             }
                         } else {
                             Image(uiImage: defaultProfilePhoto)

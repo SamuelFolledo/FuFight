@@ -36,9 +36,7 @@ struct HomeView: View {
             }
             .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
             .overlay {
-                if let message = vm.loadingMessage {
-                    ProgressView(message)
-                }
+                LoadingView(message: vm.loadingMessage)
             }
             .navigationDestination(for: GameRoute.self) { route in
                 switch route {

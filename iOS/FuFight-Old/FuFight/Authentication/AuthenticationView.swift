@@ -35,9 +35,7 @@ struct AuthenticationView: View {
             }
             .navigationBarTitle(vm.step.title, displayMode: .large)
             .overlay {
-                if let message = vm.loadingMessage {
-                    ProgressView(message)
-                }
+                LoadingView(message: vm.loadingMessage)
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             .alert(withText: $vm.topFieldText,
