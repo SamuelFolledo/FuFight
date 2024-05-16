@@ -40,11 +40,11 @@ struct GameView: View {
                isPresented: $vm.isAlertPresented)
         .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
-               secondaryButton: AlertButton(title: "Go home", action: { path.removeLast(path.count) }),
+               secondaryButton: AlertButton(title: "Go home", action: transitionBackToHome),
                isPresented: .constant(vm.state == .gameOver))
         .alert(title: "Game is paused",
                primaryButton: AlertButton(title: "Resume", action: {}),
-               secondaryButton: AlertButton(title: "Exit", action: { path.removeLast(path.count) }),
+               secondaryButton: AlertButton(title: "Exit", action: transitionBackToHome),
                isPresented: $vm.isGamePaused)
         .overlay {
             timerView
@@ -108,10 +108,16 @@ struct GameView: View {
     }
 }
 
+private extension GameView {
+    func transitionBackToHome() {
+        path.removeLast(path.count)
+    }
+}
+
 #Preview {
     @State var path: NavigationPath = NavigationPath()
 
     return NavigationView {
-        GameView(path: $path, vm: GameViewModel(isPracticeMode: true))
+        GameView(path: $path, vm: GameViewModel(isPracticeMode: true, player: fakePlayer, enemyPlayer: fakeEnemyPlayer))
     }
 }

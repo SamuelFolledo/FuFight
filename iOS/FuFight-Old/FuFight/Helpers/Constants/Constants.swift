@@ -112,18 +112,18 @@ let defaultAllDashDefenses: [Defense] = Dash.allCases.compactMap { Defense($0) }
 ///Speed multiplier for the player that has the speed boost
 let speedBoostMultiplier: CGFloat = 1.1
 
-//let fakePlayer = Player(photoUrl: fakePhotoUrl,
-//                        username: "Samuel",
-//                        hp: defaultMaxHp,
-//                        maxHp: defaultMaxHp,
-//                        fighter: Fighter(type: .bianca, isEnemy: false),
-//                        state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
-//                        moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
+let fakePlayer = Player(photoUrl: fakePhotoUrl,
+                        username: "Samuel",
+                        hp: defaultMaxHp,
+                        maxHp: defaultMaxHp,
+                        fighter: Fighter(type: .samuel, isEnemy: false),
+                        state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+                        moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 let fakeEnemyPlayer = Player(photoUrl: fakePhotoUrl,
                              username: "Zoro",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
-                             fighter: Fighter(type: .samuel, isEnemy: true),
+                             fighter: Fighter(type: .clara, isEnemy: true),
                              state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
