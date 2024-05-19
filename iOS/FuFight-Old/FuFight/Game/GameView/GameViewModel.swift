@@ -77,7 +77,7 @@ class GameViewModel: BaseViewModel {
     func attackSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
         guard let enemyPlayer else { return }
         guard selectedMove.state != .cooldown,
-            let selectedAttack = Attack(move: selectedMove) else { return }
+              let selectedAttack = Attack(moveId: selectedMove.id) else { return }
         isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
         let attackResult = AttackResult.damage(20)
         if isPracticeMode,
@@ -92,7 +92,7 @@ class GameViewModel: BaseViewModel {
 
     func defenseSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
         guard selectedMove.state != .cooldown,
-              let selectedDefense = Defense(move: selectedMove) else { return }
+              let selectedDefense = Defense(moveId: selectedMove.id) else { return }
         isEnemy ? enemyPlayer?.moves.updateSelected(selectedDefense.position) : player.moves.updateSelected(selectedDefense.position)
     }
 

@@ -69,10 +69,10 @@ class Player {
               let fighterType = lobby.fighterType,
               let enemyFighterType = lobby.enemyFighterType
         else { return nil }
-        self.photoUrl = !isLobbyOwner ? lobby.photoUrl : lobby.enemyPhotoUrl!
-        self.username = !isLobbyOwner ? lobby.username : lobby.enemyUsername!
-        self.userId = !isLobbyOwner ? lobby.userId : lobby.enemyId!
-        self.moves = (!isLobbyOwner ? lobby.moves : lobby.enemyMoves) ?? Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.photoUrl = !isLobbyOwner ? lobby.photoUrl! : lobby.enemyPhotoUrl!
+        self.username = !isLobbyOwner ? lobby.username! : lobby.enemyUsername!
+        self.userId = !isLobbyOwner ? lobby.userId! : lobby.enemyId!
+        self.moves = !isLobbyOwner ? lobby.moves! : lobby.enemyMoves!
         self.fighter = Fighter(type: !isLobbyOwner ? fighterType : enemyFighterType, isEnemy: true)
         self.hp = defaultMaxHp
         self.maxHp = defaultMaxHp

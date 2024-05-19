@@ -85,7 +85,7 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
                     do {
                         let fetchedLobby = try snapshot.data(as: GameLobby.self)
                         if fetchedLobby.isValid {
-                            LOG("Created lobby is now valid against \(isLobbyOwner ? fetchedLobby.enemyUsername ?? "" : fetchedLobby.username) with fighter \(isLobbyOwner ? fetchedLobby.enemyFighterType?.rawValue ?? "" : fetchedLobby.fighterType?.rawValue ?? "")")
+                            LOG("Created lobby is now valid against \(isLobbyOwner ? fetchedLobby.enemyUsername ?? "" : fetchedLobby.username ?? "") with fighter \(isLobbyOwner ? fetchedLobby.enemyFighterType?.rawValue ?? "" : fetchedLobby.fighterType?.rawValue ?? "")")
                             lobby = fetchedLobby
                         }
                     } catch {
@@ -116,17 +116,18 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
                 if lobbyIds.isEmpty {
                     //Create lobby and wait for an enemy to join
                     //Create an enemy player from kENEMYUSERNAME
-                    let lobbyId = try await GameNetworkManager.createLobby(for: account, fighterType: player.fighter.fighterType)
+                    lobby = try! await GameNetworkManager.createLobby(lobby: GameLobby(player: player))
                     isLobbyOwner = true
                     updateLoadingMessage(to: "Waiting for opponent")
-                    currentLobbyId = lobbyId
+                    currentLobbyId = lobby!.lobbyId!
                     //TODO: Listen for changes and wait for up to 5-12 seconds
                 } else {
                     //Join someone's lobby by writing to their lobby as an enemy
                     //Create an enemy player from kUSERNAME
                     LOGD("Lobbies found at \(lobbyIds)")
                     let lobbyId = lobbyIds.first!
-                    try await GameNetworkManager.joinLobby(lobbyId: lobbyId, account: account, fighterType: player.fighter.fighterType)
+                    lobby = GameLobby(lobbyId: lobbyId, enemyPlayer: player)
+                    try await GameNetworkManager.joinLobby(lobby: lobby!)
                     isLobbyOwner = false
                     updateLoadingMessage(to: "Syncing with opponent")
                     currentLobbyId = lobbyId
@@ -138,9 +139,10 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
     }
 
     func deleteCurrentLobby() {
-        guard let currentLobbyId else { return }
+        guard let currentLobbyId,
+            let lobby else { return }
         Task {
-            if let lobby, lobby.userId == player.userId {
+            if lobby.userId == player.userId {
                 //Only lobby's owner can delete the lobby
                 try await GameNetworkManager.deleteCurrentLobby(lobbyId: currentLobbyId)
             } else {
