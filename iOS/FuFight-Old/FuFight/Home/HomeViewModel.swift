@@ -6,30 +6,21 @@
 //
 
 import SwiftUI
-import FirebaseAuth
+import Combine
 
 final class HomeViewModel: BaseAccountViewModel {
     @Published var player: Player?
     @Published var enemyPlayer: Player?
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
-
-    //MARK: - ViewModel Overrides
-
-    override func onAppear() {
-        super.onAppear()
-        if !isAccountVerified {
-            verifyAccount()
-        }
-    }
+    let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToOffline = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToAccount = PassthroughSubject<HomeViewModel, Never>()
 
     //MARK: - Public Methods
-}
-
-//MARK: - Private Methods
-private extension HomeViewModel {
     ///Make sure account is valid at least once
-    func verifyAccount() {
+    @MainActor func verifyAccount() {
         Task {
             do {
                 if try await AccountNetworkManager.isAccountValid(userId: account.userId) {

@@ -5,6 +5,7 @@
 //  Created by Samuel Folledo on 3/4/24.
 //
 
+import Combine
 import SwiftUI
 
 enum GameState {
@@ -28,7 +29,8 @@ class GameViewModel: BaseViewModel {
     var player: Player
     var enemyPlayer: Player?
     let isPracticeMode: Bool
-    
+
+    let didExitGame = PassthroughSubject<GameViewModel, Never>()
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var timeRemaining = defaultMaxTime
     var isCountingDown: Bool = false
