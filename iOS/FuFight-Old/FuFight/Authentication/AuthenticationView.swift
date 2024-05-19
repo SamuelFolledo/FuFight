@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct AuthenticationView: View {
-    @State var vm: AuthenticationViewModel
+    @StateObject var vm: AuthenticationViewModel
     private let dividerWidth: CGFloat = 70
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -119,12 +120,7 @@ struct AuthenticationView: View {
         VStack(spacing: 30) {
             topButton
 
-            switch vm.step {
-            case .logIn, .signUp:
-                bottomButton
-            case .phone, .phoneVerification, .onboard:
-                EmptyView()
-            }
+            bottomButton
         }
     }
 
@@ -167,13 +163,16 @@ struct AuthenticationView: View {
     }
 
     @ViewBuilder var bottomButton: some View {
-        if vm.step == .logIn || vm.step == .signUp {
+        switch vm.step {
+        case .logIn, .signUp:
             Button(action: vm.bottomButtonTapped) {
                 Text(vm.step.bottomButtonTitle)
                     .frame(maxWidth: .infinity)
                     .font(boldedButtonFont)
             }
             .appButton(.tertiary)
+        case .phone, .phoneVerification, .onboard:
+            EmptyView()
         }
     }
 }

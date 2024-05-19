@@ -10,7 +10,7 @@ import FirebaseAuth
 import Combine
 import FirebaseFirestore
 
-class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
+final class GameLoadingViewModel: BaseAccountViewModel {
     @Published var lobby: GameLobby?
     @Published var player: Player
     @Published var enemyPlayer: Player?
@@ -64,6 +64,37 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
         currentLobbyId = nil
     }
 
+    //MARK: - ViewModel Overrides
+
+    override func onAppear() {
+        super.onAppear()
+        updateLoadingMessage(to: "Finding opponent")
+        findOrCreateLobby()
+    }
+
+    override func onDisappear() {
+        super.onDisappear()
+        deleteCurrentLobby()
+    }
+
+    //MARK: - Public Methods
+
+    func deleteCurrentLobby() {
+        guard let currentLobbyId,
+            let lobby else { return }
+        Task {
+            if lobby.userId == player.userId {
+                //Only lobby's owner can delete the lobby
+                try await GameNetworkManager.deleteCurrentLobby(lobbyId: currentLobbyId)
+            } else {
+                //Delete enemy data from joined lobby
+                try await GameNetworkManager.leaveLobby(lobbyId: currentLobbyId)
+            }
+        }
+    }
+}
+
+private extension GameLoadingViewModel {
     func unsubscribe() {
         if listener != nil {
             listener?.remove()
@@ -95,20 +126,6 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
             }
     }
 
-    //MARK: - ViewModel Overrides
-
-    override func onAppear() {
-        super.onAppear()
-        updateLoadingMessage(to: "Finding opponent")
-        findOrCreateLobby()
-    }
-
-    override func onDisappear() {
-        super.onDisappear()
-        deleteCurrentLobby()
-    }
-
-    //MARK: - Public Methods
     func findOrCreateLobby() {
         Task {
             do {
@@ -134,20 +151,6 @@ class GameLoadingViewModel: BaseAccountViewModel, ObservableObject {
                 }
             } catch {
                 updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
-            }
-        }
-    }
-
-    func deleteCurrentLobby() {
-        guard let currentLobbyId,
-            let lobby else { return }
-        Task {
-            if lobby.userId == player.userId {
-                //Only lobby's owner can delete the lobby
-                try await GameNetworkManager.deleteCurrentLobby(lobbyId: currentLobbyId)
-            } else {
-                //Delete enemy data from joined lobby
-                try await GameNetworkManager.leaveLobby(lobbyId: currentLobbyId)
             }
         }
     }

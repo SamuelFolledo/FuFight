@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ViewModel {
+protocol ViewModel: ObservableObject {
     ///Called when view appears
     func onAppear()
     ///Called when view disappears

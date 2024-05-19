@@ -7,31 +7,30 @@
 
 import SwiftUI
 
-@Observable
-class UpdatePasswordViewModel: BaseViewModel {
-    var currentPassword = ""
-    var currentPasswordFieldType: FieldType = .password(.current)
-    var currentPasswordIsSecure = true
-    var currentPasswordHasError = false
-    var currentPasswordIsActive = false
-    var password = "" {
+final class UpdatePasswordViewModel: BaseViewModel {
+    @Published var currentPassword = ""
+    @Published var currentPasswordFieldType: FieldType = .password(.current)
+    @Published var currentPasswordIsSecure = true
+    @Published var currentPasswordHasError = false
+    @Published var currentPasswordIsActive = false
+    @Published var password = "" {
         didSet {
             validateNewPassword()
         }
     }
-    var passwordFieldType: FieldType = .password(.new)
-    var passwordIsSecure = true
-    var passwordHasError = false
-    var passwordIsActive = false
-    var confirmPassword = "" {
+    @Published var passwordFieldType: FieldType = .password(.new)
+    @Published var passwordIsSecure = true
+    @Published var passwordHasError = false
+    @Published var passwordIsActive = false
+    @Published var confirmPassword = "" {
         didSet {
             validateConfirmNewPassword()
         }
     }
-    var confirmPasswordFieldType: FieldType = .password(.confirmNew)
-    var confirmPasswordIsSecure = true
-    var confirmPasswordHasError = false
-    var confirmPasswordIsActive = false
+    @Published var confirmPasswordFieldType: FieldType = .password(.confirmNew)
+    @Published var confirmPasswordIsSecure = true
+    @Published var confirmPasswordHasError = false
+    @Published var confirmPasswordIsActive = false
     var isUpdatePasswordButtonEnabled: Bool {
         if currentPassword.isEmpty || password.isEmpty || confirmPassword.isEmpty {
             return false

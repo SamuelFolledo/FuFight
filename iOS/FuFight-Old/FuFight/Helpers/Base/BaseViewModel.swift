@@ -7,22 +7,14 @@
 
 import Foundation
 
-@Observable
 class BaseViewModel: ViewModel {
     var dismissAction: (() -> Void)?
-    var isAlertPresented: Bool = false
+    @Published var isAlertPresented: Bool = false
     private(set) var alertTitle = ""
     private(set) var alertMessage = ""
-    private(set) var error: MainError? {
-        didSet {
-            if let error {
-                alertTitle = error.title
-                alertMessage = error.message ?? ""
-            }
-        }
-    }
+    private(set) var error: MainError? = nil
     ///Set this to nil in order to remove this global loading indicator, empty string will show it but have empty message
-    private(set) var loadingMessage: String? = nil
+    @Published private(set) var loadingMessage: String? = nil
 
     //MARK: - ViewModel Overrides
 
@@ -30,23 +22,17 @@ class BaseViewModel: ViewModel {
 
     func onDisappear() { }
 
-    func updateAlert(_ title: String, message: String) {
-        alertTitle = title
-        alertMessage = message
-    }
-
-    func updateError(_ error: MainError?) {
+    func updateError(_ newError: MainError?) {
         updateLoadingMessage(to: nil)
+        if let newError {
+            LOGE(newError.fullMessage, from: BaseViewModel.self)
+            error = newError
+            updateAlert(newError.title, message: newError.message)
+        } else {
+            error = nil
+        }
         DispatchQueue.main.async {
-            if let error {
-                LOGE(error.fullMessage, from: BaseViewModel.self)
-                self.error = error
-                self.isAlertPresented = true
-            } else {
-                ///clear error messages
-                self.isAlertPresented = false
-                self.error = nil
-            }
+            self.isAlertPresented = newError != nil
         }
     }
 
@@ -58,5 +44,14 @@ class BaseViewModel: ViewModel {
 
     func dismissView() {
         dismissAction?()
+    }
+}
+
+private extension BaseViewModel {
+    func updateAlert(_ title: String, message: String?) {
+        alertTitle = title
+        if let message {
+            alertMessage = message
+        }
     }
 }
