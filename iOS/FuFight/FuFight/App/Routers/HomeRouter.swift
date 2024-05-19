@@ -1,5 +1,5 @@
 //
-//  HomeCoordinator.swift
+//  HomeRouter.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 5/19/24.
@@ -34,7 +34,7 @@ enum HomeRoute: Hashable, Identifiable {
 }
 
 ///In charge of view model creations and view transitions
-class HomeCoordinator: ObservableObject {
+class HomeRouter: ObservableObject {
     @Published var navigationPath: [HomeRoute] = []
     var subscriptions = Set<AnyCancellable>()
 
