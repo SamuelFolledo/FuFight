@@ -32,8 +32,10 @@ struct GameView: View {
             createPlayerView(for: .user)
         }
         .background {
-            GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemyPlayer.fighter, isPracticeMode: vm.isPracticeMode)
-                .ignoresSafeArea()
+            if let enemyPlayer = vm.enemyPlayer {
+                GameSceneView(fighter: vm.player.fighter, enemyFighter: enemyPlayer.fighter, isPracticeMode: vm.isPracticeMode)
+                    .ignoresSafeArea()
+            }
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
@@ -76,33 +78,37 @@ struct GameView: View {
 
     ///Returns the player's view including player's name, photo, and HP, and damages
     @ViewBuilder func createPlayerView(for playerType: PlayerType) -> some View {
-        let player = playerType.isEnemy ? vm.enemyPlayer : vm.player
-        let enemyPlayer = playerType.isEnemy ? vm.player : vm.enemyPlayer
-        PlayerView(player: player,
-                   enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
-                   onImageTappedAction: {
-            if playerType == .user {
-                vm.isGamePaused = true
-            }
-        })
-        .padding(.horizontal)
-        .padding(.top, playerType.isEnemy ? 0 : 8)
+        if let enemy = vm.enemyPlayer {
+            let player = playerType.isEnemy ? enemy : vm.player
+            let enemyPlayer = playerType.isEnemy ? vm.player : enemy
+            PlayerView(player: player,
+                       enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
+                       onImageTappedAction: {
+                if playerType == .user {
+                    vm.isGamePaused = true
+                }
+            })
+            .padding(.horizontal)
+            .padding(.top, playerType.isEnemy ? 0 : 8)
+        }
     }
 
     ///Returns the attacks and defenses view for a player
     ///Note: For some reason attacks and defenses view is required to be inside an @ViewBuilder function to refresh its state and fire state
     @ViewBuilder func createMovesView(for playerType: PlayerType) -> some View {
-        let player = playerType.isEnemy ? vm.enemyPlayer : vm.player
-        MovesView(
-            attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType) {
-                vm.attackSelected($0, isEnemy: playerType.isEnemy)
-            },
-            defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
-                vm.defenseSelected($0, isEnemy: playerType.isEnemy)
-            },
-            playerType: playerType)
-        .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
-        .padding(playerType.isEnemy ? [.trailing] : [])
+        if let enemy = vm.enemyPlayer {
+            let player = playerType.isEnemy ? enemy : vm.player
+            MovesView(
+                attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType) {
+                    vm.attackSelected($0, isEnemy: playerType.isEnemy)
+                },
+                defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
+                    vm.defenseSelected($0, isEnemy: playerType.isEnemy)
+                },
+                playerType: playerType)
+            .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
+            .padding(playerType.isEnemy ? [.trailing] : [])
+        }
     }
 }
 

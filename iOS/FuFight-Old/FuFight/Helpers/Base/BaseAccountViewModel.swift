@@ -32,12 +32,20 @@ class BaseAccountViewModel: BaseViewModel {
 
 private extension BaseAccountViewModel {
     func observeAuthChanges() {
-        authChangesListener = auth.addStateDidChangeListener { (authDataResult, user) in
-            if let user {
-                let updatedAccount = Account(user)
-                LOGD("Auth ACCOUNT changes handler for \(user.displayName ?? "")", from: BaseAccountViewModel.self)
-                self.account.update(with: updatedAccount)
-                AccountManager.saveCurrent(self.account)
+        authChangesListener = auth.addStateDidChangeListener { (authDataResult, updatedUser) in
+            if let updatedUser,
+               let account = Account.current {
+                if updatedUser.uid != account.userId ||
+                    updatedUser.displayName != account.username ||
+                    updatedUser.photoURL != account.photoUrl ||
+                    updatedUser.email != account.email ||
+                    updatedUser.phoneNumber != account.phoneNumber ||
+                    updatedUser.metadata.creationDate != account.createdAt {
+                    let updatedAccount = Account(updatedUser)
+                    LOGD("Auth ACCOUNT changes handler for \(updatedUser.displayName ?? "")", from: BaseAccountViewModel.self)
+                    self.account.update(with: updatedAccount)
+                    AccountManager.saveCurrent(self.account)
+                }
             }
         }
     }

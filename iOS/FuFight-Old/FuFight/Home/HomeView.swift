@@ -40,12 +40,21 @@ struct HomeView: View {
             }
             .navigationDestination(for: GameRoute.self) { route in
                 switch route {
-                case .loading:
-                    if let player = vm.player {
-                        GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player))
-                    }
                 case .onlineGame:
-                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
+                    if let player = vm.player {
+                        if let enemyPlayer = vm.enemyPlayer {
+                            let _ = LOGD("Starting online game with \(player.username) VS \(enemyPlayer.username)")
+                            GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: player, enemyPlayer: enemyPlayer))
+                                .onDisappear {
+                                    vm.enemyPlayer = nil
+                                }
+                        } else {
+                            GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player, account: vm.account) { enemyPlayer in
+                                LOGD("Enemy player from loading is \(enemyPlayer?.username ?? "")")
+                                vm.enemyPlayer = enemyPlayer
+                            })
+                        }
+                    }
                 case .offlineGame:
                     GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
                 case .practice:
@@ -94,7 +103,7 @@ struct HomeView: View {
 
     var playButton: some View {
         Button {
-            vm.path.append(GameRoute.loading)
+            vm.path.append(GameRoute.onlineGame)
         } label: {
             Image("playButton")
                 .frame(width: 200)

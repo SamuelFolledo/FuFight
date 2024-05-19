@@ -34,6 +34,7 @@ struct PlayerState {
 class Player {
     private(set) var photoUrl: URL?
     private(set) var username: String
+    private(set) var userId: String
     private(set) var hp: CGFloat
     private(set) var maxHp: CGFloat
     private(set) var isEnemy: Bool
@@ -44,11 +45,12 @@ class Player {
 
     var speed: CGFloat = 0
 
-    var currentRound: Round { return rounds.last! }
+    var currentRound: Round? { return rounds.last }
     var isDead: Bool { hp <= 0 }
     var hpText: String { String(format: "%.2f", hp) }
 
-    init(photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, fighter: Fighter, state: PlayerState, moves: Moves) {
+    init(userId: String, photoUrl: URL, username: String, hp: CGFloat, maxHp: CGFloat, fighter: Fighter, state: PlayerState, moves: Moves) {
+        self.userId = userId
         self.photoUrl = photoUrl
         self.username = username
         self.hp = hp
@@ -59,6 +61,26 @@ class Player {
         self.moves = moves
         self.rounds = []
         self.speed = 0
+    }
+
+    ///Creates an enemy player from the lobby
+    init?(lobby: GameLobby?, isLobbyOwner: Bool) {
+        guard let lobby,
+              let fighterType = lobby.fighterType,
+              let enemyFighterType = lobby.enemyFighterType
+        else { return nil }
+        self.photoUrl = !isLobbyOwner ? lobby.photoUrl : lobby.enemyPhotoUrl!
+        self.username = !isLobbyOwner ? lobby.username : lobby.enemyUsername!
+        self.userId = !isLobbyOwner ? lobby.userId : lobby.enemyId!
+        self.moves = (!isLobbyOwner ? lobby.moves : lobby.enemyMoves) ?? Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses)
+        self.fighter = Fighter(type: !isLobbyOwner ? fighterType : enemyFighterType, isEnemy: true)
+        self.hp = defaultMaxHp
+        self.maxHp = defaultMaxHp
+        self.rounds = []
+        self.speed = 0
+        self.isEnemy = true
+        //TODO: hasSpeedBoost should not be false
+        self.state = .init(boostLevel: .none, hasSpeedBoost: false)
     }
 
     func loadAnimations() {
@@ -108,6 +130,12 @@ class Player {
         state.resetBoost()
         moves.resetMoves()
         fighter.resumeAnimations()
+    }
+}
+
+extension Player: Equatable {
+    static func ==(lhs: Player, rhs: Player) -> Bool {
+        return lhs.userId == rhs.userId
     }
 }
 

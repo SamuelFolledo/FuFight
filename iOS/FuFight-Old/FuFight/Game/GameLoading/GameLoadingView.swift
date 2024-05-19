@@ -9,13 +9,12 @@ import SwiftUI
 
 struct GameLoadingView: View {
     @Binding var path: NavigationPath
-    @State var vm: GameLoadingViewModel
+    @ObservedObject var vm: GameLoadingViewModel
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
                 Spacer()
-
 
             }
             .alert(title: vm.alertTitle,
@@ -43,17 +42,11 @@ struct GameLoadingView: View {
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
-        .onAppear(delay: 3) {
-            vm.updateLoadingMessage(to: "Creating match")
-
-            runAfterDelay(delay: 0.2) {
-                self.path.append(GameRoute.onlineGame)
-            }
-        }
     }
 
     var cancelButton: some View {
         Button {
+            vm.deleteCurrentLobby()
             transitionBackToHome()
         } label: {
             Text("Cancel")
@@ -78,5 +71,5 @@ private extension GameLoadingView {
 #Preview {
     @State var path: NavigationPath = NavigationPath()
 
-    return GameLoadingView(path: $path, vm: GameLoadingViewModel(player: fakeEnemyPlayer))
+    return GameLoadingView(path: $path, vm: GameLoadingViewModel(player: fakePlayer, account: fakeAccount))
 }

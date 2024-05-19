@@ -37,7 +37,7 @@ class AccountManager {
         guard let data = defaults.data(forKey: kCURRENTACCOUNT) else { return nil }
         do {
             let account = try JSONDecoder().decode(Account.self, from: data)
-            LOGD("ACCOUNT: Locally getting \(account.displayName) with status of \(account.status)", from: AccountManager.self)
+//            LOGD("ACCOUNT: Locally getting \(account.displayName) with status of \(account.status)", from: AccountManager.self)
             return account
         } catch {
             LOGE("Error decoding current account \(error.localizedDescription)", from: AccountManager.self)

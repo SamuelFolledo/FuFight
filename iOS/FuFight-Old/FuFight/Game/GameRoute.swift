@@ -8,7 +8,6 @@
 import Foundation
 
 enum GameRoute: String {
-    case loading
     case onlineGame
     case offlineGame
     case practice
