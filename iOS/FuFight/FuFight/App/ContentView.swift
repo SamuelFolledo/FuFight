@@ -12,17 +12,18 @@ import Combine
 ///Source: https://medium.com/@sarimk80/navigationstack-with-viewmodel-c0ec223cf16b
 ///Source: https://betterprogramming.pub/flow-navigation-with-swiftui-4-e006882c5efa
 struct ContentView: View {
-    @StateObject var homeCoordinator: HomeCoordinator = HomeCoordinator()
+    @StateObject var homeRouter: HomeRouter = HomeRouter()
     @StateObject var account: Account = Account.current ?? Account()
     var subscriptions = Set<AnyCancellable>()
 
     var body: some View {
         switch account.status {
         case .online:
+            //Go to home page
             TabView {
-                NavigationStack(path: $homeCoordinator.navigationPath) {
+                NavigationStack(path: $homeRouter.navigationPath) {
                     VStack {
-                        HomeView(vm: homeCoordinator.makeHomeViewModel(account: account))
+                        HomeView(vm: homeRouter.makeHomeViewModel(account: account))
                     }
                     .navigationDestination(for: HomeRoute.self) { screen in
                         switch screen {
@@ -40,8 +41,7 @@ struct ContentView: View {
                 }
 
                 NavigationStack {
-                    AccountView(vm: homeCoordinator.makeAccountViewModel(account: account))
-                    //.environmentObject(AccountViewModel)
+                    AccountView(vm: homeRouter.makeAccountViewModel(account: account))
                 }
                 .tabItem {
                     Label("Settings", systemImage: "gear")
@@ -51,9 +51,11 @@ struct ContentView: View {
             .transition(.move(edge: .trailing))
 
         case .unfinished:
+            //Finish creating account
             createAuthenticationView(step: .onboard)
 
         case .logOut:
+            //Log in
             createAuthenticationView(step: .logIn)
         }
     }
@@ -69,6 +71,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(homeCoordinator: HomeCoordinator())
+        ContentView(homeRouter: HomeRouter())
     }
 }
