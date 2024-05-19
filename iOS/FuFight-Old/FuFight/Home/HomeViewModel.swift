@@ -14,22 +14,9 @@ final class HomeViewModel: BaseAccountViewModel {
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
 
-    //MARK: - ViewModel Overrides
-
-    override func onAppear() {
-        super.onAppear()
-        if !isAccountVerified {
-            verifyAccount()
-        }
-    }
-
     //MARK: - Public Methods
-}
-
-//MARK: - Private Methods
-private extension HomeViewModel {
     ///Make sure account is valid at least once
-    func verifyAccount() {
+    @MainActor func verifyAccount() {
         Task {
             do {
                 if try await AccountNetworkManager.isAccountValid(userId: account.userId) {

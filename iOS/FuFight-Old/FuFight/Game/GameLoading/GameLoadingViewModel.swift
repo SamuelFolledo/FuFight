@@ -19,7 +19,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
     private var isLobbyOwner: Bool = false
     private var listener: ListenerRegistration?
-    private var cancellables = Set<AnyCancellable>()
+    private var subscriptions = Set<AnyCancellable>()
 
     init(player: Player, enemyPlayer: Player? = nil, account: Account, onEnemyPlayerReceived: ((_ enemyPlayer: Player?)->Void)? = nil) {
         self.player = player
@@ -36,7 +36,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                     self?.subscribeToLobbyChanges()
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &subscriptions)
 
         //After getting a lobby with player and enemy, create an enemyPlayer
         $lobby
@@ -44,7 +44,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                 Player(lobby: lobby, isLobbyOwner: self.isLobbyOwner)
             }
             .assign(to: \.enemyPlayer, on: self)
-            .store(in: &cancellables)
+            .store(in: &subscriptions)
 
         //After receiving creating an enemyPlayer, go to GameView
         $enemyPlayer
@@ -54,7 +54,9 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                     self?.onEnemyPlayerReceived?(player)
                 }
             }
-            .store(in: &cancellables)
+            .store(in: &subscriptions)
+
+        findOrCreateLobby()
     }
 
     deinit {
@@ -65,20 +67,12 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     }
 
     //MARK: - ViewModel Overrides
-
-    override func onAppear() {
-        super.onAppear()
-        updateLoadingMessage(to: "Finding opponent")
-        findOrCreateLobby()
-    }
-
     override func onDisappear() {
         super.onDisappear()
         deleteCurrentLobby()
     }
 
     //MARK: - Public Methods
-
     func deleteCurrentLobby() {
         guard let currentLobbyId,
             let lobby else { return }
@@ -89,6 +83,36 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             } else {
                 //Delete enemy data from joined lobby
                 try await GameNetworkManager.leaveLobby(lobbyId: currentLobbyId)
+            }
+        }
+    }
+
+    func findOrCreateLobby() {
+        updateLoadingMessage(to: "Finding opponent")
+        Task {
+            do {
+                let lobbyIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
+                if lobbyIds.isEmpty {
+                    //Create lobby and wait for an enemy to join
+                    //Create an enemy player from kENEMYUSERNAME
+                    let createdLobby = try! await GameNetworkManager.createLobby(lobby: GameLobby(player: player))
+                    DispatchQueue.main.async {
+                        self.updateLobby(gameLobby: createdLobby, isOwner: true)
+                    }
+                    //TODO: Listen for changes and wait for up to 5-12 seconds
+                } else {
+                    //Join someone's lobby by writing to their lobby as an enemy
+                    //Create an enemy player from kUSERNAME
+                    LOGD("Lobbies found at \(lobbyIds)")
+                    let lobbyId = lobbyIds.first!
+                    let fetchedLobby = GameLobby(lobbyId: lobbyId, enemyPlayer: player)
+                    try await GameNetworkManager.joinLobby(lobby: fetchedLobby)
+                    DispatchQueue.main.async {
+                        self.updateLobby(gameLobby: fetchedLobby, isOwner: false)
+                    }
+                }
+            } catch {
+                updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
             }
         }
     }
@@ -116,8 +140,10 @@ private extension GameLoadingViewModel {
                     do {
                         let fetchedLobby = try snapshot.data(as: GameLobby.self)
                         if fetchedLobby.isValid {
-                            LOG("Created lobby is now valid against \(isLobbyOwner ? fetchedLobby.enemyUsername ?? "" : fetchedLobby.username ?? "") with fighter \(isLobbyOwner ? fetchedLobby.enemyFighterType?.rawValue ?? "" : fetchedLobby.fighterType?.rawValue ?? "")")
-                            lobby = fetchedLobby
+                            DispatchQueue.main.async {
+                                LOG("Created lobby is now valid against \(self.isLobbyOwner ? fetchedLobby.enemyUsername ?? "" : fetchedLobby.username ?? "") with fighter \(self.isLobbyOwner ? fetchedLobby.enemyFighterType?.rawValue ?? "" : fetchedLobby.fighterType?.rawValue ?? "")")
+                                self.updateLobby(gameLobby: fetchedLobby, isOwner: self.isLobbyOwner)
+                            }
                         }
                     } catch {
                         LOGDE("Error creating lobby with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
@@ -126,32 +152,14 @@ private extension GameLoadingViewModel {
             }
     }
 
-    func findOrCreateLobby() {
-        Task {
-            do {
-                let lobbyIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
-                if lobbyIds.isEmpty {
-                    //Create lobby and wait for an enemy to join
-                    //Create an enemy player from kENEMYUSERNAME
-                    lobby = try! await GameNetworkManager.createLobby(lobby: GameLobby(player: player))
-                    isLobbyOwner = true
-                    updateLoadingMessage(to: "Waiting for opponent")
-                    currentLobbyId = lobby!.lobbyId!
-                    //TODO: Listen for changes and wait for up to 5-12 seconds
-                } else {
-                    //Join someone's lobby by writing to their lobby as an enemy
-                    //Create an enemy player from kUSERNAME
-                    LOGD("Lobbies found at \(lobbyIds)")
-                    let lobbyId = lobbyIds.first!
-                    lobby = GameLobby(lobbyId: lobbyId, enemyPlayer: player)
-                    try await GameNetworkManager.joinLobby(lobby: lobby!)
-                    isLobbyOwner = false
-                    updateLoadingMessage(to: "Syncing with opponent")
-                    currentLobbyId = lobbyId
-                }
-            } catch {
-                updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
-            }
+    @MainActor func updateLobby(gameLobby: GameLobby, isOwner: Bool) {
+        isLobbyOwner = isOwner
+        lobby = gameLobby
+        currentLobbyId = gameLobby.lobbyId
+        if isOwner {
+            updateLoadingMessage(to: "Waiting for opponent")
+        } else {
+            updateLoadingMessage(to: "Syncing with opponent")
         }
     }
 }

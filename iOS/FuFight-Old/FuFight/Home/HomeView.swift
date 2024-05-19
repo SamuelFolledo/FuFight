@@ -79,6 +79,9 @@ struct HomeView: View {
         }
         .onAppear {
             vm.onAppear()
+            if !vm.isAccountVerified {
+                vm.verifyAccount()
+            }
         }
         .onDisappear {
             vm.onDisappear()
