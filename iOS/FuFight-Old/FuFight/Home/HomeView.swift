@@ -11,55 +11,30 @@ struct HomeView: View {
     @StateObject var vm: HomeViewModel
 
     var body: some View {
-        NavigationStack(path: $vm.path) {
-            GeometryReader { proxy in
-                ScrollView {
-                    ZStack {
-                        DaePreview()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
+        GeometryReader { proxy in
+            ScrollView {
+                ZStack {
+                    DaePreview()
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+
+                    VStack {
+                        navigationView
 
                         VStack {
-                            navigationView
+                            Text("Welcome \(vm.account.displayName)")
+                                .font(mediumTitleFont)
+                                .foregroundStyle(.white)
 
-                            VStack {
-                                Text("Welcome \(vm.account.displayName)")
-                                    .font(mediumTitleFont)
-                                    .foregroundStyle(.white)
-
-                                Spacer()
-                            }
-                            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                            .padding()
+                            Spacer()
                         }
+                        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                        .padding()
                     }
                 }
             }
             .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
             .overlay {
                 LoadingView(message: vm.loadingMessage)
-            }
-            .navigationDestination(for: GameRoute.self) { route in
-                switch route {
-                case .onlineGame:
-                    if let player = vm.player {
-                        if let enemyPlayer = vm.enemyPlayer {
-                            let _ = LOGD("Starting online game with \(player.username) VS \(enemyPlayer.username)")
-                            GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: player, enemyPlayer: enemyPlayer))
-                                .onDisappear {
-                                    vm.enemyPlayer = nil
-                                }
-                        } else {
-                            GameLoadingView(path: $vm.path, vm: GameLoadingViewModel(player: player, account: vm.account) { enemyPlayer in
-                                LOGD("Enemy player from loading is \(enemyPlayer?.username ?? "")")
-                                vm.enemyPlayer = enemyPlayer
-                            })
-                        }
-                    }
-                case .offlineGame:
-                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
-                case .practice:
-                    GameView(path: $vm.path, vm: GameViewModel(isPracticeMode: true, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer))
-                }
             }
             .background(
                 backgroundImage
@@ -73,6 +48,7 @@ struct HomeView: View {
 
                     practiceButton
                 }
+                .padding(.bottom)
             }
             .navigationBarHidden(true)
             .frame(maxWidth: .infinity)
@@ -106,7 +82,7 @@ struct HomeView: View {
 
     var playButton: some View {
         Button {
-            vm.path.append(GameRoute.onlineGame)
+            vm.transitionToLoading.send(vm)
         } label: {
             Image("playButton")
                 .frame(width: 200)
@@ -115,7 +91,7 @@ struct HomeView: View {
 
     var offlinePlayButton: some View {
         Button {
-            vm.path.append(GameRoute.offlineGame)
+            vm.transitionToOffline.send(vm)
         } label: {
             Text("Offline Play")
                 .padding(6)
@@ -131,7 +107,7 @@ struct HomeView: View {
 
     var practiceButton: some View {
         Button {
-            vm.path.append(GameRoute.practice)
+            vm.transitionToPractice.send(vm)
         } label: {
             Text("Practice")
                 .padding(6)

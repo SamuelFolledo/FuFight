@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 import Combine
 import FirebaseFirestore
 
@@ -15,16 +14,16 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     @Published var player: Player
     @Published var enemyPlayer: Player?
     @Published var currentLobbyId: String?
-    var onEnemyPlayerReceived: ((_ enemyPlayer: Player?)->Void)?
+    let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
+    let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
     private var isLobbyOwner: Bool = false
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
-    init(player: Player, enemyPlayer: Player? = nil, account: Account, onEnemyPlayerReceived: ((_ enemyPlayer: Player?)->Void)? = nil) {
+    init(player: Player, enemyPlayer: Player? = nil, account: Account) {
         self.player = player
         self.enemyPlayer = enemyPlayer
-        self.onEnemyPlayerReceived = onEnemyPlayerReceived
         super.init(account: account)
 
         //After receiving a lobbyId (created or joined), subscribe to changes and update lobby
@@ -50,8 +49,8 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         $enemyPlayer
             .receive(on: DispatchQueue.main)
             .sink { [weak self] player in
-                if player != nil {
-                    self?.onEnemyPlayerReceived?(player)
+                if let self, player != nil {
+                    self.didFindEnemy.send(self)
                 }
             }
             .store(in: &subscriptions)

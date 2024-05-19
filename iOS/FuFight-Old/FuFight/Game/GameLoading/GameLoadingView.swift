@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct GameLoadingView: View {
-    @Binding var path: NavigationPath
     @ObservedObject var vm: GameLoadingViewModel
 
     var body: some View {
@@ -47,7 +46,7 @@ struct GameLoadingView: View {
     var cancelButton: some View {
         Button {
             vm.deleteCurrentLobby()
-            transitionBackToHome()
+            vm.didCancel.send(vm)
         } label: {
             Text("Cancel")
                 .padding(6)
@@ -62,14 +61,6 @@ struct GameLoadingView: View {
     }
 }
 
-private extension GameLoadingView {
-    func transitionBackToHome() {
-        path.removeLast(path.count)
-    }
-}
-
 #Preview {
-    @State var path: NavigationPath = NavigationPath()
-
-    return GameLoadingView(path: $path, vm: GameLoadingViewModel(player: fakePlayer, account: fakeAccount))
+    GameLoadingView(vm: GameLoadingViewModel(player: fakePlayer, account: fakeAccount))
 }

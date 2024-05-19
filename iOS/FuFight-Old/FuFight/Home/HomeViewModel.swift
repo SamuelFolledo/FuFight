@@ -6,13 +6,17 @@
 //
 
 import SwiftUI
-import FirebaseAuth
+import Combine
 
 final class HomeViewModel: BaseAccountViewModel {
     @Published var player: Player?
     @Published var enemyPlayer: Player?
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
+    let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToOffline = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToAccount = PassthroughSubject<HomeViewModel, Never>()
 
     //MARK: - Public Methods
     ///Make sure account is valid at least once
