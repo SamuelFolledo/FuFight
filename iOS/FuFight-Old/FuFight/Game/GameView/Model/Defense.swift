@@ -27,7 +27,7 @@ protocol DefenseProtocol {
     var position: DefensePosition { get }
 }
 
-struct Defense: MoveProtocol, DefenseProtocol {
+struct Defense: MoveProtocol, DefenseProtocol, DefenseTypeProtocol {
     private let move: any DefenseTypeProtocol
 
     //MARK: Move Protocol Properties
@@ -53,8 +53,8 @@ struct Defense: MoveProtocol, DefenseProtocol {
         self.move = defense
     }
 
-    init?(move: any Move) {
-        if let move = Dash(rawValue: move.id) {
+    init?(moveId: String) {
+        if let move = Dash(rawValue: moveId) {
             self.move = move
         } else {
             return nil
@@ -71,4 +71,22 @@ struct Defense: MoveProtocol, DefenseProtocol {
     }
 
     //MARK: - Public Methods
+}
+
+//MARK: - Decodable extension
+extension Defense: Codable {
+    private enum CodingKeys : String, CodingKey {
+        case move = "move"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(move.id, forKey: .move)
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let moveId = try values.decodeIfPresent(String.self, forKey: .move)!
+        self.move = Defense(moveId: moveId)!
+    }
 }

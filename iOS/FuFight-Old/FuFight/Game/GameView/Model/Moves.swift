@@ -230,3 +230,51 @@ private extension Moves {
         rightHardAttack.setFireState(to: .initial)
     }
 }
+
+//MARK: - Decodable extension
+extension Moves: Codable {
+    private enum CodingKeys : String, CodingKey {
+        case leftLightAttack = "leftLightAttack"
+        case rightLightAttack = "rightLightAttack"
+        case leftMediumAttack = "leftMediumAttack"
+        case rightMediumAttack = "rightMediumAttack"
+        case leftHardAttack = "leftHardAttack"
+        case rightHardAttack = "rightHardAttack"
+
+        case forwardDefense = "forwardDefense"
+        case leftDefense = "leftDefense"
+        case backwardDefense = "backwardDefense"
+        case rightDefense = "rightDefense"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(leftLightAttack, forKey: .leftLightAttack)
+        try container.encode(rightLightAttack, forKey: .rightLightAttack)
+        try container.encode(leftMediumAttack, forKey: .leftMediumAttack)
+        try container.encode(rightMediumAttack, forKey: .rightMediumAttack)
+        try container.encode(leftHardAttack, forKey: .leftHardAttack)
+        try container.encode(rightHardAttack, forKey: .rightHardAttack)
+        try container.encode(forwardDefense, forKey: .forwardDefense)
+        try container.encode(leftDefense, forKey: .leftDefense)
+        try container.encode(backwardDefense, forKey: .backwardDefense)
+        try container.encode(rightDefense, forKey: .rightDefense)
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let leftLightAttack = try values.decodeIfPresent(Attack.self, forKey: .leftLightAttack)!
+        let rightLightAttack = try values.decodeIfPresent(Attack.self, forKey: .rightLightAttack)!
+        let leftMediumAttack = try values.decodeIfPresent(Attack.self, forKey: .leftMediumAttack)!
+        let rightMediumAttack = try values.decodeIfPresent(Attack.self, forKey: .rightMediumAttack)!
+        let leftHardAttack = try values.decodeIfPresent(Attack.self, forKey: .leftHardAttack)!
+        let rightHardAttack = try values.decodeIfPresent(Attack.self, forKey: .rightHardAttack)!
+        let forwardDefense = try values.decodeIfPresent(Defense.self, forKey: .forwardDefense)!
+        let leftDefense = try values.decodeIfPresent(Defense.self, forKey: .leftDefense)!
+        let backwardDefense = try values.decodeIfPresent(Defense.self, forKey: .backwardDefense)!
+        let rightDefense = try values.decodeIfPresent(Defense.self, forKey: .rightDefense)!
+        let attacks: [Attack] = [leftLightAttack, rightLightAttack, leftMediumAttack, rightMediumAttack, leftHardAttack, rightHardAttack]
+        let defenses: [Defense] = [forwardDefense, leftDefense, backwardDefense, rightDefense]
+        self.init(attacks: attacks, defenses: defenses)
+    }
+}

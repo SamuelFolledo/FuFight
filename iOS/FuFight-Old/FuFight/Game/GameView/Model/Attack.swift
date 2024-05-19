@@ -42,7 +42,7 @@ protocol AttackProtocol {
     var canBoost: Bool { get }
 }
 
-struct Attack: MoveProtocol, AttackProtocol {
+struct Attack: MoveProtocol, AttackProtocol, AttackTypeProtocol {
     private let move: any AttackTypeProtocol
 
     //MARK: Move Protocol
@@ -73,8 +73,8 @@ struct Attack: MoveProtocol, AttackProtocol {
         self.move = attack
     }
 
-    init?(move: any Move) {
-        if let move = Punch(rawValue: move.id) {
+    init?(moveId: String) {
+        if let move = Punch(rawValue: moveId) {
             self.move = move
         } else {
             return nil
@@ -93,5 +93,23 @@ struct Attack: MoveProtocol, AttackProtocol {
     //MARK: - Other Public Methods
     mutating func setFireState(to newFireState: FireState) {
         self.fireState = newFireState
+    }
+}
+
+//MARK: - Decodable extension
+extension Attack: Codable {
+    private enum CodingKeys : String, CodingKey {
+        case move = "move"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(move.id, forKey: .move)
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let moveId = try values.decodeIfPresent(String.self, forKey: .move)!
+        self.move = Attack(moveId: moveId)!
     }
 }

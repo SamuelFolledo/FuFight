@@ -98,7 +98,7 @@ private extension GameSceneView {
                 defensesView: DefensesView(
                     defenses: defaultAllDashDefenses,
                     playerType: .enemy) { move in
-                        guard let defense = Defense(move: move) else { return }
+                        guard let defense = Defense(moveId: move.id) else { return }
                         switch defense.position {
                         case .forward:
                             fighter.playAnimation(.idleStand)
