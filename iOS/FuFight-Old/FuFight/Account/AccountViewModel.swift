@@ -13,9 +13,9 @@ enum ReauthenticateReasonType {
     case saveAccount
 }
 
-@Observable
-class AccountViewModel: BaseAccountViewModel {
-    var isViewingMode: Bool = true
+final class AccountViewModel: BaseAccountViewModel {
+    ///False if user is editing after a recent authentication
+    @Published var isViewingMode: Bool = true
     var selectedImage: UIImage? = nil {
         didSet {
             if isViewingMode && selectedImage != nil {
@@ -24,14 +24,14 @@ class AccountViewModel: BaseAccountViewModel {
             }
         }
     }
-    var usernameFieldText: String = ""
-    var usernameFieldHasError: Bool = false
-    var usernameFieldIsActive: Bool = false
-    var isDeleteAccountAlertPresented: Bool = false
+    @Published var usernameFieldText: String = ""
+    @Published var usernameFieldHasError: Bool = false
+    @Published var usernameFieldIsActive: Bool = false
+    @Published var isDeleteAccountAlertPresented: Bool = false
     private var isRecentlyAuthenticated = false
-    var isReauthenticationAlertPresented = false
-    var password = ""
-    private var reauthenticationReasonType: ReauthenticateReasonType = .editAccount
+    @Published var isReauthenticationAlertPresented = false
+    @Published var password = ""
+    @Published private var reauthenticationReasonType: ReauthenticateReasonType = .editAccount
 
     override func onAppear() {
         super.onAppear()
@@ -96,7 +96,9 @@ class AccountViewModel: BaseAccountViewModel {
     func editSaveButtonTapped() {
         if isViewingMode {
             if isRecentlyAuthenticated {
-                isViewingMode = false
+                DispatchQueue.main.async {
+                    self.isViewingMode = false
+                }
             } else {
                 showReauthenticateAlert(reasonType: .editAccount)
             }

@@ -8,12 +8,11 @@
 import SwiftUI
 import FirebaseAuth
 
-@Observable
-class HomeViewModel: BaseAccountViewModel {
-    var player: Player?
-    var enemyPlayer: Player?
-    var isAccountVerified = false
-    var path = NavigationPath()
+final class HomeViewModel: BaseAccountViewModel {
+    @Published var player: Player?
+    @Published var enemyPlayer: Player?
+    @Published var isAccountVerified = false
+    @Published var path = NavigationPath()
 
     //MARK: - ViewModel Overrides
 

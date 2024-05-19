@@ -5,45 +5,44 @@
 //  Created by Samuel Folledo on 2/16/24.
 //
 
-import UIKit
+import Combine
 import SwiftUI
 
-@Observable
-class AuthenticationViewModel: BaseViewModel {
-    private(set) var step: AuthStep
-    let account: Account
+final class AuthenticationViewModel: BaseViewModel {
+    @Published private(set) var step: AuthStep
+    @Published var account: Account
 
-    var showForgotPassword: Bool = false
-    var rememberMe: Bool = Defaults.isSavingEmailAndPassword {
+    @Published var showForgotPassword: Bool = false
+    @Published var rememberMe: Bool = Defaults.isSavingEmailAndPassword {
         didSet {
             Defaults.isSavingEmailAndPassword = rememberMe
             saveTopFieldTextIfNeeded()
             saveBottomFieldTextIfNeeded()
         }
     }
-    var topFieldType: FieldType = .emailOrUsername
-    var topFieldText: String = Defaults.isSavingEmailAndPassword ? Defaults.savedEmailOrUsername : "" {
+    @Published var topFieldType: FieldType = .emailOrUsername
+    @Published var topFieldText: String = Defaults.isSavingEmailAndPassword ? Defaults.savedEmailOrUsername : "" {
         didSet {
             saveTopFieldTextIfNeeded()
             updateTopFieldTypeIfNeeded()
         }
     }
-    var topFieldHasError: Bool = false
-    var topFieldIsActive: Bool = false
-    var bottomFieldType: FieldType = .password(.current)
-    var bottomFieldText: String = Defaults.isSavingEmailAndPassword ? Defaults.savedPassword : "" {
+    @Published var topFieldHasError: Bool = false
+    @Published var topFieldIsActive: Bool = false
+    @Published var bottomFieldType: FieldType = .password(.current)
+    @Published var bottomFieldText: String = Defaults.isSavingEmailAndPassword ? Defaults.savedPassword : "" {
         didSet {
             saveBottomFieldTextIfNeeded()
         }
     }
-    var bottomFieldIsSecure = !Defaults.showPassword {
+    @Published var bottomFieldIsSecure = !Defaults.showPassword {
         didSet {
             Defaults.showPassword = !bottomFieldIsSecure
         }
     }
-    var bottomFieldHasError: Bool = false
-    var bottomFieldIsActive: Bool = false
-    var selectedImage: UIImage? = nil
+    @Published var bottomFieldHasError: Bool = false
+    @Published var bottomFieldIsActive: Bool = false
+    @Published var selectedImage: UIImage? = nil
 
     var topButtonIsEnabled: Bool {
         switch step {

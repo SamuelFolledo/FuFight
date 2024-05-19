@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AccountView: View {
-    @State var vm: AccountViewModel
+    @StateObject var vm: AccountViewModel
 
     var body: some View {
         ScrollView {

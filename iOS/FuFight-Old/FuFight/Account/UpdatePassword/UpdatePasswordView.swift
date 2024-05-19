@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct UpdatePasswordView: View {
-    @State var vm = UpdatePasswordViewModel()
+    @StateObject var vm = UpdatePasswordViewModel()
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
