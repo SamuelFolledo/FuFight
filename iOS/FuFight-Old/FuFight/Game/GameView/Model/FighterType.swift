@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FighterType {
+enum FighterType: String {
     case samuel, clara
 
     var daeUrl: URL? {

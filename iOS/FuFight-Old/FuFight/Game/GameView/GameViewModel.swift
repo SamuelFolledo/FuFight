@@ -26,7 +26,7 @@ enum GameState {
 class GameViewModel: BaseViewModel {
     var state: GameState
     var player: Player
-    var enemyPlayer: Player
+    var enemyPlayer: Player?
     let isPracticeMode: Bool
     
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -50,6 +50,12 @@ class GameViewModel: BaseViewModel {
         updateState(.starting)
     }
 
+    override func onDisappear() {
+        super.onDisappear()
+        player.prepareForRematch()
+        enemyPlayer = nil
+    }
+
     //MARK: - Public Methods
     func decrementTimeByOneSecond() {
         //Only countdown when game's state is .gaming and timer is active
@@ -64,11 +70,12 @@ class GameViewModel: BaseViewModel {
 
     func rematch() {
         player.prepareForRematch()
-        enemyPlayer.prepareForRematch()
+        enemyPlayer?.prepareForRematch()
         updateState(.starting)
     }
 
     func attackSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
+        guard let enemyPlayer else { return }
         guard selectedMove.state != .cooldown,
             let selectedAttack = Attack(move: selectedMove) else { return }
         isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
@@ -77,7 +84,7 @@ class GameViewModel: BaseViewModel {
            let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemyPlayer.fighter.fighterType, attackResult: attackResult) {
             playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
                 runAfterDelay(delay: 0.3) {
-                    self.enemyPlayer.fighter.showResult(attackResult)
+                    self.enemyPlayer?.fighter.showResult(attackResult)
                 }
             }
         }
@@ -86,7 +93,7 @@ class GameViewModel: BaseViewModel {
     func defenseSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
         guard selectedMove.state != .cooldown,
               let selectedDefense = Defense(move: selectedMove) else { return }
-        isEnemy ? enemyPlayer.moves.updateSelected(selectedDefense.position) : player.moves.updateSelected(selectedDefense.position)
+        isEnemy ? enemyPlayer?.moves.updateSelected(selectedDefense.position) : player.moves.updateSelected(selectedDefense.position)
     }
 
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
@@ -109,7 +116,7 @@ class GameViewModel: BaseViewModel {
         case .starting:
             timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             player.loadAnimations()
-            enemyPlayer.loadAnimations()
+            enemyPlayer?.loadAnimations()
             updateState(.gaming)
         case .gaming:
             startNewGame()
@@ -124,7 +131,7 @@ private extension GameViewModel {
     func startNewGame() {
         let hasSpeedBoost = Bool.random()
         player.state.setSpeedBoost(to: hasSpeedBoost)
-        enemyPlayer.state.setSpeedBoost(to: !hasSpeedBoost)
+        enemyPlayer?.state.setSpeedBoost(to: !hasSpeedBoost)
         isDefenderAlive = true
         createNewRound()
     }
@@ -132,7 +139,7 @@ private extension GameViewModel {
     func createNewRound() {
         player.prepareForNewRound()
         print("\n\n=================================== Round \(self.player.rounds.count) ============================================")
-        enemyPlayer.prepareForNewRound()
+        enemyPlayer?.prepareForNewRound()
         timeRemaining = defaultMaxTime
         secondAttackerDelay = 0
         secondAttackerDamageDealtReduction = 0
@@ -142,11 +149,16 @@ private extension GameViewModel {
 
     func endOfRoundHandler() {
         isCountingDown = false
+        /*
+         TODO: Send selected moves to database
+         TODO: Listen to enemy's move's changes
+         TODO: Fetch enemy's moves if available
+        */
         if isTestingEnvironment {
             //TODO: Remove this auto generated enemy round
-            enemyPlayer.moves.randomlySelectMoves()
+            enemyPlayer?.moves.randomlySelectMoves()
         }
-        enemyPlayer.populateSelectedMovesAndSpeed()
+        enemyPlayer?.populateSelectedMovesAndSpeed()
         player.populateSelectedMovesAndSpeed()
         if !isPracticeMode {
             damageAndAnimate()
@@ -174,14 +186,15 @@ private extension GameViewModel {
 
     func attackingHandler(isFasterAttacker: Bool) {
         //Get the attacker and defender
+        guard let enemyPlayer else { return }
         let attacker: Player
         let defender: Player
         if isFasterAttacker {
             attacker = player.speed > enemyPlayer.speed ? player : enemyPlayer
             defender = player.speed > enemyPlayer.speed ? enemyPlayer : player
             //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
-            secondAttackerDelay = attacker.currentRound.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
-            secondAttackerDamageDealtReduction = attacker.currentRound.attack?.damageReduction ?? 0
+            secondAttackerDelay = attacker.currentRound?.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
+            secondAttackerDamageDealtReduction = attacker.currentRound?.attack?.damageReduction ?? 0
 
         } else {
             attacker = player.speed > enemyPlayer.speed ? enemyPlayer : player
@@ -191,9 +204,14 @@ private extension GameViewModel {
         }
 
         //Get the damage results
-        let attackResult = GameService.getAttackResult(attackerRound: attacker.currentRound, defenderRound: defender.currentRound, defenderHp: defender.hp, damageReduction: secondAttackerDamageDealtReduction)
+        guard let attackerRound = attacker.currentRound,
+              let defenderRound = defender.currentRound else {
+            LOGDE("Attacking handler has no current round for \(attacker.currentRound != nil ? attacker.currentRound.debugDescription : "nil") and \(defender.currentRound != nil ? defender.currentRound.debugDescription : "nil")")
+            return
+        }
+        let attackResult = GameService.getAttackResult(attackerRound: attackerRound, defenderRound: defenderRound, defenderHp: defender.hp, damageReduction: secondAttackerDamageDealtReduction)
 
-        LOGD("AttackHandler \(attacker.fighter.fighterType.name) (\(attacker.speed)) with \(attacker.currentRound.attack?.name ?? "no attack") \t\t vs \(defender.currentRound.defend?.name ?? "no defense") \t\t\(attackResult)")
+        LOGD("AttackHandler \(attacker.fighter.fighterType.name) (\(attacker.speed)) with \(attackerRound.attack?.name ?? "no attack") \t\t vs \(defenderRound.defend?.name ?? "no defense") \t\t\(attackResult)")
 
         //Update attacker based on results
         if attackResult.didAttackLand {
@@ -203,7 +221,7 @@ private extension GameViewModel {
                 attacker.state.setSpeedBoost(to: true)
                 defender.state.setSpeedBoost(to: false)
             } else {
-                if !(defender.currentRound.attackResult?.didAttackLand ?? true) {
+                if !(defenderRound.attackResult?.didAttackLand ?? true) {
                     attacker.state.setSpeedBoost(to: true)
                     defender.state.setSpeedBoost(to: false)
                 }
@@ -219,7 +237,7 @@ private extension GameViewModel {
         defender.setCurrentRoundDefendResult(attackResult)
 
         //Play attacker's and defender's animations
-        if let attack = attacker.currentRound.attack,
+        if let attack = attackerRound.attack,
            let defenderAnimation = GameService.getDefenderAnimation(attack: attack, attackerType: attacker.fighter.fighterType, attackResult: attackResult) {
             playFightersAnimation(attackAnimation: attack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: attacker.isEnemy) {
                 //Show attack result's damage after a little delay
@@ -235,6 +253,7 @@ private extension GameViewModel {
     ///   - defend: defender's defend choice
     ///   - isAttackerEnemy: set to true if the attacking fighter is the enemy
     func playFightersAnimation(attackAnimation: AnimationType, defenderAnimation: AnimationType, isAttackerEnemy: Bool, completion: (() -> Void)? = nil) {
+        guard let enemyPlayer else { return }
         let attackingFighter = isAttackerEnemy ? enemyPlayer.fighter : player.fighter
         let defendingFighter = isAttackerEnemy ? player.fighter : enemyPlayer.fighter
         attackingFighter.playAnimation(attackAnimation)
@@ -248,6 +267,7 @@ private extension GameViewModel {
     }
 
     func gameOver() {
+        guard let enemyPlayer else { return }
         if enemyPlayer.isDead {
             LOGD("Player won", from: GameViewModel.self)
             enemyPlayer.defeated()
