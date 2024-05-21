@@ -9,17 +9,22 @@ import Foundation
 
 //Account Keys
 public let kCURRENTACCOUNT: String = "currentAccount"
+
+public let kUSERPLAYER: String = "userPlayer"
 public let kUSERID: String = "userId"
 public let kUSERNAME: String = "username"
 public let kPHOTOURL: String = "photoUrl"
 public let kUSERMOVES: String = "moves"
 public let kUSERFIGHTERTYPE: String = "fighterType"
 
+public let kENEMYPLAYER: String = "enemyPlayer"
 public let kENEMYID: String = "enemyId"
 public let kENEMYUSERNAME: String = "enemyUsername"
 public let kENEMYPHOTOURL: String = "enemyPhotoUrl"
 public let kENEMYMOVES: String = "enemyMoves"
 public let kENEMYFIGHTERTYPE: String = "enemyFighterType"
+
+public let kCHALLENGERS: String = "challengers"
 
 public let kEMAIL: String = "email"
 public let kCREATEDAT: String = "createdAt"

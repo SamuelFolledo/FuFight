@@ -65,6 +65,7 @@ struct AccountView: View {
         .onTapGesture {
             hideKeyboard()
         }
+        .toolbar(.hidden, for: .tabBar)
     }
 
     var editSaveButton: some View {

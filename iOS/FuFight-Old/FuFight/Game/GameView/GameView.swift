@@ -62,6 +62,7 @@ struct GameView: View {
         .onReceive(vm.timer) { time in
             vm.decrementTimeByOneSecond()
         }
+        .toolbar(.hidden, for: .tabBar)
     }
 
     var timerView: some View {

@@ -26,13 +26,18 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         self.enemyPlayer = enemyPlayer
         super.init(account: account)
 
-        //After receiving a lobbyId (created or joined), subscribe to changes and update lobby
+        //After receiving a lobbyId, lobbyOwner will listen to lobby changes when challengers appears, while nonLobbyOwner will listen to when a game Firestore document is created
         $currentLobbyId
             .receive(on: DispatchQueue.main)
             .sink { [weak self] lobbyId in
                 if lobbyId != nil {
-                    self?.unsubscribe()
-                    self?.subscribeToLobbyChanges()
+                    guard let self else { return }
+                    self.unsubscribe()
+                    if self.isLobbyOwner {
+                        self.subscribeToLobbyChanges()
+                    } else {
+                        self.subscribeToGameChanges(with: lobbyId!)
+                    }
                 }
             }
             .store(in: &subscriptions)
@@ -48,16 +53,23 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         //After receiving creating an enemyPlayer, go to GameView
         $enemyPlayer
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] player in
-                if let self, player != nil {
-                    self.didFindEnemy.send(self)
+            .sink { [weak self] enemyPlayer in
+                if let self, let enemyPlayer {
+                    //stop subscribing to changes on the lobby
+                    unsubscribe()
+                    if self.isLobbyOwner {
+                        createGame(enemyPlayer: enemyPlayer)
+                    } else {
+                        LOGD("Lobby joiner is transitioning to GameView")
+                        self.didFindEnemy.send(self)
+                    }
                 }
             }
             .store(in: &subscriptions)
 
         findOrCreateLobby()
     }
-
+	
     deinit {
         unsubscribe()
         lobby = nil
@@ -76,16 +88,21 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         guard let currentLobbyId,
             let lobby else { return }
         Task {
-            if lobby.userId == player.userId {
+            var updatedLobby = lobby
+            updatedLobby.leave(userId: player.userId)
+            if lobby.player?.userId == player.userId {
                 //Only lobby's owner can delete the lobby
                 try await GameNetworkManager.deleteCurrentLobby(lobbyId: currentLobbyId)
             } else {
                 //Delete enemy data from joined lobby
-                try await GameNetworkManager.leaveLobby(lobbyId: currentLobbyId)
+                try await GameNetworkManager.leaveLobby(updatedLobby)
             }
         }
     }
+}
 
+private extension GameLoadingViewModel {
+    ///Search for lobbies the user can join. If there is no available lobby, creates a lobby and wait for challengers
     func findOrCreateLobby() {
         updateLoadingMessage(to: "Finding opponent")
         Task {
@@ -93,16 +110,13 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                 let lobbyIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
                 if lobbyIds.isEmpty {
                     //Create lobby and wait for an enemy to join
-                    //Create an enemy player from kENEMYUSERNAME
-                    let createdLobby = try! await GameNetworkManager.createLobby(lobby: GameLobby(player: player))
+                    let ownedLobby = try! await GameNetworkManager.createOrRejoinLobby(lobby: GameLobby(player: player))
                     DispatchQueue.main.async {
-                        self.updateLobby(gameLobby: createdLobby, isOwner: true)
+                        self.updateLobby(gameLobby: ownedLobby, isOwner: true)
                     }
                     //TODO: Listen for changes and wait for up to 5-12 seconds
                 } else {
-                    //Join someone's lobby by writing to their lobby as an enemy
-                    //Create an enemy player from kUSERNAME
-                    LOGD("Lobbies found at \(lobbyIds)")
+                    //Join someone's lobby by writing to their lobby as an enemy. Enemy in this case is the user
                     let lobbyId = lobbyIds.first!
                     let fetchedLobby = GameLobby(lobbyId: lobbyId, enemyPlayer: player)
                     try await GameNetworkManager.joinLobby(lobby: fetchedLobby)
@@ -115,9 +129,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             }
         }
     }
-}
 
-private extension GameLoadingViewModel {
     func unsubscribe() {
         if listener != nil {
             listener?.remove()
@@ -125,22 +137,24 @@ private extension GameLoadingViewModel {
         }
     }
 
-    ///subscribe to lobby database changes and update VM's lobby based on changes
+    ///subscribe to lobby database changes for lobby owners
     func subscribeToLobbyChanges() {
         if listener != nil {
             unsubscribe()
         }
-        guard let currentLobbyId else { return }
+        guard isLobbyOwner,
+            let currentLobbyId
+        else { return }
+        LOGD("Subscribing to lobby changes as owner")
         let query = lobbiesDb.document(currentLobbyId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
-                guard let self = self else { return } //check if lobby creator goes here after enemy joins
+                guard let self = self else { return }
                 if let snapshot, snapshot.exists {
                     do {
                         let fetchedLobby = try snapshot.data(as: GameLobby.self)
                         if fetchedLobby.isValid {
                             DispatchQueue.main.async {
-                                LOG("Created lobby is now valid against \(self.isLobbyOwner ? fetchedLobby.enemyUsername ?? "" : fetchedLobby.username ?? "") with fighter \(self.isLobbyOwner ? fetchedLobby.enemyFighterType?.rawValue ?? "" : fetchedLobby.fighterType?.rawValue ?? "")")
                                 self.updateLobby(gameLobby: fetchedLobby, isOwner: self.isLobbyOwner)
                             }
                         }
@@ -151,14 +165,48 @@ private extension GameLoadingViewModel {
             }
     }
 
+    ///subscribe to game database changes when it is created for lobby joiner
+    func subscribeToGameChanges(with lobbyId: String) {
+        if listener != nil {
+            unsubscribe()
+        }
+        guard !isLobbyOwner else { return }
+        updateLoadingMessage(to: "Syncing with opponent")
+        LOGD("Subscribing to game changes as joiner at \(lobbyId)")
+        let query = gamesDb.document(lobbyId)
+        listener = query
+            .addSnapshotListener { [weak self] snapshot, error in
+                do {
+                    guard let self,
+                          let snapshot,
+                          snapshot.exists else { return }
+                    let fetchedGame = try snapshot.data(as: FetchedGame.self)
+                    if fetchedGame.enemyPlayer.userId == player.userId {
+                        self.enemyPlayer = Player(fetchedPlayer: fetchedGame.enemyPlayer)
+                    } else {
+                        TODO("Handle when game created is not the user")
+                    }
+                } catch let error {
+                    print(error)
+                }
+            }
+    }
+
     @MainActor func updateLobby(gameLobby: GameLobby, isOwner: Bool) {
         isLobbyOwner = isOwner
-        lobby = gameLobby
         currentLobbyId = gameLobby.lobbyId
         if isOwner {
+            lobby = gameLobby
             updateLoadingMessage(to: "Waiting for opponent")
-        } else {
-            updateLoadingMessage(to: "Syncing with opponent")
+        }
+    }
+
+    func createGame(enemyPlayer: Player) {
+        if isLobbyOwner {
+            Task {
+                try await GameNetworkManager.createGameFromLobby(lobby)
+                self.didFindEnemy.send(self)
+            }
         }
     }
 }

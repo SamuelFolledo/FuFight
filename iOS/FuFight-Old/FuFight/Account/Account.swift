@@ -76,10 +76,14 @@ class Account: ObservableObject, Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(username, forKey: .username)
-        try container.encode(photoUrl, forKey: .photoUrl)
+        if let photoUrl {
+            try container.encode(photoUrl, forKey: .photoUrl)
+        }
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(email, forKey: .email)
-        try container.encode(phoneNumber, forKey: .phoneNumber)
+        if let phoneNumber {
+            try container.encode(phoneNumber, forKey: .phoneNumber)
+        }
         try container.encode(status.rawValue, forKey: .status)
     }
 
