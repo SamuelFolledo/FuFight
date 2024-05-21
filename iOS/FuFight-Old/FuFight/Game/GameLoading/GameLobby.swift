@@ -28,7 +28,7 @@ struct GameLobby {
         challengers.append(FetchedPlayer(enemyPlayer))
     }
 
-    mutating func leave(userId: String) {
+    mutating func leaveAsChallenger(userId: String) {
         for (index, challenger) in challengers.enumerated() where challenger.userId == userId {
             challengers.remove(at: index)
         }

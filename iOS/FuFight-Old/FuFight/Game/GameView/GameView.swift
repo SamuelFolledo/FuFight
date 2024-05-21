@@ -110,6 +110,13 @@ struct GameView: View {
 private extension GameView {
     func transitionBackToHome() {
         vm.didExitGame.send(vm)
+        Task {
+            do {
+                TODO("todo only delete lobby and game if player is owner")
+                try await GameNetworkManager.deleteCurrentLobby(lobbyId: vm.player.userId)
+                try await GameNetworkManager.deleteGame(vm.player.userId)
+            }
+        }
     }
 }
 
