@@ -43,7 +43,7 @@ class HomeRouter: ObservableObject {
         UITabBar.appearance().backgroundColor = UIColor.clear
         UITabBar.appearance().backgroundImage = UIImage()
         //Change TabItem (text + icon) color
-        UITabBar.appearance().unselectedItemTintColor = UIColor.darkGray
+        UITabBar.appearance().unselectedItemTintColor = UIColor.gray
     }
 
     //MARK: - Home Methods
@@ -70,19 +70,15 @@ class HomeRouter: ObservableObject {
         return vm
     }
 
-    func transitionTo(route: GameRoute?, vm: HomeViewModel) {
-        guard let route else {
-            navigateToRoot()
-            return
-        }
+    func transitionTo(route: GameRoute, vm: HomeViewModel) {
         switch route {
         case .onlineGame:
             //show loading and let loading handle transition to online game
             if let player = vm.player {
                 if let enemyPlayer = vm.enemyPlayer {
-                    TODO("Handle returning to current online game vs \(enemyPlayer.username)")
+                    TODO("Handle returning to current online game for \(player.username) vs \(enemyPlayer.username)")
                 } else {
-                    let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(player: player, account: vm.account))
+                    let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(player: player, enemyPlayer: vm.enemyPlayer, account: vm.account))
                     navigationPath.append(nextVm)
                 }
             }
@@ -117,7 +113,9 @@ class HomeRouter: ObservableObject {
     }
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
-        navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: true, player: vm.player, enemyPlayer: vm.enemyPlayer!)))
+        if let enemyPlayer = vm.enemyPlayer {
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: vm.player, enemyPlayer: enemyPlayer)))
+        }
     }
 
     //MARK: - GameView Methods
@@ -139,6 +137,6 @@ class HomeRouter: ObservableObject {
     }
 
     private func navigateToRoot() {
-        navigationPath = []
+        navigationPath.removeAll()
     }
 }

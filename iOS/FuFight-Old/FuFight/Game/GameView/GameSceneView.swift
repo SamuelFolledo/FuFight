@@ -38,10 +38,10 @@ struct GameSceneView: UIViewRepresentable {
 
 private extension GameSceneView {
     func setUpFighters() {
-        scene.rootNode.addChildNode(fighter.daeHolderNode)
-        fighter.positionNode(asEnemy: false, asHorizontal: isPracticeMode)
-        scene.rootNode.addChildNode(enemyFighter.daeHolderNode)
-        enemyFighter.positionNode(asEnemy: true, asHorizontal: isPracticeMode)
+        [fighter, enemyFighter].forEach {
+            scene.rootNode.addChildNode($0.daeHolderNode)
+            $0.positionNode(asHorizontal: isPracticeMode)
+        }
     }
 
     func setUpCamera() {

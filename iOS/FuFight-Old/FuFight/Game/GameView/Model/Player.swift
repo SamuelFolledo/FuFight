@@ -31,14 +31,14 @@ struct PlayerState {
 }
 
 @Observable
-class Player {
-    private(set) var photoUrl: URL?
+class Player: PlayerProtocol {
+    private(set) var photoUrl: URL
     private(set) var username: String
     private(set) var userId: String
     private(set) var hp: CGFloat
     private(set) var maxHp: CGFloat
     private(set) var isEnemy: Bool
-    private(set) var fighter: Fighter
+    var fighter: Fighter
     var state: PlayerState
     var moves: Moves
     var rounds: [Round]

@@ -14,7 +14,7 @@ import SwiftUI
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
 
-let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FAh7dI1GyI2N4IUVkVUDbqTmvHro2.jpg?alt=media&token=7946e8c2-6812-4b70-b63a-53082f7b0cb1")!
+let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FNbJGeGskGZb1BT7m9NYm5l87mps1.jpg?alt=media&token=29b66d7a-bd94-42b6-9a77-c1dcfd2accb8")!
 let fakeAccount = Account()
 
 
@@ -117,7 +117,7 @@ let speedBoostMultiplier: CGFloat = 1.1
 
 let fakePlayer = Player(userId: "fakePlayer",
                         photoUrl: fakePhotoUrl,
-                        username: "Samuel",
+                        username: "User",
                         hp: defaultMaxHp,
                         maxHp: defaultMaxHp,
                         fighter: Fighter(type: .samuel, isEnemy: false),
@@ -125,7 +125,7 @@ let fakePlayer = Player(userId: "fakePlayer",
                         moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              photoUrl: fakePhotoUrl,
-                             username: "Zoro",
+                             username: "Enemy",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
                              fighter: Fighter(type: .clara, isEnemy: true),

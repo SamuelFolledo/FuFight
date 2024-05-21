@@ -96,6 +96,7 @@ extension GameNetworkManager {
         guard let lobby, let player = lobby.player, let enemyPlayer = lobby.challengers.first else { return }
         do {
             let gameDic: [String: Any] = [
+                kOWNERID: player.userId,
                 kUSERPLAYER: try player.asDictionary(),
                 kENEMYPLAYER: try enemyPlayer.asDictionary(),
             ]

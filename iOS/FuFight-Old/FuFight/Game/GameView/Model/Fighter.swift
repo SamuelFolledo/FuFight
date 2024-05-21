@@ -73,8 +73,8 @@ class Fighter {
         fatalError("init(coder:) has not been implemented")
     }
 
-    //MARK: - Public Methods
-    func positionNode(asEnemy: Bool, asHorizontal: Bool = false) {
+    //MARK: - Public Methods.
+    func positionNode(asHorizontal: Bool = false) {
         daeHolderNode.scale = SCNVector3Make(fighterType.scale, fighterType.scale, fighterType.scale)
         var xPosition: Float = isEnemy ? 1.5 : 0    //further
         let yPosition: Float = 0.5                  //vertical position
@@ -139,7 +139,7 @@ class Fighter {
 
 private extension Fighter {
     ///Create node from default animation
-    private func createNode() {
+    func createNode() {
         daeHolderNode = SCNNode(daePath: fighterType.defaultDaePath)
         //Add materials and images programmatically
         for child in daeHolderNode.childNodes {
@@ -153,7 +153,7 @@ private extension Fighter {
     }
 
     ///Adds animation player to the animationsNode with the animationType.rawValue as the key
-    private func addAnimationPlayer(_ animationType: AnimationType) {
+    func addAnimationPlayer(_ animationType: AnimationType) {
         // Load the dae file for that animation
         let path = fighterType.animationPath(animationType)
         let scene = SCNScene(named: path)!
