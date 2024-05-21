@@ -66,14 +66,30 @@ class Player {
     ///Creates an enemy player from the lobby
     init?(lobby: GameLobby?, isLobbyOwner: Bool) {
         guard let lobby,
-              let fighterType = lobby.fighterType,
-              let enemyFighterType = lobby.enemyFighterType
+              let player = lobby.player,
+              let enemyPlayer = lobby.challengers.first
         else { return nil }
-        self.photoUrl = !isLobbyOwner ? lobby.photoUrl! : lobby.enemyPhotoUrl!
-        self.username = !isLobbyOwner ? lobby.username! : lobby.enemyUsername!
-        self.userId = !isLobbyOwner ? lobby.userId! : lobby.enemyId!
-        self.moves = !isLobbyOwner ? lobby.moves! : lobby.enemyMoves!
-        self.fighter = Fighter(type: !isLobbyOwner ? fighterType : enemyFighterType, isEnemy: true)
+        self.photoUrl = !isLobbyOwner ? player.photoUrl : enemyPlayer.photoUrl
+        self.username = !isLobbyOwner ? player.username : enemyPlayer.username
+        self.userId = !isLobbyOwner ? player.userId : enemyPlayer.userId
+        self.moves = !isLobbyOwner ? player.moves : enemyPlayer.moves
+        self.fighter = Fighter(type: !isLobbyOwner ? player.fighterType : enemyPlayer.fighterType, isEnemy: true)
+        self.hp = defaultMaxHp
+        self.maxHp = defaultMaxHp
+        self.rounds = []
+        self.speed = 0
+        self.isEnemy = true
+        //TODO: hasSpeedBoost should not be false
+        self.state = .init(boostLevel: .none, hasSpeedBoost: false)
+    }
+
+    ///Lobby owner's initializer
+    init(fetchedPlayer: FetchedPlayer) {
+        self.photoUrl = fetchedPlayer.photoUrl
+        self.username = fetchedPlayer.username
+        self.userId = fetchedPlayer.userId
+        self.moves = fetchedPlayer.moves
+        self.fighter = Fighter(type: fetchedPlayer.fighterType, isEnemy: true)
         self.hp = defaultMaxHp
         self.maxHp = defaultMaxHp
         self.rounds = []

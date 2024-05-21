@@ -23,18 +23,17 @@ enum GameState {
     }
 }
 
-@Observable
 class GameViewModel: BaseViewModel {
-    var state: GameState
-    var player: Player
-    var enemyPlayer: Player?
+    @Published var state: GameState
+    @Published var player: Player
+    @Published var enemyPlayer: Player?
     let isPracticeMode: Bool
 
     let didExitGame = PassthroughSubject<GameViewModel, Never>()
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    var timeRemaining = defaultMaxTime
+    @Published var timeRemaining = defaultMaxTime
     var isCountingDown: Bool = false
-    var isGamePaused: Bool = false
+    @Published var isGamePaused: Bool = false
     var isDefenderAlive = true
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0

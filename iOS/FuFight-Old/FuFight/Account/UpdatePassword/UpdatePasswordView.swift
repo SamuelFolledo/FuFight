@@ -55,6 +55,7 @@ struct UpdatePasswordView: View {
             backgroundImage
                 .padding(.trailing, 800)
         )
+        .toolbar(.hidden, for: .tabBar)
     }
 
     var currentPasswordField: some View {

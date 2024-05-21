@@ -16,47 +16,54 @@ struct ContentView: View {
     @StateObject var account: Account = Account.current ?? Account()
     var subscriptions = Set<AnyCancellable>()
 
+    @Environment(\.scenePhase) var scenePhase
+
     var body: some View {
-        switch account.status {
-        case .online:
-            //Go to home page
-            TabView {
-                NavigationStack(path: $homeRouter.navigationPath) {
-                    VStack {
-                        HomeView(vm: homeRouter.makeHomeViewModel(account: account))
-                    }
-                    .navigationDestination(for: HomeRoute.self) { screen in
-                        switch screen {
-                        case .loading(vm: let vm):
-                            GameLoadingView(vm: vm)
-                        case .game(vm: let vm):
-                            GameView(vm: vm)
-                        case .account(vm: let vm):
-                            AccountView(vm: vm)
+        Group {
+            switch account.status {
+            case .online:
+                //Go to home page
+                TabView {
+                    NavigationStack(path: $homeRouter.navigationPath) {
+                        VStack {
+                            HomeView(vm: homeRouter.makeHomeViewModel(account: account))
+                        }
+                        .navigationDestination(for: HomeRoute.self) { screen in
+                            switch screen {
+                            case .loading(vm: let vm):
+                                GameLoadingView(vm: vm)
+                            case .game(vm: let vm):
+                                GameView(vm: vm)
+                            case .account(vm: let vm):
+                                AccountView(vm: vm)
+                            }
                         }
                     }
-                }
-                .tabItem {
-                    Label("Home", systemImage: "house")
-                }
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
 
-                NavigationStack {
-                    AccountView(vm: homeRouter.makeAccountViewModel(account: account))
+                    NavigationStack {
+                        AccountView(vm: homeRouter.makeAccountViewModel(account: account))
+                    }
+                    .tabItem {
+                        Label("Settings", systemImage: "gear")
+                    }
                 }
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
+                .accentColor(Color.white)
+                .transition(.move(edge: .trailing))
+
+            case .unfinished:
+                //Finish creating account
+                createAuthenticationView(step: .onboard)
+
+            case .logOut:
+                //Log in
+                createAuthenticationView(step: .logIn)
             }
-            .accentColor(Color.white)
-            .transition(.move(edge: .trailing))
-
-        case .unfinished:
-            //Finish creating account
-            createAuthenticationView(step: .onboard)
-
-        case .logOut:
-            //Log in
-            createAuthenticationView(step: .logIn)
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            scenePhaseChangedHandler(newPhase)
         }
     }
 
@@ -68,6 +75,29 @@ struct ContentView: View {
     }
 }
 
+private extension ContentView {
+    func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
+        switch scenePhase {
+        case .background:
+            Task {
+                if let account = Account.current {
+                    try await GameNetworkManager.deleteCurrentLobby(lobbyId: account.userId)
+                    try await GameNetworkManager.deleteGame(account.userId)
+                    //TODO: Maybe save game locally in order to rejoin
+                    LOGD("App is terminated, lobby and game is deleted")
+                } else {
+                    LOGD("App is terminated with no account")
+                }
+            }
+        case .inactive:
+            LOGD("App is inactive")
+        case .active:
+            LOGD("App is active")
+        @unknown default:
+            break
+        }
+    }
+}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

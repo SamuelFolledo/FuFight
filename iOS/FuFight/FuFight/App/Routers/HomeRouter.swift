@@ -43,7 +43,7 @@ class HomeRouter: ObservableObject {
         UITabBar.appearance().backgroundColor = UIColor.clear
         UITabBar.appearance().backgroundImage = UIImage()
         //Change TabItem (text + icon) color
-        UITabBar.appearance().unselectedItemTintColor = UIColor.systemGray2
+        UITabBar.appearance().unselectedItemTintColor = UIColor.darkGray
     }
 
     //MARK: - Home Methods
