@@ -8,7 +8,8 @@
 import FirebaseFirestore
 
 struct GameLobby {
-    @DocumentID var lobbyId: String?
+    @DocumentID private var documentId: String?
+    var ownerId: String { documentId! }
     private(set) var player: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
     private(set) var isSearching: Bool = true
@@ -19,12 +20,13 @@ struct GameLobby {
 
     ///Lobby owner initializer
     init(player: Player) {
+        self.documentId = player.userId
         self.player = FetchedPlayer(player)
     }
 
     ///Lobby joiner/enemy initializer
     init(lobbyId: String, enemyPlayer: Player) {
-        self.lobbyId = lobbyId
+        self.documentId = lobbyId
         challengers.append(FetchedPlayer(enemyPlayer))
     }
 
@@ -40,6 +42,7 @@ extension GameLobby: Codable {
     private enum CodingKeys : String, CodingKey {
         case player = "player"
         case challengers = "challengers"
+        case ownerId = "ownerId"
         case isSearching = "isSearching"
     }
 
@@ -51,6 +54,7 @@ extension GameLobby: Codable {
         }
         try container.encode(challengers, forKey: .challengers)
         try container.encode(isSearching, forKey: .isSearching)
+        try container.encode(ownerId, forKey: .ownerId)
     }
 
     init(from decoder: Decoder) throws {
@@ -58,5 +62,6 @@ extension GameLobby: Codable {
         self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)
         self.isSearching = try values.decodeIfPresent(Bool.self, forKey: .isSearching) ?? false
         self.challengers = try values.decodeIfPresent(Array<FetchedPlayer>.self, forKey: .challengers) ?? []
+        self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
     }
 }

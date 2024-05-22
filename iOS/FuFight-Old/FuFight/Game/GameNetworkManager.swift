@@ -30,24 +30,19 @@ extension GameNetworkManager {
     }
 
     ///For lobby owner to create a new or rejoin an existing lobby
-    static func createOrRejoinLobby(lobby: GameLobby) async throws -> GameLobby {
-        var updatedLobby = lobby
+    static func createOrRejoinLobby(lobby: GameLobby) async throws {
         do {
             let userId = lobby.player!.userId
-            //Check if user already has a lobby created
             let lobbyDocuments = try await lobbiesDb.whereField(kUSERID, isEqualTo: userId).getDocuments()
             if lobbyDocuments.isEmpty {
+                //Check if user already has a lobby created
                 let lobbyDocument = lobbiesDb.document(userId)
                 try lobbyDocument.setData(from: lobby)
                 LOGD("Current lobby created with id: \(lobbyDocument.documentID)")
-                updatedLobby.lobbyId = lobbyDocument.documentID
-                return updatedLobby
             } else {
                 //Rejoin lobby
                 let lobbyDocument = lobbyDocuments.documents.first!
                 LOGD("Current lobby rejoined at id: \(lobbyDocument.documentID)")
-                updatedLobby.lobbyId = lobbyDocument.documentID
-                return updatedLobby
             }
         } catch {
             throw error
@@ -71,8 +66,8 @@ extension GameNetworkManager {
             let enemyDic: [String: Any] = [
                 kCHALLENGERS: FieldValue.arrayUnion([try enemyPlayer.asDictionary()]),
             ]
-            try lobbiesDb.document(lobby.lobbyId!).setData(from: lobby, merge: true)
-            LOGD("User joined someone's lobby as enemy with lobby id: \(lobby.lobbyId!)")
+            try lobbiesDb.document(lobby.ownerId).setData(from: lobby, merge: true)
+            LOGD("User joined someone's lobby as enemy with lobby id: \(lobby.ownerId)")
         } catch {
             throw error
         }
@@ -80,10 +75,10 @@ extension GameNetworkManager {
 
     ///For enemy to leave a lobby
     static func leaveLobby(_ lobby: GameLobby?) async throws {
-        guard let lobby, let lobbyId = lobby.lobbyId else { return }
+        guard let lobby else { return }
         do {
-            try lobbiesDb.document(lobbyId).setData(from: lobby, merge: true)
-            LOGD("User left lobby as enemy with lobby id: \(lobbyId)")
+            try lobbiesDb.document(lobby.ownerId).setData(from: lobby, merge: true)
+            LOGD("User left lobby as enemy with lobby id: \(lobby.ownerId)")
         } catch {
             throw error
         }
@@ -96,12 +91,12 @@ extension GameNetworkManager {
         guard let lobby, let player = lobby.player, let enemyPlayer = lobby.challengers.first else { return }
         do {
             let gameDic: [String: Any] = [
-                kOWNERID: player.userId,
+                kOWNERID: lobby.ownerId,
                 kUSERPLAYER: try player.asDictionary(),
                 kENEMYPLAYER: try enemyPlayer.asDictionary(),
             ]
             try await gamesDb.document(player.userId).setData(gameDic)
-            LOGD("Lobby owner \(player.username) created a Game document against \(enemyPlayer.username) lobby id: \(lobby.lobbyId ?? "")")
+            LOGD("Lobby owner \(player.username) created a Game document against \(enemyPlayer.username) lobby id: \(lobby.ownerId)")
         } catch {
             throw error
         }
