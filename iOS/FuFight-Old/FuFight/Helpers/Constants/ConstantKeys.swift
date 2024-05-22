@@ -25,6 +25,7 @@ public let kENEMYMOVES: String = "enemyMoves"
 public let kENEMYFIGHTERTYPE: String = "enemyFighterType"
 
 public let kCHALLENGERS: String = "challengers"
+public let kOWNERID: String = "ownerId"
 
 public let kEMAIL: String = "email"
 public let kCREATEDAT: String = "createdAt"

@@ -30,6 +30,13 @@ struct PlayerState {
     }
 }
 
+protocol PlayerProtocol {
+    var userId: String { get }
+    var username: String { get }
+    var photoUrl: URL { get }
+    var moves: Moves { get set }
+}
+
 @Observable
 class Player: PlayerProtocol {
     private(set) var photoUrl: URL

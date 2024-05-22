@@ -109,9 +109,10 @@ private extension GameLoadingViewModel {
                 let lobbyIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
                 if lobbyIds.isEmpty {
                     //Create lobby and wait for an enemy to join
-                    let ownedLobby = try! await GameNetworkManager.createOrRejoinLobby(lobby: GameLobby(player: player))
+                    let ownedLobby = GameLobby(player: player)
+                    try! await GameNetworkManager.createOrRejoinLobby(lobby: ownedLobby)
                     DispatchQueue.main.async {
-                        self.updateLobby(gameLobby: ownedLobby, isOwner: true) //this has document id
+                        self.updateLobby(gameLobby: ownedLobby, isOwner: true)
                     }
                     //TODO: Listen for changes and wait for up to 5-12 seconds
                 } else {
@@ -150,11 +151,10 @@ private extension GameLoadingViewModel {
                 guard let self = self else { return }
                 if let snapshot, snapshot.exists {
                     do {
-                        var fetchedLobby = try snapshot.data(as: GameLobby.self)
-                        fetchedLobby.lobbyId = currentLobbyId
-                        if fetchedLobby.isValid {
+                        let fetchedOwnedLobby = try snapshot.data(as: GameLobby.self)
+                        if fetchedOwnedLobby.isValid {
                             DispatchQueue.main.async {
-                                self.updateLobby(gameLobby: fetchedLobby, isOwner: self.isLobbyOwner)
+                                self.updateLobby(gameLobby: fetchedOwnedLobby, isOwner: self.isLobbyOwner)
                             }
                         }
                     } catch {
@@ -179,9 +179,8 @@ private extension GameLoadingViewModel {
                     guard let self,
                           let snapshot,
                           snapshot.exists else { return }
-                    var gameAsChallenger = try snapshot.data(as: FetchedGame.self)
-                    gameAsChallenger.ownerId = lobbyId
-                    if gameAsChallenger.enemyPlayer.userId == player.userId {
+                    let gameAsChallenger = try snapshot.data(as: FetchedGame.self)
+                    if gameAsChallenger.ownerId != player.userId {
                         self.enemyPlayer = Player(fetchedPlayer: gameAsChallenger.player)
                     } else {
                         TODO("Handle when game created is not the user")
@@ -206,8 +205,8 @@ private extension GameLoadingViewModel {
     }
 
     func createGame(enemyPlayer: Player) {
-        if isLobbyOwner {
-            Task {
+        Task {
+            if isLobbyOwner, let lobby {
                 try await GameNetworkManager.createGameFromLobby(lobby)
                 self.didFindEnemy.send(self)
             }

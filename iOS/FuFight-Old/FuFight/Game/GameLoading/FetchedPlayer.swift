@@ -7,13 +7,6 @@
 
 import FirebaseFirestore
 
-protocol PlayerProtocol {
-    var userId: String { get }
-    var username: String { get }
-    var photoUrl: URL { get }
-    var moves: Moves { get set }
-}
-
 struct FetchedPlayer: PlayerProtocol {
     private(set) var userId: String
     private(set) var username: String
