@@ -164,7 +164,7 @@ private extension AccountViewModel {
                 updateLoadingMessage(to: Str.deletingUsername)
                 try await AccountNetworkManager.deleteUsername(account.username!)
                 newUsername = username
-                account.username = newUsername
+                account.updateUsername(username)
             }
 
             ///If there's any photo changes, set account's photo in Storage and save the photo URL

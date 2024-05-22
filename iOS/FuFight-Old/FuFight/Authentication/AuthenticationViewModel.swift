@@ -206,8 +206,7 @@ private extension AuthenticationViewModel {
                    let photoUrl = try await AccountNetworkManager.storePhoto(selectedImage, for: account.userId) {
                     updateLoadingMessage(to: Str.updatingUser)
                     try await AccountNetworkManager.updateAuthenticatedUser(username: username, photoUrl: photoUrl)
-                    account.username = username
-                    account.photoUrl = photoUrl
+                    account.finishAccountCreation(username: username, photoUrl: photoUrl)
                     updateLoadingMessage(to: Str.savingUser)
                     try await AccountNetworkManager.setUsername(username, userId: account.userId, email: account.email)
                     try await AccountNetworkManager.setData(account: account)

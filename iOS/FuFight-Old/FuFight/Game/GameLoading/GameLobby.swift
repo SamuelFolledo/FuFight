@@ -10,6 +10,7 @@ import FirebaseFirestore
 struct GameLobby {
     @DocumentID private var documentId: String?
     var ownerId: String { documentId! }
+    ///Player that owns the lobby
     private(set) var player: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
     private(set) var isSearching: Bool = true
@@ -52,7 +53,9 @@ extension GameLobby: Codable {
         if let player {
             try container.encode(player, forKey: .player)
         }
-        try container.encode(challengers, forKey: .challengers)
+        if !challengers.isEmpty {
+            try container.encode(challengers, forKey: .challengers)
+        }
         try container.encode(isSearching, forKey: .isSearching)
         try container.encode(ownerId, forKey: .ownerId)
     }
