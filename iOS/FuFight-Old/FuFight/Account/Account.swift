@@ -12,12 +12,12 @@ import FirebaseCore
 import FirebaseFirestore
 
 class Account: ObservableObject, Codable {
-    @DocumentID var id: String?
-    @Published var username: String?
-    @Published var photoUrl: URL?
-    @Published var email: String?
+    @DocumentID private(set) var id: String?
+    @Published private(set) var username: String?
+    @Published private(set) var email: String?
     @Published private(set) var phoneNumber: String?
     @Published private(set) var createdAt: Date?
+    @Published var photoUrl: URL?
     @Published var status: Account.Status = .unfinished
 
     var userId: String {
@@ -100,6 +100,15 @@ class Account: ObservableObject, Codable {
     }
 
     //MARK: Public Methods
+
+    func finishAccountCreation(username: String, photoUrl: URL) {
+        self.username = username
+        self.photoUrl = photoUrl
+    }
+
+    func updateUsername(_ newUsername: String) {
+        self.username = newUsername
+    }
 
     func update(with user: Account) {
         if let id = user.id,

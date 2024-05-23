@@ -1,5 +1,5 @@
 //
-//  GameLobby.swift
+//  GameRoom.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 5/17/24.
@@ -7,9 +7,10 @@
 
 import FirebaseFirestore
 
-struct GameLobby {
+struct GameRoom {
     @DocumentID private var documentId: String?
     var ownerId: String { documentId! }
+    ///Player that owns the room
     private(set) var player: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
     private(set) var isSearching: Bool = true
@@ -18,15 +19,15 @@ struct GameLobby {
         player != nil && challengers.first != nil
     }
 
-    ///Lobby owner initializer
+    ///Room owner initializer
     init(player: Player) {
         self.documentId = player.userId
         self.player = FetchedPlayer(player)
     }
 
-    ///Lobby joiner/enemy initializer
-    init(lobbyId: String, enemyPlayer: Player) {
-        self.documentId = lobbyId
+    ///Room joiner/enemy initializer
+    init(roomId: String, enemyPlayer: Player) {
+        self.documentId = roomId
         challengers.append(FetchedPlayer(enemyPlayer))
     }
 
@@ -38,7 +39,7 @@ struct GameLobby {
 }
 
 //MARK: - Codable extension
-extension GameLobby: Codable {
+extension GameRoom: Codable {
     private enum CodingKeys : String, CodingKey {
         case player = "player"
         case challengers = "challengers"
@@ -52,7 +53,9 @@ extension GameLobby: Codable {
         if let player {
             try container.encode(player, forKey: .player)
         }
-        try container.encode(challengers, forKey: .challengers)
+        if !challengers.isEmpty {
+            try container.encode(challengers, forKey: .challengers)
+        }
         try container.encode(isSearching, forKey: .isSearching)
         try container.encode(ownerId, forKey: .ownerId)
     }

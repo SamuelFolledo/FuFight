@@ -175,6 +175,11 @@ extension AccountNetworkManager {
         }
     }
 
+    ///Get the document from the Account collections using their username
+    static func fetchAccountDocument(with username: String) async throws -> QueryDocumentSnapshot? {
+        return try await accountsDb.whereFilter(Filter.whereField(kUSERNAME, isEqualTo: username)).limit(to: 1).getDocuments().documents.first
+    }
+
     ///Delete user's data from Accounts collection
     static func deleteData(_ userId: String) async throws {
         do {
@@ -186,7 +191,7 @@ extension AccountNetworkManager {
         }
     }
 
-    ///Set username to the database into both Accounts and Username collections
+    ///Set username to the database into Accounts collections
     static func setUsername(_ username: String, userId: String, email: String? = nil) async throws {
         let username = username.trimmed
         guard !userId.isEmpty,
@@ -195,39 +200,20 @@ extension AccountNetworkManager {
             ///Update Accounts collection
             let accountsRef = accountsDb.document(userId)
             try await accountsRef.setData([kUSERNAME: username], merge: true)
-            ///Update Usernames collection
-            let loweredUsername = username.lowercased()
-            var data: [String: Any] = [kUSERID: userId, kUSERNAME: username]
-            if let email {
-                data[kEMAIL] = email.trimmed
-            }
-            let usernameRef = usernamesDb.document(loweredUsername)
-            try await usernameRef.setData(data, merge: true)
         } catch {
             throw error
         }
     }
 
-    ///Delete user's data from Usernames collection
-    static func deleteUsername(_ username: String) async throws {
-        do {
-            let loweredUsername = username.trimmed.lowercased()
-            let usernameRef = usernamesDb.document(loweredUsername)
-            try await usernameRef.delete()
-            LOGD("DB: Finished deleting account in Usernames collection username: \(username)", from: self)
-        } catch {
-            throw error
-        }
-    }
-
-    ///Check Users collection in database if username is unique
+    ///Check Accounts collection in database if username is unique
     static func isUnique(username: String) async throws -> Bool {
         do {
-            let loweredUsername = username.trimmed.lowercased()
-            let document = try await usernamesDb.document(loweredUsername).getDocument()
-            let isUnique = !document.exists
-            LOGD("DB: Username \(username) is unique = \(isUnique)", from: self)
-            return isUnique
+            if let _ = try await fetchAccountDocument(with: username) {
+                return false
+            }
+            let isUsernameUnique = true
+            LOGD("DB: Username \(username) is unique = \(isUsernameUnique)", from: self)
+            return isUsernameUnique
         } catch {
             throw error
         }
@@ -236,11 +222,8 @@ extension AccountNetworkManager {
     ///Fetch the email from Usernames collection
     static func fetchEmailFrom(username: String) async throws -> String? {
         do {
-            let loweredUsername = username.trimmed.lowercased()
-            let document = try await usernamesDb.document(loweredUsername).getDocument()
-            if document.exists,
-               let usernameData = document.data(),
-               let email = usernameData[kEMAIL] as? String {
+            guard let accountDocument = try await fetchAccountDocument(with: username) else { return nil }
+            if let email = accountDocument.data()[kEMAIL] as? String {
                 LOGD("DB: Finished fetching email \(email) from username \(username)", from: self)
                 return email
             }
