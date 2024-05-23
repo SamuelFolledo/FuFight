@@ -10,14 +10,14 @@ import Combine
 import FirebaseFirestore
 
 final class GameLoadingViewModel: BaseAccountViewModel {
-    @Published var lobby: GameLobby?
+    @Published var room: GameRoom?
     @Published var player: Player
     @Published var enemyPlayer: Player?
-    @Published var currentLobbyId: String?
+    @Published var currentRoomId: String?
     let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
-    private var isLobbyOwner: Bool = false
+    private var isRoomOwner: Bool = false
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
@@ -26,25 +26,25 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         self.enemyPlayer = enemyPlayer
         super.init(account: account)
 
-        //After receiving a lobbyId, lobbyOwner will listen to lobby changes when challengers appears, while nonLobbyOwner will listen to when a game Firestore document is created
-        $currentLobbyId
+        //After receiving a roomId, roomOwner will listen to room changes when challengers appears, while nonRoomOwner will listen to when a game Firestore document is created
+        $currentRoomId
             .delay(for: 0.5, scheduler: RunLoop.main) //0.5 seconds delay fixed not transitioning to GameView when enemyPlayer appears
-            .sink { [weak self] lobbyId in
-                if lobbyId != nil {
+            .sink { [weak self] roomId in
+                if roomId != nil {
                     guard let self else { return }
-                    if self.isLobbyOwner {
-                        self.subscribeToLobbyChanges()
+                    if self.isRoomOwner {
+                        self.subscribeToRoomChanges()
                     } else {
-                        self.subscribeToGameChanges(with: lobbyId!)
+                        self.subscribeToGameChanges(with: roomId!)
                     }
                 }
             }
             .store(in: &subscriptions)
 
-        //After getting a lobby with player and enemy, create an enemyPlayer
-        $lobby
-            .map { lobby in
-                Player(lobby: lobby, isLobbyOwner: self.isLobbyOwner)
+        //After getting a room with player and enemy, create an enemyPlayer
+        $room
+            .map { room in
+                Player(room: room, isRoomOwner: self.isRoomOwner)
             }
             .assign(to: \.enemyPlayer, on: self)
             .store(in: &subscriptions)
@@ -54,9 +54,9 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             .delay(for: 0.1, scheduler: RunLoop.main) // helps reduce the visual jank and this vm's enemyPlayer has been set
             .sink { [weak self] enemyPlayer in
                 if let self, let enemyPlayer {
-                    //stop subscribing to changes on the lobby
+                    //stop subscribing to changes on the room
                     unsubscribe()
-                    if isLobbyOwner {
+                    if isRoomOwner {
                         createGame(enemyPlayer: enemyPlayer)
                     } else {
                         didFindEnemy.send(self)
@@ -65,7 +65,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             }
             .store(in: &subscriptions)
 
-        findOrCreateLobby()
+        findOrCreateRoom()
     }
 
     //MARK: - ViewModel Overrides
@@ -76,52 +76,52 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
     override func onDisappear() {
         super.onDisappear()
-        deleteCurrentLobby()
+        deleteCurrentRoom()
         unsubscribe()
-        lobby = nil
+        room = nil
         enemyPlayer = nil
-        currentLobbyId = nil
+        currentRoomId = nil
         subscriptions.removeAll()
     }
 
     //MARK: - Public Methods
-    func deleteCurrentLobby() {
-        guard let currentLobbyId else { return }
+    func deleteCurrentRoom() {
+        guard let currentRoomId else { return }
         Task {
-            if self.lobby?.player?.userId == player.userId {
-                //Only lobby's owner can delete the lobby
-                try await GameNetworkManager.deleteCurrentLobby(lobbyId: currentLobbyId)
-            } else if lobby != nil {
-                //Delete enemy data from joined lobby
-                self.lobby?.leaveAsChallenger(userId: player.userId)
-                try await GameNetworkManager.leaveLobby(self.lobby!)
+            if self.room?.player?.userId == player.userId {
+                //Only room's owner can delete the room
+                try await GameNetworkManager.deleteCurrentRoom(roomId: currentRoomId)
+            } else if room != nil {
+                //Delete enemy data from joined room
+                self.room?.leaveAsChallenger(userId: player.userId)
+                try await GameNetworkManager.leaveRoom(self.room!)
             }
         }
     }
 }
 
 private extension GameLoadingViewModel {
-    ///Search for lobbies the user can join. If there is no available lobby, creates a lobby and wait for challengers
-    func findOrCreateLobby() {
+    ///Search for lobbies the user can join. If there is no available room, creates a room and wait for challengers
+    func findOrCreateRoom() {
         updateLoadingMessage(to: "Finding opponent")
         Task {
             do {
-                let lobbyIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
-                if lobbyIds.isEmpty {
-                    //Create lobby and wait for an enemy to join
-                    let ownedLobby = GameLobby(player: player)
-                    try! await GameNetworkManager.createOrRejoinLobby(lobby: ownedLobby)
+                let roomIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
+                if roomIds.isEmpty {
+                    //Create room and wait for an enemy to join
+                    let ownedRoom = GameRoom(player: player)
+                    try! await GameNetworkManager.createOrRejoinRoom(room: ownedRoom)
                     DispatchQueue.main.async {
-                        self.updateLobby(gameLobby: ownedLobby, isOwner: true)
+                        self.updateRoom(gameRoom: ownedRoom, isOwner: true)
                     }
                     //TODO: Listen for changes and wait for up to 5-12 seconds
                 } else {
-                    //Join someone's lobby by writing to their lobby as an enemy. Enemy in this case is the user
-                    let lobbyId = lobbyIds.first!
-                    let fetchedLobby = GameLobby(lobbyId: lobbyId, enemyPlayer: player)
-                    try await GameNetworkManager.joinLobby(lobby: fetchedLobby)
-                    isLobbyOwner = false
-                    currentLobbyId = lobbyId
+                    //Join someone's room by writing to their room as an enemy. Enemy in this case is the user
+                    let roomId = roomIds.first!
+                    let fetchedRoom = GameRoom(roomId: roomId, enemyPlayer: player)
+                    try await GameNetworkManager.joinRoom(room: fetchedRoom)
+                    isRoomOwner = false
+                    currentRoomId = roomId
                 }
             } catch {
                 updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
@@ -136,43 +136,43 @@ private extension GameLoadingViewModel {
         }
     }
 
-    ///subscribe to lobby database changes for lobby owners
-    func subscribeToLobbyChanges() {
+    ///subscribe to room database changes for room owners
+    func subscribeToRoomChanges() {
         if listener != nil {
             unsubscribe()
         }
-        guard isLobbyOwner,
-            let currentLobbyId
+        guard isRoomOwner,
+            let currentRoomId
         else { return }
-        LOGD("Subscribing to lobby changes as owner")
-        let query = lobbiesDb.document(currentLobbyId)
+        LOGD("Subscribing to room changes as owner")
+        let query = lobbiesDb.document(currentRoomId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
                 if let snapshot, snapshot.exists {
                     do {
-                        let fetchedOwnedLobby = try snapshot.data(as: GameLobby.self)
-                        if fetchedOwnedLobby.isValid {
+                        let fetchedOwnedRoom = try snapshot.data(as: GameRoom.self)
+                        if fetchedOwnedRoom.isValid {
                             DispatchQueue.main.async {
-                                self.updateLobby(gameLobby: fetchedOwnedLobby, isOwner: self.isLobbyOwner)
+                                self.updateRoom(gameRoom: fetchedOwnedRoom, isOwner: self.isRoomOwner)
                             }
                         }
                     } catch {
-                        LOGDE("Error creating lobby with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
+                        LOGDE("Error creating room with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
                     }
                 }
             }
     }
 
-    ///subscribe to game database changes when it is created for lobby joiner
-    func subscribeToGameChanges(with lobbyId: String) {
+    ///subscribe to game database changes when it is created for room joiner
+    func subscribeToGameChanges(with roomId: String) {
         if listener != nil {
             unsubscribe()
         }
-        guard !isLobbyOwner else { return }
+        guard !isRoomOwner else { return }
         updateLoadingMessage(to: "Syncing with opponent")
-        LOGD("Subscribing to game changes as joiner at \(lobbyId)")
-        let query = gamesDb.document(lobbyId)
+        LOGD("Subscribing to game changes as joiner at \(roomId)")
+        let query = gamesDb.document(roomId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 do {
@@ -191,23 +191,23 @@ private extension GameLoadingViewModel {
             }
     }
 
-    @MainActor func updateLobby(gameLobby: GameLobby, isOwner: Bool) {
-        isLobbyOwner = isOwner
-        currentLobbyId = gameLobby.player!.userId
+    @MainActor func updateRoom(gameRoom: GameRoom, isOwner: Bool) {
+        isRoomOwner = isOwner
+        currentRoomId = gameRoom.player!.userId
         if isOwner {
-            lobby = gameLobby
+            room = gameRoom
             updateLoadingMessage(to: "Waiting for opponent")
-            if gameLobby.isValid {
-                LOGD("Valid game lobby with enemyPlayer \(gameLobby.challengers.first!.username)")
-                self.enemyPlayer = Player(fetchedPlayer: gameLobby.challengers.first!)
+            if gameRoom.isValid {
+                LOGD("Valid game room with enemyPlayer \(gameRoom.challengers.first!.username)")
+                self.enemyPlayer = Player(fetchedPlayer: gameRoom.challengers.first!)
             }
         }
     }
 
     func createGame(enemyPlayer: Player) {
         Task {
-            if isLobbyOwner, let lobby {
-                try await GameNetworkManager.createGameFromLobby(lobby)
+            if isRoomOwner, let room {
+                try await GameNetworkManager.createGameFromRoom(room)
                 self.didFindEnemy.send(self)
             }
         }

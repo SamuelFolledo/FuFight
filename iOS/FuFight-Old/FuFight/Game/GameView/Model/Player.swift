@@ -70,17 +70,17 @@ class Player: PlayerProtocol {
         self.speed = 0
     }
 
-    ///Creates an enemy player from the lobby
-    init?(lobby: GameLobby?, isLobbyOwner: Bool) {
-        guard let lobby,
-              let player = lobby.player,
-              let enemyPlayer = lobby.challengers.first
+    ///Creates an enemy player from the room
+    init?(room: GameRoom?, isRoomOwner: Bool) {
+        guard let room,
+              let player = room.player,
+              let enemyPlayer = room.challengers.first
         else { return nil }
-        self.photoUrl = !isLobbyOwner ? player.photoUrl : enemyPlayer.photoUrl
-        self.username = !isLobbyOwner ? player.username : enemyPlayer.username
-        self.userId = !isLobbyOwner ? player.userId : enemyPlayer.userId
-        self.moves = !isLobbyOwner ? player.moves : enemyPlayer.moves
-        self.fighter = Fighter(type: !isLobbyOwner ? player.fighterType : enemyPlayer.fighterType, isEnemy: true)
+        self.photoUrl = !isRoomOwner ? player.photoUrl : enemyPlayer.photoUrl
+        self.username = !isRoomOwner ? player.username : enemyPlayer.username
+        self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
+        self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
+        self.fighter = Fighter(type: !isRoomOwner ? player.fighterType : enemyPlayer.fighterType, isEnemy: true)
         self.hp = defaultMaxHp
         self.maxHp = defaultMaxHp
         self.rounds = []
@@ -90,7 +90,7 @@ class Player: PlayerProtocol {
         self.state = .init(boostLevel: .none, hasSpeedBoost: false)
     }
 
-    ///Lobby owner's initializer
+    ///Room owner's initializer
     init(fetchedPlayer: FetchedPlayer) {
         self.photoUrl = fetchedPlayer.photoUrl
         self.username = fetchedPlayer.username

@@ -14,71 +14,71 @@ class GameNetworkManager {
     private init() {}
 }
 
-//MARK: - Lobby methods
+//MARK: - Room methods
 extension GameNetworkManager {
-    ///Fetch an available lobby if there's any available. Return avaialble lobbyIds
+    ///Fetch an available room if there's any available. Return avaialble roomIds
     static func findAvailableLobbies(userId: String) async throws -> [String] {
-        let nonUserLobbyFilter: Filter = .whereField("player.\(kUSERID)", isNotEqualTo: userId)
+        let nonUserRoomFilter: Filter = .whereField("player.\(kUSERID)", isNotEqualTo: userId)
         do {
-            let availableLobbies = try await lobbiesDb.whereFilter(nonUserLobbyFilter).limit(to: 3).getDocuments()
-            let lobbyIds = availableLobbies.documents.compactMap { $0.documentID }
-            LOGD("Total lobbies found: \(lobbyIds.count)")
-            return lobbyIds
+            let availableLobbies = try await lobbiesDb.whereFilter(nonUserRoomFilter).limit(to: 3).getDocuments()
+            let roomIds = availableLobbies.documents.compactMap { $0.documentID }
+            LOGD("Total lobbies found: \(roomIds.count)")
+            return roomIds
         } catch {
             throw error
         }
     }
 
-    ///For lobby owner to create a new or rejoin an existing lobby
-    static func createOrRejoinLobby(lobby: GameLobby) async throws {
+    ///For room owner to create a new or rejoin an existing room
+    static func createOrRejoinRoom(room: GameRoom) async throws {
         do {
-            let userId = lobby.player!.userId
-            let lobbyDocuments = try await lobbiesDb.whereField(kUSERID, isEqualTo: userId).getDocuments()
-            if lobbyDocuments.isEmpty {
-                //Check if user already has a lobby created
-                let lobbyDocument = lobbiesDb.document(userId)
-                try lobbyDocument.setData(from: lobby)
-                LOGD("Current lobby created with id: \(lobbyDocument.documentID)")
+            let userId = room.player!.userId
+            let roomDocuments = try await lobbiesDb.whereField(kUSERID, isEqualTo: userId).getDocuments()
+            if roomDocuments.isEmpty {
+                //Check if user already has a room created
+                let roomDocument = lobbiesDb.document(userId)
+                try roomDocument.setData(from: room)
+                LOGD("Current room created with id: \(roomDocument.documentID)")
             } else {
-                //Rejoin lobby
-                let lobbyDocument = lobbyDocuments.documents.first!
-                LOGD("Current lobby rejoined at id: \(lobbyDocument.documentID)")
+                //Rejoin room
+                let roomDocument = roomDocuments.documents.first!
+                LOGD("Current room rejoined at id: \(roomDocument.documentID)")
             }
         } catch {
             throw error
         }
     }
 
-    ///For lobby owner to delete lobby
-    static func deleteCurrentLobby(lobbyId: String) async throws {
+    ///For room owner to delete room
+    static func deleteCurrentRoom(roomId: String) async throws {
         do {
-            try await lobbiesDb.document(lobbyId).delete()
-            LOGD("Player's lobby is successfully deleted with lobby id: \(lobbyId)")
+            try await lobbiesDb.document(roomId).delete()
+            LOGD("Player's room is successfully deleted with room id: \(roomId)")
         } catch {
             throw error
         }
     }
 
-    ///For enemy joining a lobby as one of the challengers
-    static func joinLobby(lobby: GameLobby) async throws {
+    ///For enemy joining a room as one of the challengers
+    static func joinRoom(room: GameRoom) async throws {
         do {
-            let enemyPlayer = lobby.challengers.first!
+            let enemyPlayer = room.challengers.first!
             let enemyDic: [String: Any] = [
                 kCHALLENGERS: FieldValue.arrayUnion([try enemyPlayer.asDictionary()]),
             ]
-            try lobbiesDb.document(lobby.ownerId).setData(from: lobby, merge: true)
-            LOGD("User joined someone's lobby as enemy with lobby id: \(lobby.ownerId)")
+            try lobbiesDb.document(room.ownerId).setData(from: room, merge: true)
+            LOGD("User joined someone's room as enemy with room id: \(room.ownerId)")
         } catch {
             throw error
         }
     }
 
-    ///For enemy to leave a lobby
-    static func leaveLobby(_ lobby: GameLobby?) async throws {
-        guard let lobby else { return }
+    ///For enemy to leave a room
+    static func leaveRoom(_ room: GameRoom?) async throws {
+        guard let room else { return }
         do {
-            try lobbiesDb.document(lobby.ownerId).setData(from: lobby, merge: true)
-            LOGD("User left lobby as enemy with lobby id: \(lobby.ownerId)")
+            try lobbiesDb.document(room.ownerId).setData(from: room, merge: true)
+            LOGD("User left room as enemy with room id: \(room.ownerId)")
         } catch {
             throw error
         }
@@ -87,16 +87,16 @@ extension GameNetworkManager {
 
 //MARK: - Game methods
 extension GameNetworkManager {
-    static func createGameFromLobby(_ lobby: GameLobby?) async throws {
-        guard let lobby, let player = lobby.player, let enemyPlayer = lobby.challengers.first else { return }
+    static func createGameFromRoom(_ room: GameRoom?) async throws {
+        guard let room, let player = room.player, let enemyPlayer = room.challengers.first else { return }
         do {
             let gameDic: [String: Any] = [
-                kOWNERID: lobby.ownerId,
+                kOWNERID: room.ownerId,
                 kUSERPLAYER: try player.asDictionary(),
                 kENEMYPLAYER: try enemyPlayer.asDictionary(),
             ]
             try await gamesDb.document(player.userId).setData(gameDic)
-            LOGD("Lobby owner \(player.username) created a Game document against \(enemyPlayer.username) lobby id: \(lobby.ownerId)")
+            LOGD("Room owner \(player.username) created a Game document against \(enemyPlayer.username) room id: \(room.ownerId)")
         } catch {
             throw error
         }
@@ -105,7 +105,7 @@ extension GameNetworkManager {
     static func deleteGame(_ userId: String) async throws {
         do {
             try await gamesDb.document(userId).delete()
-            LOGD("Lobby creator's game is deleted at: \(userId)")
+            LOGD("Room creator's game is deleted at: \(userId)")
         } catch {
             throw error
         }

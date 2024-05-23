@@ -112,8 +112,8 @@ private extension GameView {
         vm.didExitGame.send(vm)
         Task {
             do {
-                TODO("todo only delete lobby and game if player is owner")
-                try await GameNetworkManager.deleteCurrentLobby(lobbyId: vm.player.userId)
+                TODO("todo only delete room and game if player is owner")
+                try await GameNetworkManager.deleteCurrentRoom(roomId: vm.player.userId)
                 try await GameNetworkManager.deleteGame(vm.player.userId)
             }
         }
