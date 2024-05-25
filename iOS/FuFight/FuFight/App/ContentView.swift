@@ -81,7 +81,7 @@ private extension ContentView {
         case .background:
             Task {
                 if let account = Account.current {
-                    try await GameNetworkManager.deleteCurrentRoom(roomId: account.userId)
+                    try await RoomNetworkManager.deleteCurrentRoom(roomId: account.userId)
                     try await GameNetworkManager.deleteGame(account.userId)
                     //TODO: Maybe save game locally in order to rejoin
                     LOGD("App is terminated, room and game is deleted")

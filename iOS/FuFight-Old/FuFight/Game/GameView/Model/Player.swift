@@ -71,7 +71,7 @@ class Player: PlayerProtocol {
     }
 
     ///Creates an enemy player from the room
-    init?(room: GameRoom?, isRoomOwner: Bool) {
+    init?(room: Room?, isRoomOwner: Bool) {
         guard let room,
               let player = room.player,
               let enemyPlayer = room.challengers.first
