@@ -1,5 +1,5 @@
 //
-//  GameRoom.swift
+//  Room.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 5/17/24.
@@ -7,7 +7,8 @@
 
 import FirebaseFirestore
 
-struct GameRoom {
+///Represent a single Room in the database. This class represents the public data for an Account
+class Room: Codable {
     @DocumentID private var documentId: String?
     var ownerId: String { documentId! }
     ///Player that owns the room
@@ -17,6 +18,11 @@ struct GameRoom {
 
     var isValid: Bool {
         player != nil && challengers.first != nil
+    }
+
+    ///Returns the currently signed in account's room
+    static var current: Room? {
+        return RoomManager.getCurrent()
     }
 
     ///Room owner initializer
@@ -31,15 +37,7 @@ struct GameRoom {
         challengers.append(FetchedPlayer(enemyPlayer))
     }
 
-    mutating func leaveAsChallenger(userId: String) {
-        for (index, challenger) in challengers.enumerated() where challenger.userId == userId {
-            challengers.remove(at: index)
-        }
-    }
-}
-
-//MARK: - Codable extension
-extension GameRoom: Codable {
+    //MARK: - Codable Requirements
     private enum CodingKeys : String, CodingKey {
         case player = "player"
         case challengers = "challengers"
@@ -60,11 +58,23 @@ extension GameRoom: Codable {
         try container.encode(ownerId, forKey: .ownerId)
     }
 
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)
         self.isSearching = try values.decodeIfPresent(Bool.self, forKey: .isSearching) ?? false
         self.challengers = try values.decodeIfPresent(Array<FetchedPlayer>.self, forKey: .challengers) ?? []
         self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
     }
+
+    //MARK: - Public Methods
+    func leaveAsChallenger(userId: String) {
+        for (index, challenger) in challengers.enumerated() where challenger.userId == userId {
+            challengers.remove(at: index)
+        }
+    }
+}
+
+//MARK: - Private extension
+private extension Room  {
+
 }

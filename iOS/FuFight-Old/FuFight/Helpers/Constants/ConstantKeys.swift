@@ -9,6 +9,7 @@ import Foundation
 
 //Account Keys
 public let kCURRENTACCOUNT: String = "currentAccount"
+public let kCURRENTROOM: String = "currentRoom"
 
 public let kUSERPLAYER: String = "userPlayer"
 public let kUSERID: String = "userId"
@@ -46,7 +47,7 @@ public let kOPPONENTUID: String = "opponentUid"
 //Firebase Storage and Database keys
 public let kACCOUNTS: String = "Accounts"
 public let kPHOTOS: String = "Photos"
-public let kLOBBIES: String = "Lobbies"
+public let kROOMS: String = "Rooms"
 public let kHISTORIES: String = "Histories"
 public let kGAMES: String = "Games"
 

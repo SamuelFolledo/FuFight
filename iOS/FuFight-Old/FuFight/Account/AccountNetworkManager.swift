@@ -5,7 +5,6 @@
 //  Created by Samuel Folledo on 2/17/24.
 //
 
-import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage

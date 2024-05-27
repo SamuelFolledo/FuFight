@@ -10,7 +10,7 @@ import Combine
 import FirebaseFirestore
 
 final class GameLoadingViewModel: BaseAccountViewModel {
-    @Published var room: GameRoom?
+    @Published var room: Room?
     @Published var player: Player
     @Published var enemyPlayer: Player?
     @Published var currentRoomId: String?
@@ -90,27 +90,27 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         Task {
             if self.room?.player?.userId == player.userId {
                 //Only room's owner can delete the room
-                try await GameNetworkManager.deleteCurrentRoom(roomId: currentRoomId)
+                try await RoomNetworkManager.deleteCurrentRoom(roomId: currentRoomId)
             } else if room != nil {
                 //Delete enemy data from joined room
                 self.room?.leaveAsChallenger(userId: player.userId)
-                try await GameNetworkManager.leaveRoom(self.room!)
+                try await RoomNetworkManager.leaveRoom(self.room!)
             }
         }
     }
 }
 
 private extension GameLoadingViewModel {
-    ///Search for lobbies the user can join. If there is no available room, creates a room and wait for challengers
+    ///Search for rooms the user can join. If there is no available room, creates a room and wait for challengers
     func findOrCreateRoom() {
         updateLoadingMessage(to: "Finding opponent")
         Task {
             do {
-                let roomIds = try await GameNetworkManager.findAvailableLobbies(userId: account.userId)
+                let roomIds = try await RoomNetworkManager.findAvailableRooms(userId: account.userId)
                 if roomIds.isEmpty {
                     //Create room and wait for an enemy to join
-                    let ownedRoom = GameRoom(player: player)
-                    try! await GameNetworkManager.createOrRejoinRoom(room: ownedRoom)
+                    let ownedRoom = Room(player: player)
+                    try! await RoomNetworkManager.createOrRejoinRoom(room: ownedRoom)
                     DispatchQueue.main.async {
                         self.updateRoom(gameRoom: ownedRoom, isOwner: true)
                     }
@@ -118,8 +118,8 @@ private extension GameLoadingViewModel {
                 } else {
                     //Join someone's room by writing to their room as an enemy. Enemy in this case is the user
                     let roomId = roomIds.first!
-                    let fetchedRoom = GameRoom(roomId: roomId, enemyPlayer: player)
-                    try await GameNetworkManager.joinRoom(room: fetchedRoom)
+                    let fetchedRoom = Room(roomId: roomId, enemyPlayer: player)
+                    try await RoomNetworkManager.joinRoom(room: fetchedRoom)
                     isRoomOwner = false
                     currentRoomId = roomId
                 }
@@ -145,13 +145,13 @@ private extension GameLoadingViewModel {
             let currentRoomId
         else { return }
         LOGD("Subscribing to room changes as owner")
-        let query = lobbiesDb.document(currentRoomId)
+        let query = roomsDb.document(currentRoomId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
                 if let snapshot, snapshot.exists {
                     do {
-                        let fetchedOwnedRoom = try snapshot.data(as: GameRoom.self)
+                        let fetchedOwnedRoom = try snapshot.data(as: Room.self)
                         if fetchedOwnedRoom.isValid {
                             DispatchQueue.main.async {
                                 self.updateRoom(gameRoom: fetchedOwnedRoom, isOwner: self.isRoomOwner)
@@ -191,7 +191,7 @@ private extension GameLoadingViewModel {
             }
     }
 
-    @MainActor func updateRoom(gameRoom: GameRoom, isOwner: Bool) {
+    @MainActor func updateRoom(gameRoom: Room, isOwner: Bool) {
         isRoomOwner = isOwner
         currentRoomId = gameRoom.player!.userId
         if isOwner {

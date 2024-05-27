@@ -211,6 +211,7 @@ private extension AuthenticationViewModel {
                     try await AccountNetworkManager.setUsername(username, userId: account.userId, email: account.email)
                     try await AccountNetworkManager.setData(account: account)
                     try await AccountManager.saveCurrent(account)
+                    TODO("Set account's Room with default values")
                     updateError(nil)
                     transitionToHomeView()
                 } else {
@@ -251,6 +252,7 @@ private extension AuthenticationViewModel {
                     account.update(with: fetchedAccount)
                     updateLoadingMessage(to: Str.savingUser)
                     try await AccountManager.saveCurrent(account)
+                    TODO("Fetch account's Room")
                     updateError(nil)
                     ///Transition to home view
                     transitionToHomeView()
@@ -268,7 +270,6 @@ private extension AuthenticationViewModel {
 
     func transitionToHomeView() {
         account.status = .online
-        AccountManager.saveCurrent(account)
     }
 
     func resetFields() {
