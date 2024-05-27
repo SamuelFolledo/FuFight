@@ -42,6 +42,7 @@ let defaultEnemyHp: CGFloat = 100
 var animationToTest: AnimationType = .punchHeadRightHard
 
 //Fonts
+let tabFontSize: Font = .caption
 let defaultFontSize: CGFloat = 16
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
 let textFont = Font.system(size: defaultFontSize, weight: .regular)
@@ -66,6 +67,7 @@ let disabledUiColor = UIColor.systemGray2
 let disabledColor = Color(uiColor: disabledUiColor)
 let destructiveUiColor = UIColor.systemRed
 let destructiveColor = Color(uiColor: destructiveUiColor)
+let unselectedTabColor: Color = Color(uiColor: .lightGray)
 
 //MARK: - Constant Assets
 //Backgrounds

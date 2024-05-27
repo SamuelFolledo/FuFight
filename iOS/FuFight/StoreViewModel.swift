@@ -1,22 +1,20 @@
 //
-//  HomeViewModel.swift
+//  StoreViewModel.swift
 //  FuFight
 //
-//  Created by Samuel Folledo on 2/16/24.
+//  Created by Samuel Folledo on 5/25/24.
 //
 
 import Combine
 import SwiftUI
 
-final class HomeViewModel: BaseAccountViewModel {
+final class StoreViewModel: BaseAccountViewModel {
     @Published var player: Player?
-    @Published var enemyPlayer: Player?
-    @Published var isAccountVerified = false
     @Published var path = NavigationPath()
-    let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
-    let transitionToOffline = PassthroughSubject<HomeViewModel, Never>()
-    let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()
-    let transitionToAccount = PassthroughSubject<HomeViewModel, Never>()
+    //    let transitionToLoading = PassthroughSubject<StoreViewModel, Never>()
+    //    let transitionToOffline = PassthroughSubject<StoreViewModel, Never>()
+    //    let transitionToPractice = PassthroughSubject<StoreViewModel, Never>()
+    //    let transitionToAccount = PassthroughSubject<StoreViewModel, Never>()
 
     //MARK: - Public Methods
     ///Make sure account is valid at least once
@@ -24,8 +22,6 @@ final class HomeViewModel: BaseAccountViewModel {
         Task {
             do {
                 if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
-                    LOGD("Account verified", from: HomeViewModel.self)
-                    isAccountVerified = true
                     self.player = Player(userId: account.userId, photoUrl: account.photoUrl ?? fakePhotoUrl,
                                          username: Account.current?.displayName ?? "",
                                          hp: defaultMaxHp,
@@ -35,7 +31,7 @@ final class HomeViewModel: BaseAccountViewModel {
                                          moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
                     return
                 }
-                LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
+                LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: StoreViewModel.self)
                 AccountManager.deleteCurrent()
                 updateError(nil)
                 account.reset()

@@ -32,7 +32,6 @@ struct HomeView: View {
                     }
                 }
             }
-            .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
             .overlay {
                 LoadingView(message: vm.loadingMessage)
             }
@@ -41,14 +40,18 @@ struct HomeView: View {
                     .padding(.leading, 30)
             )
             .safeAreaInset(edge: .bottom) {
-                VStack {
-                    playButton
+                HStack {
+                    Spacer()
 
-                    offlinePlayButton
+                    VStack {
+                        practiceButton
 
-                    practiceButton
+                        offlinePlayButton
+
+                        playButton
+                    }
                 }
-                .padding(.bottom)
+                .padding(.bottom, 90)
             }
             .navigationBarHidden(true)
             .frame(maxWidth: .infinity)
@@ -75,7 +78,9 @@ struct HomeView: View {
     }
 
     var accountImage: some View {
-        NavigationLink(destination: AccountView(vm: AccountViewModel(account: vm.account))) {
+        Button {
+            vm.transitionToAccount.send(vm)
+        } label: {
             AccountImage(url: vm.account.photoUrl, radius: 30)
         }
     }
@@ -85,7 +90,7 @@ struct HomeView: View {
             vm.transitionToLoading.send(vm)
         } label: {
             Image("playButton")
-                .frame(width: 200)
+                .frame(width: 150)
         }
     }
 
@@ -93,11 +98,11 @@ struct HomeView: View {
         Button {
             vm.transitionToOffline.send(vm)
         } label: {
-            Text("Offline Play")
+            Text("Offline")
                 .padding(6)
-                .frame(maxWidth: .infinity)
+                .frame(width: 120)
                 .foregroundStyle(Color(uiColor: .systemBackground))
-                .font(.title)
+                .font(boldedButtonFont)
                 .background(Color(uiColor: .label))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
@@ -111,9 +116,9 @@ struct HomeView: View {
         } label: {
             Text("Practice")
                 .padding(6)
-                .frame(maxWidth: .infinity)
+                .frame(width: 120)
                 .foregroundStyle(Color(uiColor: .label))
-                .font(.title)
+                .font(buttonFont)
                 .background(Color(uiColor: .systemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
