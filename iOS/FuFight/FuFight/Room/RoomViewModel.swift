@@ -9,40 +9,32 @@ import Combine
 import SwiftUI
 
 final class RoomViewModel: BaseAccountViewModel {
-    @Published var player: Player?
+    @Published var player: FetchedPlayer!
     @Published var path = NavigationPath()
-//    let transitionToLoading = PassthroughSubject<RoomViewModel, Never>()
-//    let transitionToOffline = PassthroughSubject<RoomViewModel, Never>()
-//    let transitionToPractice = PassthroughSubject<RoomViewModel, Never>()
-//    let transitionToAccount = PassthroughSubject<RoomViewModel, Never>()
+    let playerType: PlayerType = .user
+
+    //MARK: - Override Methods
+    override func onAppear() {
+        super.onAppear()
+        refreshPlayer()
+    }
 
     //MARK: - Public Methods
-    ///Make sure account is valid at least once
-    @MainActor func verifyAccount() {
-        Task {
-            do {
-                if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
-                    self.player = Player(userId: account.userId, photoUrl: account.photoUrl ?? fakePhotoUrl,
-                                         username: Account.current?.displayName ?? "",
-                                         hp: defaultMaxHp,
-                                         maxHp: defaultMaxHp,
-                                         fighter: Fighter(type: .samuel, isEnemy: false),
-                                         state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
-                                         moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-                    return
-                }
-                LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: RoomViewModel.self)
-                AccountManager.deleteCurrent()
-                updateError(nil)
-                account.reset()
-                account.status = .logOut
-                if Defaults.isSavingEmailAndPassword {
-                    Defaults.savedEmailOrUsername = ""
-                    Defaults.savedPassword = ""
-                }
-            } catch {
-                updateError(MainError(type: .deletingUser, message: error.localizedDescription))
-            }
-        }
+    func attackSelected(_ selectedMove: any AttackProtocol) {
+        let tempPlayer = player!
+        tempPlayer.moves.toggleType(at: selectedMove.position)
+        guard let currentRoom = RoomManager.getCurrent() else { return }
+        currentRoom.updatePlayer(player: tempPlayer)
+        RoomManager.saveCurrent(currentRoom)
+        player = tempPlayer
+    }
+
+    func defenseSelected(_ selectedMove: any MoveProtocol) {
+
+    }
+
+    func refreshPlayer() {
+        guard let player = RoomManager.getPlayer() else { return }
+        self.player = player
     }
 }

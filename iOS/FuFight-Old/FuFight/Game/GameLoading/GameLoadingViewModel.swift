@@ -11,8 +11,8 @@ import FirebaseFirestore
 
 final class GameLoadingViewModel: BaseAccountViewModel {
     @Published var room: Room?
-    @Published var player: Player
-    @Published var enemyPlayer: Player?
+    @Published var player: FetchedPlayer
+    @Published var enemyPlayer: FetchedPlayer?
     @Published var currentRoomId: String?
     let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
@@ -21,9 +21,8 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
-    init(player: Player, enemyPlayer: Player? = nil, account: Account) {
-        self.player = player
-        self.enemyPlayer = enemyPlayer
+    override init(account: Account) {
+        self.player = RoomManager.getPlayer() ?? FetchedPlayer(account)
         super.init(account: account)
 
         //After receiving a roomId, roomOwner will listen to room changes when challengers appears, while nonRoomOwner will listen to when a game Firestore document is created
@@ -44,7 +43,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         //After getting a room with player and enemy, create an enemyPlayer
         $room
             .map { room in
-                Player(room: room, isRoomOwner: self.isRoomOwner)
+                FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
             }
             .assign(to: \.enemyPlayer, on: self)
             .store(in: &subscriptions)
@@ -181,7 +180,7 @@ private extension GameLoadingViewModel {
                           snapshot.exists else { return }
                     let gameAsChallenger = try snapshot.data(as: FetchedGame.self)
                     if gameAsChallenger.ownerId != player.userId {
-                        self.enemyPlayer = Player(fetchedPlayer: gameAsChallenger.player)
+                        self.enemyPlayer = gameAsChallenger.player
                     } else {
                         TODO("Handle when game created is not the user")
                     }
@@ -199,12 +198,12 @@ private extension GameLoadingViewModel {
             updateLoadingMessage(to: "Waiting for opponent")
             if gameRoom.isValid {
                 LOGD("Valid game room with enemyPlayer \(gameRoom.challengers.first!.username)")
-                self.enemyPlayer = Player(fetchedPlayer: gameRoom.challengers.first!)
+                self.enemyPlayer = gameRoom.challengers.first!
             }
         }
     }
 
-    func createGame(enemyPlayer: Player) {
+    func createGame(enemyPlayer: FetchedPlayer) {
         Task {
             if isRoomOwner, let room {
                 try await GameNetworkManager.createGameFromRoom(room)

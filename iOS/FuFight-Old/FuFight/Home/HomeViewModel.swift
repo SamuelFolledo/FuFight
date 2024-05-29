@@ -9,8 +9,8 @@ import Combine
 import SwiftUI
 
 final class HomeViewModel: BaseAccountViewModel {
-    @Published var player: Player?
-    @Published var enemyPlayer: Player?
+    @Published var player: FetchedPlayer?
+    @Published var enemyPlayer: FetchedPlayer?
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
     let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
@@ -18,35 +18,48 @@ final class HomeViewModel: BaseAccountViewModel {
     let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()
     let transitionToAccount = PassthroughSubject<HomeViewModel, Never>()
 
+    override init(account: Account) {
+        super.init(account: account)
+    }
+
+    override func onAppear() {
+        super.onAppear()
+        DispatchQueue.main.async {
+            self.verifyAccount()
+        }
+        refreshPlayer()
+    }
+
     //MARK: - Public Methods
     ///Make sure account is valid at least once
     @MainActor func verifyAccount() {
-        Task {
-            do {
-                if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
-                    LOGD("Account verified", from: HomeViewModel.self)
-                    isAccountVerified = true
-                    self.player = Player(userId: account.userId, photoUrl: account.photoUrl ?? fakePhotoUrl,
-                                         username: Account.current?.displayName ?? "",
-                                         hp: defaultMaxHp,
-                                         maxHp: defaultMaxHp,
-                                         fighter: Fighter(type: .samuel, isEnemy: false),
-                                         state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
-                                         moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
-                    return
+        if !isAccountVerified {
+            Task {
+                do {
+                    if try await AccountNetworkManager.isAccountValid(userId: account.userId) {
+                        LOGD("Account verified", from: HomeViewModel.self)
+                        isAccountVerified = true
+                        refreshPlayer()
+                        return
+                    }
+                    LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
+                    AccountManager.deleteCurrent()
+                    updateError(nil)
+                    account.reset()
+                    account.status = .logOut
+                    if Defaults.isSavingEmailAndPassword {
+                        Defaults.savedEmailOrUsername = ""
+                        Defaults.savedPassword = ""
+                    }
+                } catch {
+                    updateError(MainError(type: .deletingUser, message: error.localizedDescription))
                 }
-                LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
-                AccountManager.deleteCurrent()
-                updateError(nil)
-                account.reset()
-                account.status = .logOut
-                if Defaults.isSavingEmailAndPassword {
-                    Defaults.savedEmailOrUsername = ""
-                    Defaults.savedPassword = ""
-                }
-            } catch {
-                updateError(MainError(type: .deletingUser, message: error.localizedDescription))
             }
         }
+    }
+
+    func refreshPlayer() {
+        guard let player = RoomManager.getPlayer() else { return }
+        self.player = player
     }
 }

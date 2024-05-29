@@ -92,7 +92,8 @@ private extension GameSceneView {
             MovesView(
                 attacksView: AttacksView(
                     attacks: defaultAllPunchAttacks,
-                    playerType: .enemy) { move in
+                    playerType: .enemy, 
+                    isEditing: false) { move in
                         fighter.playAnimation(move.animationType)
                     },
                 defensesView: DefensesView(

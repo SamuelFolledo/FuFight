@@ -94,7 +94,7 @@ struct GameView: View {
         if let enemy = vm.enemyPlayer {
             let player = playerType.isEnemy ? enemy : vm.player
             MovesView(
-                attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType) {
+                attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType, isEditing: false) {
                     vm.attackSelected($0, isEnemy: playerType.isEnemy)
                 },
                 defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {

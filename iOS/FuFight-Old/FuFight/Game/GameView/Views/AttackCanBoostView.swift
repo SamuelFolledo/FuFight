@@ -9,7 +9,8 @@ import SwiftUI
 
 struct AttackCanBoostView: View {
     let playerType: PlayerType
-
+    var isEditing: Bool
+    
     @State private var isShowingCanBoostIndicator: Bool = false
     @State private var moveClockwise: Bool = false
     private var strokeWidth: CGFloat {
@@ -27,6 +28,7 @@ struct AttackCanBoostView: View {
 
     var body: some View {
         ZStack {
+            //Circle border
             Circle()
                 .stroke(.yellow, lineWidth: strokeWidth)
                 .opacity(isShowingCanBoostIndicator ?  1 : 0)
@@ -38,15 +40,18 @@ struct AttackCanBoostView: View {
                     }
                 }
 
-            Circle()
-                .fill(.yellow)
-                .frame(width: size, height: size, alignment: .center)
-                .offset(x: xOffset)
-                .rotationEffect(.degrees(moveClockwise ? 360 : 0))
-                .animation(.linear(duration: spinDuration).repeatForever(autoreverses: false),
-                           value: moveClockwise
-                )
-                .opacity(isShowingCanBoostIndicator ?  1 : 0.3)
+            if !isEditing {
+                //Spinning circle
+                Circle()
+                    .fill(.yellow)
+                    .frame(width: size, height: size, alignment: .center)
+                    .offset(x: xOffset)
+                    .rotationEffect(.degrees(moveClockwise ? 360 : 0))
+                    .animation(.linear(duration: spinDuration).repeatForever(autoreverses: false),
+                               value: moveClockwise
+                    )
+                    .opacity(isShowingCanBoostIndicator ?  1 : 0.3)
+            }
         }
         .onAppear {
             self.moveClockwise.toggle()
@@ -55,5 +60,5 @@ struct AttackCanBoostView: View {
 }
 
 #Preview {
-    AttackCanBoostView(playerType: .user)
+    AttackCanBoostView(playerType: .user, isEditing: false)
 }
