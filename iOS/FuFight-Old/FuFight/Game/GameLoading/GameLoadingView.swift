@@ -62,5 +62,5 @@ struct GameLoadingView: View {
 }
 
 #Preview {
-    GameLoadingView(vm: GameLoadingViewModel(player: fakePlayer, account: fakeAccount))
+    GameLoadingView(vm: GameLoadingViewModel(account: fakeAccount))
 }

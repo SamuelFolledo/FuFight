@@ -20,6 +20,14 @@ enum AnimationType: String, CaseIterable {
     case punchHeadLeftMedium
     case punchHeadLeftHard
 
+    //MARK: Kicks
+    case kickHeadRightLight
+    case kickHeadRightMedium
+    case kickHeadRightHard
+    case kickHeadLeftLight
+    case kickHeadLeftMedium
+    case kickHeadLeftHard
+
     //MARK: Defensive moves
     case dodgeHeadRight
     case dodgeHeadLeft
@@ -49,11 +57,11 @@ enum AnimationType: String, CaseIterable {
     //MARK: - Properties
     var animationName: String {
         switch self {
-        case .punchHeadRightLight, .punchHeadLeftLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
+        case .punchHeadRightLight, .punchHeadLeftLight, .kickHeadRightLight, .kickHeadLeftLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
             "light\(nameSuffix)"
-        case .punchHeadRightMedium, .punchHeadLeftMedium,  .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
+        case .punchHeadRightMedium, .punchHeadLeftMedium, .kickHeadRightMedium, .kickHeadLeftMedium, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
             "medium\(nameSuffix)"
-        case .punchHeadRightHard, .punchHeadLeftHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
+        case .punchHeadRightHard, .punchHeadLeftHard, .kickHeadRightHard, .kickHeadLeftHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
             "hard\(nameSuffix)"
         case .dodgeHeadRight, .dodgeHeadLeft:
             "dodge\(nameSuffix)"
@@ -73,6 +81,14 @@ enum AnimationType: String, CaseIterable {
         case .punchHeadRightHard:
             ""
         case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            "-m"
+        case .kickHeadRightLight:
+            ""
+        case .kickHeadRightMedium:
+            ""
+        case .kickHeadRightHard:
+            ""
+        case .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             "-m"
         case .dodgeHeadRight:
             ""
@@ -107,6 +123,9 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
             "punch"
+        case .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
+            //TODO: Change to Kick
+            "punch"
         case .dodgeHeadRight, .dodgeHeadLeft:
             "dodge"
         case .hitHeadRightMedium, .hitHeadRightHard, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard:
@@ -131,7 +150,7 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .stop, .idle, .idleStand:
             nil
-        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             true
         }
     }
@@ -155,7 +174,7 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .idle, .idleStand, .stop:
             0
-        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             1
         }
     }
@@ -176,6 +195,18 @@ enum AnimationType: String, CaseIterable {
             "punchRightMedium"
         case .punchHeadRightHard:
             "punchRightHard"
+        case .kickHeadLeftLight:
+            "kickLeftLight"
+        case .kickHeadLeftMedium:
+            "kickLeftMedium"
+        case .kickHeadLeftHard:
+            "kickLeftHard"
+        case .kickHeadRightLight:
+            "kickRightLight"
+        case .kickHeadRightMedium:
+            "kickRightMedium"
+        case .kickHeadRightHard:
+            "kickRightHard"
         }
     }
 
@@ -183,7 +214,7 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             true
-        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
+        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             false
         }
     }
@@ -194,6 +225,10 @@ enum AnimationType: String, CaseIterable {
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard:
             true
         case .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+            false
+        case .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard:
+            true
+        case .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             false
         case .dodgeHeadRight:
             true
@@ -212,11 +247,11 @@ enum AnimationType: String, CaseIterable {
 
     var strength: StrengthType? {
         switch self {
-        case .punchHeadRightLight, .punchHeadLeftLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
+        case .punchHeadRightLight, .punchHeadLeftLight, .kickHeadLeftLight, .kickHeadRightLight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .killHeadRightLight, .killHeadLeftLight:
             .light
-        case .punchHeadRightMedium, .punchHeadLeftMedium, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
+        case .punchHeadRightMedium, .punchHeadLeftMedium, .kickHeadLeftMedium, .kickHeadRightMedium, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .killHeadRightMedium, .killHeadLeftMedium:
             .medium
-        case .punchHeadRightHard, .punchHeadLeftHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
+        case .punchHeadRightHard, .punchHeadLeftHard, .kickHeadLeftHard, .kickHeadRightHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
             .hard
         case .dodgeHeadRight, .dodgeHeadLeft, .stop, .idle, .idleStand:
             nil
@@ -263,7 +298,7 @@ enum AnimationType: String, CaseIterable {
             //Defense moves
             let delay = getHitDuration(for: attacker) - defenderAnimationType.getHitDuration(for: defender)
             return delay <= 0 ? 0 : delay
-        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
+        case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             //Attack moves
             break
         }
@@ -278,6 +313,12 @@ enum AnimationType: String, CaseIterable {
         case .punchHeadRightMedium, .punchHeadLeftMedium:
             fighter == .samuel ? false : true
         case .punchHeadRightHard, .punchHeadLeftHard:
+            fighter == .samuel ? false : true
+        case .kickHeadRightLight, .kickHeadLeftLight:
+            fighter == .samuel ? true : false
+        case .kickHeadRightMedium, .kickHeadLeftMedium:
+            fighter == .samuel ? false : true
+        case .kickHeadRightHard, .kickHeadLeftHard:
             fighter == .samuel ? false : true
         case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
             false
@@ -300,6 +341,12 @@ extension AnimationType {
         case .punchHeadLeftMedium, .punchHeadRightMedium:
             fighter == .samuel ? 1.2 : 1.133333
         case .punchHeadLeftHard, .punchHeadRightHard:
+            fighter == .samuel ? 1.96667 : 1.66667
+        case .kickHeadLeftLight, .kickHeadRightLight:
+            fighter == .samuel ? 1.13333 : 1.53333
+        case .kickHeadLeftMedium, .kickHeadRightMedium:
+            fighter == .samuel ? 1.2 : 1.133333
+        case .kickHeadLeftHard, .kickHeadRightHard:
             fighter == .samuel ? 1.96667 : 1.66667
         case .dodgeHeadRight, .dodgeHeadLeft:
             1.433333
@@ -370,6 +417,13 @@ extension AnimationType {
         case .punchHeadLeftMedium, .punchHeadRightMedium:
             getAnimationDuration(for: fighter) * (fighter == .samuel ? 16/36 : 22/34) //13/53 for .clara's medium2
         case .punchHeadLeftHard, .punchHeadRightHard:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 29/59 : 26/50)
+        //MARK: Kicks
+        case .kickHeadLeftLight, .kickHeadRightLight:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 7/34 : 8/31) //9/46 for clara's light2
+        case .kickHeadLeftMedium, .kickHeadRightMedium:
+            getAnimationDuration(for: fighter) * (fighter == .samuel ? 16/36 : 22/34) //13/53 for .clara's medium2
+        case .kickHeadLeftHard, .kickHeadRightHard:
             getAnimationDuration(for: fighter) * (fighter == .samuel ? 29/59 : 26/50)
         }
     }

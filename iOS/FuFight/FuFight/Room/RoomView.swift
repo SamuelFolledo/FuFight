@@ -17,6 +17,7 @@ struct RoomView: View {
                     navigationView
 
                     VStack {
+                        movesView
 
                         Spacer()
                     }
@@ -97,6 +98,20 @@ struct RoomView: View {
 //        .padding(.horizontal)
 //        .padding(.bottom, 4)
 //    }
+
+    @ViewBuilder var movesView: some View {
+        if vm.player != nil {
+            MovesView(
+                attacksView: AttacksView(attacks: vm.player.moves.attacks, playerType: vm.playerType, isEditing: true) {
+                    vm.attackSelected($0 as! AttackProtocol)
+                },
+                defensesView: DefensesView(defenses: vm.player.moves.defenses, playerType: vm.playerType) {
+                    vm.defenseSelected($0)
+                },
+                playerType: vm.playerType)
+//            .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
+        }
+    }
 }
 
 #Preview {

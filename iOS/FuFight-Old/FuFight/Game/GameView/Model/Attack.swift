@@ -43,7 +43,7 @@ protocol AttackProtocol {
 }
 
 struct Attack: MoveProtocol, AttackProtocol, AttackTypeProtocol {
-    private let move: any AttackTypeProtocol
+    private var move: any AttackTypeProtocol
 
     //MARK: Move Protocol
     var name: String { move.name }
@@ -76,6 +76,8 @@ struct Attack: MoveProtocol, AttackProtocol, AttackTypeProtocol {
     init?(moveId: String) {
         if let move = Punch(rawValue: moveId) {
             self.move = move
+        } else if let move = Kick(rawValue: moveId) {
+            self.move = move
         } else {
             return nil
         }
@@ -91,6 +93,26 @@ struct Attack: MoveProtocol, AttackProtocol, AttackTypeProtocol {
     }
 
     //MARK: - Other Public Methods
+    ///Toggle between punch and kick for the given AttackPosition
+    mutating func toggleAttackType(at position: AttackPosition) {
+        if position == move.position {
+            switch move.position {
+            case .leftLight:
+                move = move.id == Punch.leftPunchLight.id ? Kick.leftKickLight : Punch.leftPunchLight
+            case .rightLight:
+                move = move.id == Punch.rightPunchLight.id ? Kick.rightKickLight : Punch.rightPunchLight
+            case .leftMedium:
+                move = move.id == Punch.leftPunchMedium.id ? Kick.leftKickMedium : Punch.leftPunchMedium
+            case .rightMedium:
+                move = move.id == Punch.rightPunchMedium.id ? Kick.rightKickMedium : Punch.rightPunchMedium
+            case .leftHard:
+                move = move.id == Punch.leftPunchHard.id ? Kick.leftKickHard : Punch.leftPunchHard
+            case .rightHard:
+                move = move.id == Punch.rightPunchHard.id ? Kick.rightKickHard : Punch.rightPunchHard
+            }
+        }
+    }
+
     mutating func setFireState(to newFireState: FireState) {
         self.fireState = newFireState
     }

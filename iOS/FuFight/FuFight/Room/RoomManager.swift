@@ -43,6 +43,15 @@ class RoomManager {
         }
     }
 
+    static func getPlayer() -> FetchedPlayer? {
+        if let room = getCurrent() {
+            return room.player
+        } else if let account = Account.current {
+            saveCurrent(Room(account))
+        }
+        return getCurrent()?.player
+    }
+
     static func deleteCurrent() {
         defaults.removeObject(forKey: kCURRENTROOM)
     }

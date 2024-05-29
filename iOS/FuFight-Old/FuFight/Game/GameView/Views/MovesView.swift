@@ -33,7 +33,7 @@ struct MovesView<AttacksView: View, DefensesView: View>: View {
     let playerType: PlayerType = .user
 
     return MovesView(
-        attacksView: AttacksView(attacks: defaultAllPunchAttacks, playerType: playerType) {
+        attacksView: AttacksView(attacks: defaultAllPunchAttacks, playerType: playerType, isEditing: false) {
             LOGD("Selected attack is \($0.name)")
         },
         defensesView: DefensesView(defenses: defaultAllDashDefenses, playerType: playerType) {

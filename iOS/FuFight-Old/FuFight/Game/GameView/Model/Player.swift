@@ -30,7 +30,7 @@ struct PlayerState {
     }
 }
 
-protocol PlayerProtocol {
+protocol PlayerProtocol: ObservableObject {
     var userId: String { get }
     var username: String { get }
     var photoUrl: URL { get }
@@ -70,38 +70,18 @@ class Player: PlayerProtocol {
         self.speed = 0
     }
 
-    ///Creates an enemy player from the room
-    init?(room: Room?, isRoomOwner: Bool) {
-        guard let room,
-              let player = room.player,
-              let enemyPlayer = room.challengers.first
-        else { return nil }
-        self.photoUrl = !isRoomOwner ? player.photoUrl : enemyPlayer.photoUrl
-        self.username = !isRoomOwner ? player.username : enemyPlayer.username
-        self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
-        self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
-        self.fighter = Fighter(type: !isRoomOwner ? player.fighterType : enemyPlayer.fighterType, isEnemy: true)
-        self.hp = defaultMaxHp
-        self.maxHp = defaultMaxHp
-        self.rounds = []
-        self.speed = 0
-        self.isEnemy = true
-        //TODO: hasSpeedBoost should not be false
-        self.state = .init(boostLevel: .none, hasSpeedBoost: false)
-    }
-
     ///Room owner's initializer
-    init(fetchedPlayer: FetchedPlayer) {
+    init(_ fetchedPlayer: FetchedPlayer) {
         self.photoUrl = fetchedPlayer.photoUrl
         self.username = fetchedPlayer.username
         self.userId = fetchedPlayer.userId
         self.moves = fetchedPlayer.moves
-        self.fighter = Fighter(type: fetchedPlayer.fighterType, isEnemy: true)
+        self.fighter = Fighter(type: fetchedPlayer.fighterType, isEnemy: fetchedPlayer.isEnemy)
         self.hp = defaultMaxHp
         self.maxHp = defaultMaxHp
         self.rounds = []
         self.speed = 0
-        self.isEnemy = true
+        self.isEnemy = fetchedPlayer.isEnemy
         //TODO: hasSpeedBoost should not be false
         self.state = .init(boostLevel: .none, hasSpeedBoost: false)
     }

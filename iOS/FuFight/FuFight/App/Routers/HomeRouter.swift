@@ -71,21 +71,27 @@ class HomeRouter: ObservableObject {
     }
 
     func transitionTo(route: GameRoute, vm: HomeViewModel) {
+        let player = Player(vm.player!)
         switch route {
         case .onlineGame:
             //show loading and let loading handle transition to online game
-            if let player = vm.player {
-                if let enemyPlayer = vm.enemyPlayer {
-                    TODO("Handle returning to current online game for \(player.username) vs \(enemyPlayer.username)")
-                } else {
-                    let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(player: player, enemyPlayer: vm.enemyPlayer, account: vm.account))
-                    navigationPath.append(nextVm)
-                }
+            if let enemyPlayer = vm.enemyPlayer {
+                TODO("Handle returning to current online game for \(player.username) vs \(enemyPlayer.username)")
+            } else {
+//                let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(player: vm.player!,
+//                                                                          enemyPlayer: nil,
+//                                                                          account: vm.account))
+                let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(account: vm.account))
+                navigationPath.append(nextVm)
             }
         case .offlineGame:
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer)))
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, 
+                                                              player: player,
+                                                              enemyPlayer: fakeEnemyPlayer)))
         case .practice:
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: true, player: vm.player ?? fakePlayer, enemyPlayer: fakeEnemyPlayer)))
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: true, 
+                                                              player: player,
+                                                              enemyPlayer: fakeEnemyPlayer)))
         }
     }
 
@@ -99,8 +105,8 @@ class HomeRouter: ObservableObject {
     }
 
     //MARK: - GameLoadingView Methods
-    func makeLoadingViewModel(player: Player, enemyPlayer: Player? = nil, account: Account) -> GameLoadingViewModel {
-        let vm = GameLoadingViewModel(player: player, enemyPlayer: enemyPlayer, account: account)
+    func makeLoadingViewModel(account: Account) -> GameLoadingViewModel {
+        let vm = GameLoadingViewModel(account: account)
         vm.didCancel
             .sink(receiveValue: { _ in
                 self.navigateToRoot()
@@ -114,7 +120,7 @@ class HomeRouter: ObservableObject {
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
         if let enemyPlayer = vm.enemyPlayer {
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: vm.player, enemyPlayer: enemyPlayer)))
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: Player(vm.player), enemyPlayer: Player(enemyPlayer))))
         }
     }
 

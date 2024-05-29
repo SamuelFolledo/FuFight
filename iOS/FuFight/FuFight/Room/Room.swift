@@ -26,15 +26,20 @@ class Room: Codable {
     }
 
     ///Room owner initializer
-    init(player: Player) {
+    init(player: FetchedPlayer) {
         self.documentId = player.userId
-        self.player = FetchedPlayer(player)
+        self.player = player
     }
 
     ///Room joiner/enemy initializer
-    init(roomId: String, enemyPlayer: Player) {
+    init(roomId: String, enemyPlayer: FetchedPlayer) {
         self.documentId = roomId
-        challengers.append(FetchedPlayer(enemyPlayer))
+        challengers.append(enemyPlayer)
+    }
+
+    init(_ account: Account) {
+        self.documentId = account.userId
+        self.player = FetchedPlayer(account)
     }
 
     //MARK: - Codable Requirements
@@ -71,6 +76,10 @@ class Room: Codable {
         for (index, challenger) in challengers.enumerated() where challenger.userId == userId {
             challengers.remove(at: index)
         }
+    }
+
+    func updatePlayer(player: FetchedPlayer?) {
+        self.player = player
     }
 }
 

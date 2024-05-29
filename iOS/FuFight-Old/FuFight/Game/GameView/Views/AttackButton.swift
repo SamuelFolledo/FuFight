@@ -10,6 +10,7 @@ import SwiftUI
 struct AttackButton: View {
     let move: Attack
     let playerType: PlayerType
+    var isEditing: Bool
     let moveSelected: ((any MoveProtocol) -> Void)?
 
     private var width: CGFloat { playerType.isEnemy ? 160 : 800 }
@@ -59,7 +60,7 @@ struct AttackButton: View {
                     case .initial, .unselected, .selected:
                         switch move.fireState {
                         case .initial:
-                            AttackCanBoostView(playerType: playerType)
+                            AttackCanBoostView(playerType: playerType, isEditing: isEditing)
                         case .small, .big:
                             EmptyView()
                         }
@@ -71,7 +72,7 @@ struct AttackButton: View {
 
 #Preview {
     let attack = Attack(Punch.leftPunchMedium)
-    return AttackButton(move: attack, playerType: .user) {
+    return AttackButton(move: attack, playerType: .user, isEditing: false) {
         LOGD("Attack selected = \($0.name)")
     }
 }

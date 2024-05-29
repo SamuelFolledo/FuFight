@@ -10,6 +10,7 @@ import SwiftUI
 struct AttacksView: View {
     let attacks: [Attack]
     let playerType: PlayerType
+    var isEditing: Bool
     var moveSelected: ((any MoveProtocol) -> Void)?
 
     var body: some View {
@@ -42,17 +43,18 @@ struct AttacksView: View {
 
     @ViewBuilder func createButtonFrom(_ position: AttackPosition) -> some View {
         if let move = attacks.first(where: { $0.position == position }) {
-            AttackButton(move: move, playerType: playerType, moveSelected: moveSelected)
+            AttackButton(move: move, 
+                         playerType: playerType,
+                         isEditing: isEditing,
+                         moveSelected: moveSelected)
         }
     }
 }
 
 #Preview {
-    @State var attacks: [Attack] = defaultAllPunchAttacks
-
     return VStack(spacing: 200) {
-        AttacksView(attacks: attacks, playerType: .enemy)
+        AttacksView(attacks: defaultAllPunchAttacks, playerType: .enemy, isEditing: false)
 
-        AttacksView(attacks: attacks, playerType: .user)
+        AttacksView(attacks: defaultAllPunchAttacks, playerType: .user, isEditing: false)
     }
 }
