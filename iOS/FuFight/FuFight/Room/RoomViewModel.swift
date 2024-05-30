@@ -26,6 +26,9 @@ final class RoomViewModel: BaseAccountViewModel {
         guard let currentRoom = RoomManager.getCurrent() else { return }
         currentRoom.updatePlayer(player: tempPlayer)
         RoomManager.saveCurrent(currentRoom)
+        Task {
+            try await RoomNetworkManager.createRoom(currentRoom)
+        }
         player = tempPlayer
     }
 

@@ -12,18 +12,8 @@ class FetchedPlayer: PlayerProtocol {
     private(set) var userId: String
     private(set) var username: String
     private(set) var photoUrl: URL
-    private(set) var isEnemy: Bool
     var fighterType: FighterType
     var moves: Moves
-
-    init(userId: String, username: String, photoUrl: URL, isEnemy: Bool, fighterType: FighterType, moves: Moves) {
-        self.userId = userId
-        self.username = username
-        self.photoUrl = photoUrl
-        self.isEnemy = isEnemy
-        self.fighterType = fighterType
-        self.moves = moves
-    }
 
     init(_ player: Player) {
         self.userId = player.userId
@@ -31,7 +21,6 @@ class FetchedPlayer: PlayerProtocol {
         self.photoUrl = player.photoUrl
         self.moves = player.moves
         self.fighterType = player.fighter.fighterType
-        self.isEnemy = player.isEnemy
     }
 
     ///Creates an enemy player from the room
@@ -45,7 +34,6 @@ class FetchedPlayer: PlayerProtocol {
         self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
         self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
         self.fighterType = !isRoomOwner ? player.fighterType : enemyPlayer.fighterType
-        self.isEnemy = true
     }
 
     ///Default value/initializer for FetchedPlayer from current logged in account
@@ -55,7 +43,6 @@ class FetchedPlayer: PlayerProtocol {
         self.photoUrl = account.photoUrl!
         self.fighterType = .samuel
         self.moves = Moves(attacks: Punch.allCases.compactMap { Attack($0) }, defenses: Dash.allCases.compactMap { Defense($0) })
-        self.isEnemy = false
     }
 
     required init(from decoder: Decoder) throws {
@@ -68,7 +55,6 @@ class FetchedPlayer: PlayerProtocol {
         let fighterId = try values.decodeIfPresent(String.self, forKey: .fighterType)!
         let fighterType = FighterType(rawValue: fighterId)!
         self.fighterType = fighterType
-        self.isEnemy = try values.decodeIfPresent(Bool.self, forKey: .isEnemy)!
     }
 }
 
@@ -80,7 +66,6 @@ extension FetchedPlayer: Codable {
         case photoUrl = "photoUrl"
         case moves = "moves"
         case fighterType = "fighterType"
-        case isEnemy = "isEnemy"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -91,6 +76,5 @@ extension FetchedPlayer: Codable {
         try container.encode(photoUrl, forKey: .photoUrl)
         try container.encode(moves, forKey: .moves)
         try container.encode(fighterType.rawValue, forKey: .fighterType)
-        try container.encode(isEnemy, forKey: .isEnemy)
     }
 }

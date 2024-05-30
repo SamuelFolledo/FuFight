@@ -14,7 +14,7 @@ class Room: Codable {
     ///Player that owns the room
     private(set) var player: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
-    private(set) var isSearching: Bool = true
+    private(set) var isSearching: Bool = false
 
     var isValid: Bool {
         player != nil && challengers.first != nil
@@ -26,9 +26,9 @@ class Room: Codable {
     }
 
     ///Room owner initializer
-    init(player: FetchedPlayer) {
-        self.documentId = player.userId
-        self.player = player
+    init(ownerPlayer: FetchedPlayer) {
+        self.documentId = ownerPlayer.userId
+        self.player = ownerPlayer
     }
 
     ///Room joiner/enemy initializer

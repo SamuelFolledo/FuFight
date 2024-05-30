@@ -45,7 +45,6 @@ struct GameLoadingView: View {
 
     var cancelButton: some View {
         Button {
-            vm.deleteCurrentRoom()
             vm.didCancel.send(vm)
         } label: {
             Text("Cancel")

@@ -25,7 +25,7 @@ extension GameNetworkManager {
                 kENEMYPLAYER: try enemyPlayer.asDictionary(),
             ]
             try await gamesDb.document(player.userId).setData(gameDic)
-            LOGD("Room owner \(player.username) created a Game document against \(enemyPlayer.username)")
+            LOGD("createGameFromRoom() Room owner \(player.username) created a Game document against \(enemyPlayer.username)")
         } catch {
             throw error
         }

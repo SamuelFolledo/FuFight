@@ -140,7 +140,7 @@ private extension GameViewModel {
     func createNewRound() {
         player.prepareForNewRound()
         print("\n\n=================================== Round \(self.player.rounds.count) ============================================")
-        enemyPlayer?.prepareForNewRound()
+        enemyPlayer!.prepareForNewRound()
         timeRemaining = defaultMaxTime
         secondAttackerDelay = 0
         secondAttackerDamageDealtReduction = 0

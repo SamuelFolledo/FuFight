@@ -58,13 +58,15 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                     if isRoomOwner {
                         createGame(enemyPlayer: enemyPlayer)
                     } else {
-                        didFindEnemy.send(self)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            self.didFindEnemy.send(self)
+                        }
                     }
                 }
             }
             .store(in: &subscriptions)
 
-        findOrCreateRoom()
+        findOpponent()
     }
 
     //MARK: - ViewModel Overrides
@@ -75,7 +77,6 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
     override func onDisappear() {
         super.onDisappear()
-        deleteCurrentRoom()
         unsubscribe()
         room = nil
         enemyPlayer = nil
@@ -84,44 +85,51 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     }
 
     //MARK: - Public Methods
-    func deleteCurrentRoom() {
-        guard let currentRoomId else { return }
-        Task {
-            if self.room?.player?.userId == player.userId {
-                //Only room's owner can delete the room
-                try await RoomNetworkManager.deleteCurrentRoom(roomId: currentRoomId)
-            } else if room != nil {
-                //Delete enemy data from joined room
-                self.room?.leaveAsChallenger(userId: player.userId)
-                try await RoomNetworkManager.leaveRoom(self.room!)
-            }
-        }
-    }
 }
 
 private extension GameLoadingViewModel {
     ///Search for rooms the user can join. If there is no available room, creates a room and wait for challengers
-    func findOrCreateRoom() {
+    func findOpponent() {
         updateLoadingMessage(to: "Finding opponent")
         Task {
             do {
                 let roomIds = try await RoomNetworkManager.findAvailableRooms(userId: account.userId)
                 if roomIds.isEmpty {
-                    //Create room and wait for an enemy to join
-                    let ownedRoom = Room(player: player)
-                    try! await RoomNetworkManager.createOrRejoinRoom(room: ownedRoom)
-                    DispatchQueue.main.async {
-                        self.updateRoom(gameRoom: ownedRoom, isOwner: true)
-                    }
-                    //TODO: Listen for changes and wait for up to 5-12 seconds
+                    createOrRejoinRoom()
                 } else {
-                    //Join someone's room by writing to their room as an enemy. Enemy in this case is the user
-                    let roomId = roomIds.first!
-                    let fetchedRoom = Room(roomId: roomId, enemyPlayer: player)
-                    try await RoomNetworkManager.joinRoom(room: fetchedRoom)
-                    isRoomOwner = false
-                    currentRoomId = roomId
+                    joinRoomAsChallenger(roomIds: roomIds)
                 }
+            } catch {
+                updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
+            }
+        }
+    }
+
+    func createOrRejoinRoom() {
+        Task {
+            do {
+                //Create room and wait for an enemy to join
+                let ownedRoom = Room(ownerPlayer: player)
+                try await RoomNetworkManager.createOrRejoinRoom(room: ownedRoom)
+                DispatchQueue.main.async {
+                    self.updateRoom(gameRoom: ownedRoom, isOwner: true)
+                }
+                //TODO: Listen for changes and wait for up to 5-12 seconds
+            } catch {
+                updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
+            }
+        }
+    }
+
+    func joinRoomAsChallenger(roomIds: [String]) {
+        Task {
+            do {
+                //Join someone's room by writing to their room as an enemy. Enemy in this case is the user
+                let roomId = roomIds.first!
+                let fetchedRoom = Room(roomId: roomId, enemyPlayer: player)
+                try await RoomNetworkManager.joinRoom(room: fetchedRoom)
+                isRoomOwner = false
+                currentRoomId = roomId
             } catch {
                 updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
             }
@@ -163,6 +171,30 @@ private extension GameLoadingViewModel {
             }
     }
 
+    @MainActor func updateRoom(gameRoom: Room, isOwner: Bool) {
+        isRoomOwner = isOwner
+        currentRoomId = gameRoom.player!.userId
+        if isOwner {
+            room = gameRoom
+            updateLoadingMessage(to: "Waiting for opponent")
+            if gameRoom.isValid {
+                LOGD("Valid game room against enemyPlayer \(gameRoom.challengers.first!.username)")
+                self.enemyPlayer = gameRoom.challengers.first!
+            }
+        }
+    }
+
+    func createGame(enemyPlayer: FetchedPlayer) {
+        Task {
+            if isRoomOwner, let room {
+                try await GameNetworkManager.createGameFromRoom(room)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.didFindEnemy.send(self)
+                }
+            }
+        }
+    }
+
     ///subscribe to game database changes when it is created for room joiner
     func subscribeToGameChanges(with roomId: String) {
         if listener != nil {
@@ -178,9 +210,11 @@ private extension GameLoadingViewModel {
                     guard let self,
                           let snapshot,
                           snapshot.exists else { return }
-                    let gameAsChallenger = try snapshot.data(as: FetchedGame.self)
-                    if gameAsChallenger.ownerId != player.userId {
-                        self.enemyPlayer = gameAsChallenger.player
+                    let fetchedGameAsChallenger = try snapshot.data(as: FetchedGame.self)
+                    if fetchedGameAsChallenger.ownerId != player.userId {
+                        enemyPlayer = fetchedGameAsChallenger.player
+                        LOGD("Challenging to a game against the room owner \(fetchedGameAsChallenger.player.username)")
+                        unsubscribe()
                     } else {
                         TODO("Handle when game created is not the user")
                     }
@@ -188,27 +222,5 @@ private extension GameLoadingViewModel {
                     print(error)
                 }
             }
-    }
-
-    @MainActor func updateRoom(gameRoom: Room, isOwner: Bool) {
-        isRoomOwner = isOwner
-        currentRoomId = gameRoom.player!.userId
-        if isOwner {
-            room = gameRoom
-            updateLoadingMessage(to: "Waiting for opponent")
-            if gameRoom.isValid {
-                LOGD("Valid game room with enemyPlayer \(gameRoom.challengers.first!.username)")
-                self.enemyPlayer = gameRoom.challengers.first!
-            }
-        }
-    }
-
-    func createGame(enemyPlayer: FetchedPlayer) {
-        Task {
-            if isRoomOwner, let room {
-                try await GameNetworkManager.createGameFromRoom(room)
-                self.didFindEnemy.send(self)
-            }
-        }
     }
 }

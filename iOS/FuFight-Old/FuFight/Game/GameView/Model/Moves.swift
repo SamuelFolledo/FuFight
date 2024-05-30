@@ -176,8 +176,8 @@ extension Moves: Codable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        let attacks = try values.decodeIfPresent([Attack].self, forKey: .attacks)!
-        let defenses = try values.decodeIfPresent([Defense].self, forKey: .defenses)!
+        let attacks = try values.decodeIfPresent(Array<Attack>.self, forKey: .attacks)!
+        let defenses = try values.decodeIfPresent(Array<Defense>.self, forKey: .defenses)!
         self.init(attacks: attacks, defenses: defenses)
     }
 }
