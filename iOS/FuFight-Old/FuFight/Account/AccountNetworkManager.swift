@@ -191,7 +191,7 @@ extension AccountNetworkManager {
     }
 
     ///Set username to the database into Accounts collections
-    static func setUsername(_ username: String, userId: String, email: String? = nil) async throws {
+    static func updateUsername(to username: String, for userId: String) async throws {
         let username = username.trimmed
         guard !userId.isEmpty,
               !username.isEmpty else { return }

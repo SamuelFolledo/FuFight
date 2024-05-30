@@ -71,17 +71,17 @@ class Player: PlayerProtocol {
     }
 
     ///Room owner's initializer
-    init(_ fetchedPlayer: FetchedPlayer) {
+    init(fetchedPlayer: FetchedPlayer, isEnemy: Bool) {
         self.photoUrl = fetchedPlayer.photoUrl
         self.username = fetchedPlayer.username
         self.userId = fetchedPlayer.userId
         self.moves = fetchedPlayer.moves
-        self.fighter = Fighter(type: fetchedPlayer.fighterType, isEnemy: fetchedPlayer.isEnemy)
+        self.fighter = Fighter(type: fetchedPlayer.fighterType, isEnemy: isEnemy)
         self.hp = defaultMaxHp
         self.maxHp = defaultMaxHp
         self.rounds = []
         self.speed = 0
-        self.isEnemy = fetchedPlayer.isEnemy
+        self.isEnemy = isEnemy
         //TODO: hasSpeedBoost should not be false
         self.state = .init(boostLevel: .none, hasSpeedBoost: false)
     }

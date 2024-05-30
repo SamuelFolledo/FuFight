@@ -191,7 +191,7 @@ struct UnderlinedTextField: View {
                 .focused($isFocused)
                 .textContentType(type.contentType)
                 .submitLabel(type.submitLabel)
-
+                
                 accessories
             }
         }

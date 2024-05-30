@@ -28,6 +28,7 @@ enum MainErrorType {
     case noEmailFromUsername
     case reauthenticatingUser
     case noOpponentFound
+    case updatingAccountOrRoom
 
     var title: String {
         switch self {
@@ -71,6 +72,8 @@ enum MainErrorType {
             "Could not fetch email from username provided"
         case .noOpponentFound:
             "Error finding opponent"
+        case .updatingAccountOrRoom:
+            "Error updating account's data"
         }
     }
 }

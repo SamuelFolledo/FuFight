@@ -181,7 +181,7 @@ private extension AccountViewModel {
             if didChangeUsername || newPhotoUrl != nil {
                 if didChangeUsername {
                     updateLoadingMessage(to: Str.updatingUsername)
-                    try await AccountNetworkManager.setUsername(username, userId: account.userId, email: account.email)
+                    try await AccountNetworkManager.updateUsername(to: username, for: account.userId)
                     if Defaults.isSavingEmailAndPassword {
                         Defaults.savedEmailOrUsername = username
                     }

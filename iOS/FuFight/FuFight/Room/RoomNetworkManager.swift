@@ -18,23 +18,34 @@ extension RoomNetworkManager {
         do {
             let userId = room.player!.userId
             let roomDocument = roomsDb.document(userId)
-            try await roomDocument.updateData(roomDocument.asDictionary())
-            LOGD("Room created for roomId: \(userId)")
+            try roomDocument.setData(from: room)
+            LOGD("Room created for roomId: \(room.player!.username)")
         } catch {
             throw error
         }
     }
 
-    static func updateRoom(_ room: Room) async throws {
+    ///Fetches current room for the authenticated account
+    static func fetchRoom(_ account: Account) async throws -> Room {
         do {
-            let userId = room.player!.userId
-            let roomDocument = roomsDb.document(userId)
-            try await roomDocument.updateData(roomDocument.asDictionary())
-            LOGD("Room updated for roomId: \(userId)")
+            let room = try await roomsDb.document(account.userId).getDocument(as: Room.self)
+            LOGD("Room fetched for: \(account.displayName)")
+            return room
         } catch {
             throw error
         }
     }
+
+//    static func updateRoom(_ room: Room) async throws {
+//        do {
+//            let userId = room.player!.userId
+//            let roomDocument = roomsDb.document(userId)
+//            try await roomDocument.updateData(roomDocument.asDictionary())
+//            LOGD("Room updated for roomId: \(userId)")
+//        } catch {
+//            throw error
+//        }
+//    }
 
     ///Fetch an available room if there's any available. Return avaialble roomIds
     static func findAvailableRooms(userId: String) async throws -> [String] {
@@ -52,11 +63,11 @@ extension RoomNetworkManager {
     ///For room owner to create a new or rejoin an existing room
     static func createOrRejoinRoom(room: Room) async throws {
         do {
-            let userId = room.player!.userId
-            let roomDocuments = try await roomsDb.whereField(kUSERID, isEqualTo: userId).getDocuments()
+            let ownerId = room.ownerId
+            let roomDocuments = try await roomsDb.whereField(kOWNERID, isEqualTo: ownerId).getDocuments()
             if roomDocuments.isEmpty {
                 //Check if user already has a room created
-                let roomDocument = roomsDb.document(userId)
+                let roomDocument = roomsDb.document(ownerId)
                 try roomDocument.setData(from: room)
                 LOGD("Current room created with id: \(roomDocument.documentID)")
             } else {

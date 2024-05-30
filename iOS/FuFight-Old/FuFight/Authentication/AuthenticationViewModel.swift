@@ -80,7 +80,6 @@ final class AuthenticationViewModel: BaseViewModel {
             updateStep(to: .phoneVerification)
         case .phoneVerification:
             TODO("Login/sign up with phone")
-            transitionToHomeView()
         case .onboard:
             finishOnboarding()
         }
@@ -208,15 +207,14 @@ private extension AuthenticationViewModel {
                     try await AccountNetworkManager.updateAuthenticatedUser(username: username, photoUrl: photoUrl)
                     account.finishAccountCreation(username: username, photoUrl: photoUrl)
                     updateLoadingMessage(to: Str.savingUser)
-                    try await AccountNetworkManager.setUsername(username, userId: account.userId, email: account.email)
-                    try await AccountNetworkManager.setData(account: account)
-                    try await AccountManager.saveCurrent(account)
-                    TODO("Set account's Room with default values")
+                    saveAccountAndRoom(isLogIn: false)
                     updateError(nil)
                     transitionToHomeView()
                 } else {
-                    selectedImage = defaultProfilePhoto
-                    finishOnboarding()
+                    DispatchQueue.main.async {
+                        self.selectedImage = defaultProfilePhoto
+                        self.finishOnboarding()
+                    }
                 }
             } catch {
                 updateError(MainError(type: .onboard, message: error.localizedDescription))
@@ -251,8 +249,7 @@ private extension AuthenticationViewModel {
                     guard let fetchedAccount = try await AccountNetworkManager.fetchData(userId: authData.user.uid) else { return }
                     account.update(with: fetchedAccount)
                     updateLoadingMessage(to: Str.savingUser)
-                    try await AccountManager.saveCurrent(account)
-                    TODO("Fetch account's Room")
+                    saveAccountAndRoom(isLogIn: true)
                     updateError(nil)
                     ///Transition to home view
                     transitionToHomeView()
@@ -264,6 +261,30 @@ private extension AuthenticationViewModel {
                 }
             } catch {
                 updateError(MainError(type: .logIn, message: error.localizedDescription))
+            }
+        }
+    }
+
+    func saveAccountAndRoom(isLogIn: Bool) {
+        //account needed to be duplicated in order to update the account's status without transitioning to HomeView
+        let onlineAccount = account
+        onlineAccount.status = .online
+        Task {
+            do {
+                try await AccountNetworkManager.setData(account: onlineAccount)
+                try await AccountManager.saveCurrent(onlineAccount)
+
+                if isLogIn {
+                    let room = try await RoomNetworkManager.fetchRoom(onlineAccount)
+                    try await RoomManager.saveCurrent(room)
+                } else {
+                    TODO("Set account's Room with default values")
+                    let room = Room(onlineAccount)
+                    try await RoomNetworkManager.createRoom(room)
+                    try await RoomManager.saveCurrent(room)
+                }
+            } catch {
+                updateError(MainError(type: .updatingAccountOrRoom, message: error.localizedDescription))
             }
         }
     }

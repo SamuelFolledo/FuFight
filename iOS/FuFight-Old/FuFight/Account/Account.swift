@@ -18,7 +18,7 @@ class Account: ObservableObject, Codable {
     @Published private(set) var phoneNumber: String?
     @Published private(set) var createdAt: Date?
     @Published var photoUrl: URL?
-    @Published var status: Account.Status = .unfinished
+    @Published var status: Account.Status = .logOut
 
     var userId: String {
         return id!
