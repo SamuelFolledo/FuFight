@@ -46,7 +46,7 @@ final class HomeViewModel: BaseAccountViewModel {
                     AccountManager.deleteCurrent()
                     updateError(nil)
                     account.reset()
-                    account.status = .logOut
+                    account.status = .loggedOut
                     if Defaults.isSavingEmailAndPassword {
                         Defaults.savedEmailOrUsername = ""
                         Defaults.savedPassword = ""

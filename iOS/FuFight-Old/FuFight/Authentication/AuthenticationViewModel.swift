@@ -268,7 +268,7 @@ private extension AuthenticationViewModel {
     func saveAccountAndRoom(isLogIn: Bool) {
         //account needed to be duplicated in order to update the account's status without transitioning to HomeView
         let onlineAccount = account
-        onlineAccount.status = .online
+        onlineAccount.status = .loggedIn
         Task {
             do {
                 try await AccountNetworkManager.setData(account: onlineAccount)
@@ -290,7 +290,7 @@ private extension AuthenticationViewModel {
     }
 
     func transitionToHomeView() {
-        account.status = .online
+        account.status = .loggedIn
     }
 
     func resetFields() {

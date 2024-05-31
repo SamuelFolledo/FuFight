@@ -57,7 +57,7 @@ struct ContentView: View {
     //MARK: - Views
     var body: some View {
         switch account.status {
-        case .online:
+        case .loggedIn:
             ZStack(alignment: .bottom) {
                 //Go to home page
                 TabView(selection: $tab) {
@@ -84,7 +84,7 @@ struct ContentView: View {
             //Finish creating account
             createAuthenticationView(step: .onboard)
 
-        case .logOut:
+        case .loggedOut:
             //Log in
             createAuthenticationView(step: .logIn)
         }
