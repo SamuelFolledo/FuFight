@@ -72,7 +72,7 @@ final class AccountViewModel: BaseAccountViewModel {
                 AccountManager.deleteCurrent()
                 updateError(nil)
                 account.reset()
-                account.status = .logOut
+                account.status = .loggedOut
                 if Defaults.isSavingEmailAndPassword {
                     Defaults.savedEmailOrUsername = ""
                     Defaults.savedPassword = ""
@@ -136,7 +136,7 @@ final class AccountViewModel: BaseAccountViewModel {
 //MARK: - Private Methods
 private extension AccountViewModel {
     func transitionToAuthenticationView() {
-        account.status = .logOut
+        account.status = .loggedOut
         AccountManager.saveCurrent(account)
     }
 

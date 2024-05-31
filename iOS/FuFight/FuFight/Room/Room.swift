@@ -14,7 +14,7 @@ class Room: Codable {
     ///Player that owns the room
     private(set) var player: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
-    private(set) var isSearching: Bool = false
+    private(set) var status: Status = .online
 
     var isValid: Bool {
         player != nil && challengers.first != nil
@@ -31,12 +31,6 @@ class Room: Codable {
         self.player = ownerPlayer
     }
 
-    ///Room joiner/enemy initializer
-    init(roomId: String, enemyPlayer: FetchedPlayer) {
-        self.documentId = roomId
-        challengers.append(enemyPlayer)
-    }
-
     init(_ account: Account) {
         self.documentId = account.userId
         self.player = FetchedPlayer(account)
@@ -47,7 +41,7 @@ class Room: Codable {
         case player = "player"
         case challengers = "challengers"
         case ownerId = "ownerId"
-        case isSearching = "isSearching"
+        case status = "status"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -59,14 +53,15 @@ class Room: Codable {
         if !challengers.isEmpty {
             try container.encode(challengers, forKey: .challengers)
         }
-        try container.encode(isSearching, forKey: .isSearching)
+        try container.encode(status.rawValue, forKey: .status)
         try container.encode(ownerId, forKey: .ownerId)
     }
 
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)
-        self.isSearching = try values.decodeIfPresent(Bool.self, forKey: .isSearching) ?? false
+        let statusId = try values.decodeIfPresent(String.self, forKey: .status)!
+        self.status = Status(rawValue: statusId) ?? .online
         self.challengers = try values.decodeIfPresent(Array<FetchedPlayer>.self, forKey: .challengers) ?? []
         self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
     }
@@ -86,4 +81,18 @@ class Room: Codable {
 //MARK: - Private extension
 private extension Room  {
 
+}
+
+//MARK: - Custom Room Classes
+extension Room {
+    ///Status for the room owner
+    enum Status: String {
+        case online
+        case offline
+        ///searching for enemy
+        case searching
+        case gaming
+        ///during game over flow
+        case finishing
+    }
 }

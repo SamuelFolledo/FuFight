@@ -18,6 +18,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
     private var isRoomOwner: Bool = false
+    private var isEnemyFound: Bool = false
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
@@ -58,9 +59,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
                     if isRoomOwner {
                         createGame(enemyPlayer: enemyPlayer)
                     } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            self.didFindEnemy.send(self)
-                        }
+                        transitionToGameView()
                     }
                 }
             }
@@ -73,6 +72,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     override func onAppear() {
         super.onAppear()
         enemyPlayer = nil
+        updateRoomStatus(.searching)
     }
 
     override func onDisappear() {
@@ -82,9 +82,18 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         enemyPlayer = nil
         currentRoomId = nil
         subscriptions.removeAll()
+        if isEnemyFound {
+            isEnemyFound = false
+            updateRoomStatus(.gaming)
+        } else {
+            updateRoomStatus(.online)
+        }
     }
 
     //MARK: - Public Methods
+    func cancelButtonTapped() {
+        didCancel.send(self)
+    }
 }
 
 private extension GameLoadingViewModel {
@@ -126,8 +135,7 @@ private extension GameLoadingViewModel {
             do {
                 //Join someone's room by writing to their room as an enemy. Enemy in this case is the user
                 let roomId = roomIds.first!
-                let fetchedRoom = Room(roomId: roomId, enemyPlayer: player)
-                try await RoomNetworkManager.joinRoom(room: fetchedRoom)
+                try await RoomNetworkManager.joinRoom(player, roomId: roomId)
                 isRoomOwner = false
                 currentRoomId = roomId
             } catch {
@@ -188,9 +196,7 @@ private extension GameLoadingViewModel {
         Task {
             if isRoomOwner, let room {
                 try await GameNetworkManager.createGameFromRoom(room)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.didFindEnemy.send(self)
-                }
+                transitionToGameView()
             }
         }
     }
@@ -219,8 +225,25 @@ private extension GameLoadingViewModel {
                         TODO("Handle when game created is not the user")
                     }
                 } catch let error {
-                    print(error)
+                    LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
                 }
             }
+    }
+
+    func transitionToGameView() {
+        isEnemyFound = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.didFindEnemy.send(self)
+        }
+    }
+
+    func updateRoomStatus(_ status: Room.Status) {
+        Task {
+            do {
+                try await RoomNetworkManager.updateStatus(to: status, roomId: player.userId)
+            } catch let error {
+                LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
+            }
+        }
     }
 }

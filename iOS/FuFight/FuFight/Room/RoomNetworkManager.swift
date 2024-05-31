@@ -49,10 +49,16 @@ extension RoomNetworkManager {
 
     ///Fetch an available room if there's any available. Return avaialble roomIds
     static func findAvailableRooms(userId: String) async throws -> [String] {
-        let nonUserRoomFilter: Filter = .whereField("player.\(kUSERID)", isNotEqualTo: userId)
+        let isRoomSearchingFilter: Filter = .whereField(kSTATUS, isEqualTo: Room.Status.searching.rawValue)
         do {
-            let availableRooms = try await roomsDb.whereFilter(nonUserRoomFilter).limit(to: 3).getDocuments()
-            let roomIds = availableRooms.documents.compactMap { $0.documentID }
+            let availableRooms = try await roomsDb
+                .whereFilter(Filter.andFilter([
+                    isRoomSearchingFilter,
+                ]))
+                .limit(to: 3)
+                .getDocuments()
+//                .order(by: "dateAdded", descending: true)
+            let roomIds = availableRooms.documents.compactMap { $0.documentID != userId ? $0.documentID : nil }
             LOGD("Total rooms found: \(roomIds.count)")
             return roomIds
         } catch {
@@ -80,6 +86,22 @@ extension RoomNetworkManager {
         }
     }
 
+    static func updateStatus(to status: Room.Status, roomId: String) async throws {
+        do {
+            var roomDic: [String: Any] = [kSTATUS: status.rawValue]
+            switch status {
+            case .finishing, .searching:
+                break
+            case .online, .offline, .gaming:
+                roomDic[kCHALLENGERS] = FieldValue.delete()
+            }
+            try await roomsDb.document(roomId).updateData(roomDic)
+            LOGD("Player's room status is updated to: \(status.rawValue)")
+        } catch {
+            throw error
+        }
+    }
+
     ///For room owner to delete room
     static func deleteCurrentRoom(roomId: String) async throws {
         do {
@@ -90,15 +112,14 @@ extension RoomNetworkManager {
         }
     }
 
-    ///For enemy joining a room as one of the challengers
-    static func joinRoom(room: Room) async throws {
+    ///For current player to join a room as one of the challengers
+    static func joinRoom(_ player: FetchedPlayer, roomId: String) async throws {
         do {
-            let enemyPlayer = room.challengers.first!
             let enemyDic: [String: Any] = [
-                kCHALLENGERS: FieldValue.arrayUnion([try enemyPlayer.asDictionary()]),
+                kCHALLENGERS: FieldValue.arrayUnion([try player.asDictionary()]),
             ]
-            try roomsDb.document(room.ownerId).setData(from: room, merge: true)
-            LOGD("User joined someone's room as enemy with room id: \(room.ownerId)")
+            try await roomsDb.document(roomId).updateData(enemyDic)
+            LOGD("User joined someone's room as enemy with room id: \(roomId)")
         } catch {
             throw error
         }

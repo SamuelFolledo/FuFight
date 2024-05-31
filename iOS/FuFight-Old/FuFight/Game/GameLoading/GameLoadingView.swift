@@ -45,7 +45,7 @@ struct GameLoadingView: View {
 
     var cancelButton: some View {
         Button {
-            vm.didCancel.send(vm)
+            vm.cancelButtonTapped()
         } label: {
             Text("Cancel")
                 .padding(6)

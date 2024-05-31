@@ -18,7 +18,7 @@ class Account: ObservableObject, Codable {
     @Published private(set) var phoneNumber: String?
     @Published private(set) var createdAt: Date?
     @Published var photoUrl: URL?
-    @Published var status: Account.Status = .logOut
+    @Published var status: Account.Status = .loggedOut
 
     var userId: String {
         return id!
@@ -143,9 +143,9 @@ class Account: ObservableObject, Codable {
 //MARK: - Custom Account Classes
 extension Account {
     enum Status: String {
-        case online
+        case loggedIn
         ///When account is created but unfinished
         case unfinished
-        case logOut
+        case loggedOut
     }
 }
