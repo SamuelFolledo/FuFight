@@ -135,23 +135,25 @@ struct ContentView: View {
 
 private extension ContentView {
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
-        switch scenePhase {
-        case .background:
-            Task {
-                if let account = Account.current {
+        Task {
+            if let account = Account.current {
+                switch scenePhase {
+                case .background:
                     try await GameNetworkManager.deleteGame(account.userId)
-                    //TODO: Maybe save game locally in order to rejoin
-                    LOGD("App is terminated, room and game is deleted")
-                } else {
-                    LOGD("App is terminated with no account")
+                    //TODO: Maybe check and/or save game locally in order to rejoin
+                    LOGD("App is terminated, game is deleted")
+                case .inactive:
+                    LOGD("App is inactive")
+                    try await RoomNetworkManager.updateStatus(to: .offline, roomId: account.userId)
+                case .active:
+                    LOGD("App is active")
+                    try await RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
+                @unknown default:
+                    break
                 }
+            } else {
+                LOGD("App is terminated with no account")
             }
-        case .inactive:
-            LOGD("App is inactive")
-        case .active:
-            LOGD("App is active")
-        @unknown default:
-            break
         }
     }
 
