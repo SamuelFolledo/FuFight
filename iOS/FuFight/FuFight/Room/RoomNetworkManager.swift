@@ -94,8 +94,7 @@ extension RoomNetworkManager {
         case .online, .offline, .gaming:
             roomDic[kCHALLENGERS] = FieldValue.delete()
         }
-        let roomFieldsToUpdate: [String] = [kSTATUS, kCHALLENGERS]
-        roomsDb.document(roomId).setData(roomDic, mergeFields: roomFieldsToUpdate)
+        roomsDb.document(roomId).updateData(roomDic)
         LOGD("Player's room status is updated to: \(status.rawValue)")
     }
 
