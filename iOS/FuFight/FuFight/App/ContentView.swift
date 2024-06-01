@@ -135,25 +135,17 @@ struct ContentView: View {
 
 private extension ContentView {
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
-        Task {
-            if let account = Account.current {
-                switch scenePhase {
-                case .background:
-                    try await GameNetworkManager.deleteGame(account.userId)
-                    //TODO: Maybe check and/or save game locally in order to rejoin
-                    LOGD("App is terminated, game is deleted")
-                case .inactive:
-                    LOGD("App is inactive")
-                    try await RoomNetworkManager.updateStatus(to: .offline, roomId: account.userId)
-                case .active:
-                    LOGD("App is active")
-                    try await RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
-                @unknown default:
-                    break
-                }
-            } else {
-                LOGD("App is terminated with no account")
-            }
+        switch scenePhase {
+        case .background:
+            LOGD("App is backgrounded and will be terminated soon")
+            appTerminatedHandler()
+        case .inactive:
+            LOGD("App is inactive")
+        case .active:
+            LOGD("App is active")
+            appIsForegroundedHandler()
+        @unknown default:
+            break
         }
     }
 
@@ -207,6 +199,26 @@ private extension ContentView {
             .presentationDetents([.large])
             .presentationDragIndicator(.hidden)
             .transition(.move(edge: .leading))
+    }
+
+    func appTerminatedHandler() {
+        //Delete game
+        Task {
+            do {
+                try await GameNetworkManager.deleteGame(account.userId)
+            } catch let error {
+                LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
+            }
+        }
+        //Set status to offline
+        RoomNetworkManager.updateStatus(to: .offline, roomId: account.userId)
+        //TODO: Maybe check and/or save game locally in order to rejoin
+    }
+
+    func appIsForegroundedHandler() {
+        //Set status to online
+        RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
+        //TODO: Maybe check and/or save game locally in order to rejoin
     }
 }
 

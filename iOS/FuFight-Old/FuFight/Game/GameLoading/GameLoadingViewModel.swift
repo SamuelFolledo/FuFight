@@ -72,7 +72,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     override func onAppear() {
         super.onAppear()
         enemyPlayer = nil
-        updateRoomStatus(.searching)
+        RoomNetworkManager.updateStatus(to: .searching, roomId: account.userId)
     }
 
     override func onDisappear() {
@@ -84,7 +84,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         subscriptions.removeAll()
         if isEnemyFound {
             isEnemyFound = false
-            updateRoomStatus(.gaming)
+            RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
         }
     }
 
@@ -232,16 +232,6 @@ private extension GameLoadingViewModel {
         isEnemyFound = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             self.didFindEnemy.send(self)
-        }
-    }
-
-    func updateRoomStatus(_ status: Room.Status) {
-        Task {
-            do {
-                try await RoomNetworkManager.updateStatus(to: status, roomId: player.userId)
-            } catch let error {
-                LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
-            }
         }
     }
 }

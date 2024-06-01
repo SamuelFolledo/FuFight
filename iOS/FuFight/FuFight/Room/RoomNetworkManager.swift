@@ -86,20 +86,17 @@ extension RoomNetworkManager {
         }
     }
 
-    static func updateStatus(to status: Room.Status, roomId: String) async throws {
-        do {
-            var roomDic: [String: Any] = [kSTATUS: status.rawValue]
-            switch status {
-            case .finishing, .searching:
-                break
-            case .online, .offline, .gaming:
-                roomDic[kCHALLENGERS] = FieldValue.delete()
-            }
-            try await roomsDb.document(roomId).updateData(roomDic)
-            LOGD("Player's room status is updated to: \(status.rawValue)")
-        } catch {
-            throw error
+    static func updateStatus(to status: Room.Status, roomId: String) {
+        var roomDic: [String: Any] = [kSTATUS: status.rawValue]
+        switch status {
+        case .finishing, .searching:
+            break
+        case .online, .offline, .gaming:
+            roomDic[kCHALLENGERS] = FieldValue.delete()
         }
+        let roomFieldsToUpdate: [String] = [kSTATUS, kCHALLENGERS]
+        roomsDb.document(roomId).setData(roomDic, mergeFields: roomFieldsToUpdate)
+        LOGD("Player's room status is updated to: \(status.rawValue)")
     }
 
     ///For room owner to delete room
