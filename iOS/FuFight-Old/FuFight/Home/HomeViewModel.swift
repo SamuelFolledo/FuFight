@@ -40,6 +40,7 @@ final class HomeViewModel: BaseAccountViewModel {
                         LOGD("Account verified", from: HomeViewModel.self)
                         isAccountVerified = true
                         refreshPlayer()
+                        updateRoomStatus(.online)
                         return
                     }
                     LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
@@ -61,5 +62,15 @@ final class HomeViewModel: BaseAccountViewModel {
     func refreshPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
         self.player = player
+    }
+
+    func updateRoomStatus(_ status: Room.Status) {
+        Task {
+            do {
+                try await RoomNetworkManager.updateStatus(to: status, roomId: account.userId)
+            } catch let error {
+                LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
+            }
+        }
     }
 }

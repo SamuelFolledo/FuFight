@@ -85,8 +85,6 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         if isEnemyFound {
             isEnemyFound = false
             updateRoomStatus(.gaming)
-        } else {
-            updateRoomStatus(.online)
         }
     }
 
