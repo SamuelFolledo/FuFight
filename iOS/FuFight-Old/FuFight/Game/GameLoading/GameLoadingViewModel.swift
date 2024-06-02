@@ -41,7 +41,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             }
             .store(in: &subscriptions)
 
-        //After getting a room with player and enemy, create an enemyPlayer
+        //After room owner receives getting a room with player and enemy, create an enemyPlayer
         $room
             .map { room in
                 FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
@@ -217,8 +217,6 @@ private extension GameLoadingViewModel {
                     let fetchedGameAsChallenger = try snapshot.data(as: FetchedGame.self)
                     if fetchedGameAsChallenger.ownerId != player.userId {
                         enemyPlayer = fetchedGameAsChallenger.player
-                        LOGD("Challenging to a game against the room owner \(fetchedGameAsChallenger.player.username)")
-                        unsubscribe()
                     } else {
                         TODO("Handle when game created is not the user")
                     }

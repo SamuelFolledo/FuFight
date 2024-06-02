@@ -13,19 +13,20 @@ struct RoomView: View {
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
-                VStack {
-                    navigationView
+                ZStack {
+                    fighterView
 
                     VStack {
-                        movesView
+                        navigationView
 
-                        Spacer()
+                        VStack {
+                            movesView
+                        }
+                        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                        .padding()
                     }
-                    .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                    .padding()
                 }
             }
-            .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
             .overlay {
                 LoadingView(message: vm.loadingMessage)
             }
@@ -33,16 +34,6 @@ struct RoomView: View {
                 backgroundImage
                     .padding(.leading, 30)
             )
-            .safeAreaInset(edge: .bottom) {
-                VStack {
-//                    playButton
-//
-//                    offlinePlayButton
-//
-//                    practiceButton
-                }
-                .padding(.bottom)
-            }
             .navigationBarHidden(true)
             .frame(maxWidth: .infinity)
         }
@@ -56,48 +47,30 @@ struct RoomView: View {
     }
 
     var navigationView: some View {
-        HStack {
-            Spacer()
+        ZStack {
+            HStack {
+                Spacer()
 
-            Text("Edit Fighter")
-                .font(mediumTitleFont)
-                .foregroundStyle(.white)
+                Button {
+                    vm.switchButtonSelected()
+                } label: {
+                    Image(systemName: "arrow.2.squarepath")
+                        .foregroundStyle(.white)
+                }
+            }
 
-            Spacer()
+            HStack {
+                Spacer()
+
+                Text("Edit")
+                    .font(mediumTitleFont)
+                    .foregroundStyle(.white)
+
+                Spacer()
+            }
         }
         .padding(.horizontal, smallerHorizontalPadding)
     }
-
-    var accountImage: some View {
-        NavigationLink(destination: AccountView(vm: AccountViewModel(account: vm.account))) {
-            AccountImage(url: vm.account.photoUrl, radius: 30)
-        }
-    }
-
-//    var playButton: some View {
-//        Button {
-//            vm.transitionToLoading.send(vm)
-//        } label: {
-//            Image("playButton")
-//                .frame(width: 200)
-//        }
-//    }
-
-//    var offlinePlayButton: some View {
-//        Button {
-//            vm.transitionToOffline.send(vm)
-//        } label: {
-//            Text("Offline Play")
-//                .padding(6)
-//                .frame(maxWidth: .infinity)
-//                .foregroundStyle(Color(uiColor: .systemBackground))
-//                .font(.title)
-//                .background(Color(uiColor: .label))
-//                .clipShape(RoundedRectangle(cornerRadius: 16))
-//        }
-//        .padding(.horizontal)
-//        .padding(.bottom, 4)
-//    }
 
     @ViewBuilder var movesView: some View {
         if vm.player != nil {
@@ -109,7 +82,12 @@ struct RoomView: View {
                     vm.defenseSelected($0)
                 },
                 playerType: vm.playerType)
-//            .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
+        }
+    }
+
+    @ViewBuilder var fighterView: some View {
+        if vm.player != nil {
+            DaePreview(fighterType: vm.player.fighterType, animationType: vm.animationType)
         }
     }
 }

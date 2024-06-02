@@ -21,10 +21,6 @@ struct HomeView: View {
                         navigationView
 
                         VStack {
-                            Text("Welcome \(vm.account.displayName)")
-                                .font(mediumTitleFont)
-                                .foregroundStyle(.white)
-
                             Spacer()
                         }
                         .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
@@ -66,10 +62,22 @@ struct HomeView: View {
     }
 
     var navigationView: some View {
-        HStack {
-            accountImage
+        ZStack {
+            HStack {
+                accountImage
 
-            Spacer()
+                Spacer()
+            }
+            
+            HStack {
+                Spacer()
+
+                Text("Welcome \(vm.account.displayName)")
+                    .font(mediumTitleFont)
+                    .foregroundStyle(.white)
+
+                Spacer()
+            }
         }
         .padding(.horizontal, smallerHorizontalPadding)
     }
