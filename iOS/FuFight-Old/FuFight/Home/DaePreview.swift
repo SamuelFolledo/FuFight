@@ -12,8 +12,17 @@ import SceneKit
 struct DaePreview: UIViewRepresentable {
     typealias UIViewType = SCNView
 
-    var fighter: FighterType = .samuel
-    var animationType: AnimationType = .idleStand
+    var fighterType: FighterType = .samuel
+    var animationType: AnimationType = .idle
+
+    init(fighterType: FighterType, animationType: AnimationType) {
+        self.fighterType = fighterType
+        self.animationType = animationType
+    }
+
+    init() {
+        self.fighterType = Room.current?.player?.fighterType ?? .samuel
+    }
 
     func makeUIView(context: Context) -> UIViewType {
         let view = SCNView()
@@ -25,10 +34,11 @@ struct DaePreview: UIViewRepresentable {
         view.defaultCameraController.inertiaEnabled = true
         view.defaultCameraController.maximumVerticalAngle = 89
         view.defaultCameraController.minimumVerticalAngle = -89
-        let path = fighter.animationPath(animationType)
-        view.scene = SCNScene(named: path)
         return view
     }
 
-    func updateUIView(_ uiView: UIViewType, context: Context) {}
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        let path = fighterType.animationPath(animationType)
+        uiView.scene = SCNScene(named: path)
+    }
 }

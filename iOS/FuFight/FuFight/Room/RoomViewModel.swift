@@ -11,6 +11,8 @@ import SwiftUI
 final class RoomViewModel: BaseAccountViewModel {
     @Published var player: FetchedPlayer!
     @Published var path = NavigationPath()
+    @Published var animationType: AnimationType = .idle
+
     let playerType: PlayerType = .user
 
     //MARK: - Override Methods
@@ -23,21 +25,34 @@ final class RoomViewModel: BaseAccountViewModel {
     func attackSelected(_ selectedMove: any AttackProtocol) {
         let tempPlayer = player!
         tempPlayer.moves.toggleType(at: selectedMove.position)
-        guard let currentRoom = RoomManager.getCurrent() else { return }
-        currentRoom.updatePlayer(player: tempPlayer)
-        RoomManager.saveCurrent(currentRoom)
-        Task {
-            try await RoomNetworkManager.createRoom(currentRoom)
-        }
-        player = tempPlayer
+        updatePlayer(with: tempPlayer)
     }
 
     func defenseSelected(_ selectedMove: any MoveProtocol) {
 
     }
 
+    func switchButtonSelected() {
+        let updatedPlayer = player!
+        let nextFighterType: FighterType = updatedPlayer.fighterType == .clara ? .samuel : .clara
+        updatedPlayer.fighterType = nextFighterType
+        updatePlayer(with: updatedPlayer)
+    }
+}
+
+private extension RoomViewModel {
     func refreshPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
         self.player = player
+    }
+
+    func updatePlayer(with updatedPlayer: FetchedPlayer) {
+        guard let currentRoom = RoomManager.getCurrent() else { return }
+        currentRoom.updatePlayer(player: updatedPlayer)
+        Task {
+            try await RoomNetworkManager.updateOwner(updatedPlayer)
+        }
+        RoomManager.saveCurrent(currentRoom)
+        player = updatedPlayer
     }
 }

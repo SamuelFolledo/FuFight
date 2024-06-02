@@ -25,6 +25,7 @@ public let kENEMYPHOTOURL: String = "enemyPhotoUrl"
 public let kENEMYMOVES: String = "enemyMoves"
 public let kENEMYFIGHTERTYPE: String = "enemyFighterType"
 
+public let kPLAYER: String = "player"
 public let kCHALLENGERS: String = "challengers"
 public let kOWNERID: String = "ownerId"
 public let kSTATUS: String = "status"

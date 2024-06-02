@@ -36,17 +36,6 @@ extension RoomNetworkManager {
         }
     }
 
-//    static func updateRoom(_ room: Room) async throws {
-//        do {
-//            let userId = room.player!.userId
-//            let roomDocument = roomsDb.document(userId)
-//            try await roomDocument.updateData(roomDocument.asDictionary())
-//            LOGD("Room updated for roomId: \(userId)")
-//        } catch {
-//            throw error
-//        }
-//    }
-
     ///Fetch an available room if there's any available. Return avaialble roomIds
     static func findAvailableRooms(userId: String) async throws -> [String] {
         let isRoomSearchingFilter: Filter = .whereField(kSTATUS, isEqualTo: Room.Status.searching.rawValue)
@@ -121,12 +110,12 @@ extension RoomNetworkManager {
         }
     }
 
-    ///For enemy to leave a room
-    static func leaveRoom(_ room: Room?) async throws {
-        guard let room else { return }
+    ///Updates room's owner in the database
+    static func updateOwner(_ player: FetchedPlayer) async throws {
         do {
-            try roomsDb.document(room.ownerId).setData(from: room, merge: true)
-            LOGD("User left room as enemy with room id: \(room.ownerId)")
+            let roomDocument = roomsDb.document(player.userId)
+            try await roomDocument.updateData([kPLAYER: player.asDictionary()])
+            LOGD("Room's owner is updated successfully: \(player.username)")
         } catch {
             throw error
         }

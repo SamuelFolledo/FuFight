@@ -34,6 +34,7 @@ class FetchedPlayer: PlayerProtocol {
         self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
         self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
         self.fighterType = !isRoomOwner ? player.fighterType : enemyPlayer.fighterType
+        LOGD("Fighter type for enemy is \(!isRoomOwner ? player.fighterType : enemyPlayer.fighterType)")
     }
 
     ///Default value/initializer for FetchedPlayer from current logged in account
@@ -41,8 +42,12 @@ class FetchedPlayer: PlayerProtocol {
         self.userId = account.userId
         self.username = account.username!
         self.photoUrl = account.photoUrl!
-        self.fighterType = .samuel
-        self.moves = Moves(attacks: Punch.allCases.compactMap { Attack($0) }, defenses: Dash.allCases.compactMap { Defense($0) })
+        let room = Room.current
+        self.fighterType = room?.player?.fighterType ?? .samuel
+        let attacks = room?.player?.moves.attacks ?? defaultAllPunchAttacks
+        let defenses = room?.player?.moves.defenses ?? defaultAllDashDefenses
+        self.moves = Moves(attacks: attacks, defenses: defenses)
+        LOGD("Fighter type for enemy is \(room?.player?.fighterType ?? .samuel)")
     }
 
     required init(from decoder: Decoder) throws {
@@ -53,8 +58,7 @@ class FetchedPlayer: PlayerProtocol {
         self.photoUrl = try values.decodeIfPresent(URL.self, forKey: .photoUrl)!
         self.moves = try values.decodeIfPresent(Moves.self, forKey: .moves)!
         let fighterId = try values.decodeIfPresent(String.self, forKey: .fighterType)!
-        let fighterType = FighterType(rawValue: fighterId)!
-        self.fighterType = fighterType
+        self.fighterType = FighterType(rawValue: fighterId)!
     }
 }
 

@@ -48,8 +48,15 @@ class RoomManager {
             return room.player
         } else if let account = Account.current {
             saveCurrent(Room(account))
+            return getPlayer()
         }
-        return getCurrent()?.player
+        return nil
+    }
+
+    static func savePlayer(player: FetchedPlayer) {
+        guard let room = getCurrent() else { return }
+        room.updatePlayer(player: player)
+        saveCurrent(room)
     }
 
     static func deleteCurrent() {
