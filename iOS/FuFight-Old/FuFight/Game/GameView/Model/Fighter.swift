@@ -118,8 +118,9 @@ class Fighter {
         currentAnimation = nil
         if animationType.isKillAnimationType {
             //Pause fighter's animations after playing the kill animation. Reduce duration by 0.2 to not let the fighter stand back up
-            runAfterDelay(delay: player.animation.duration - 0.2) {
-                self.pauseAnimations()
+            runAfterDelay(delay: player.animation.duration - 0.2) { [weak self] in
+                guard let self else { return }
+                pauseAnimations()
             }
         }
     }

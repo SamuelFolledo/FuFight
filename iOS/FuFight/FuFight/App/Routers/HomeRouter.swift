@@ -71,7 +71,7 @@ class HomeRouter: ObservableObject {
     }
 
     func transitionTo(route: GameRoute, vm: HomeViewModel) {
-        let player = Player(fetchedPlayer: vm.player!, isEnemy: true)
+        let player = Player(fetchedPlayer: vm.player!, isEnemy: false)
         switch route {
         case .onlineGame:
             //show loading and let loading handle transition to online game
@@ -120,7 +120,7 @@ class HomeRouter: ObservableObject {
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
         if let enemyPlayer = vm.enemyPlayer {
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: Player(fetchedPlayer: vm.player, isEnemy: true), enemyPlayer: Player(fetchedPlayer: enemyPlayer, isEnemy: false))))
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: Player(fetchedPlayer: vm.player, isEnemy: false), enemyPlayer: Player(fetchedPlayer: enemyPlayer, isEnemy: true))))
         }
     }
 

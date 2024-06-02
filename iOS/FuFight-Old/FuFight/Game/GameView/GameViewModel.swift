@@ -84,8 +84,9 @@ class GameViewModel: BaseViewModel {
         if isPracticeMode,
            let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemyPlayer.fighter.fighterType, attackResult: attackResult) {
             playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
-                runAfterDelay(delay: 0.3) {
-                    self.enemyPlayer?.fighter.showResult(attackResult)
+                runAfterDelay(delay: 0.3) { [weak self] in
+                    guard let self else { return }
+                    enemyPlayer.fighter.showResult(attackResult)
                 }
             }
         }
@@ -172,16 +173,17 @@ private extension GameViewModel {
         attackingHandler(isFasterAttacker: true)
 
         //2. Apply and play second attacker's animations after a delay
-        runAfterDelay(delay: secondAttackerDelay) {
-            if self.isDefenderAlive {
-                self.attackingHandler(isFasterAttacker: false)
+        runAfterDelay(delay: secondAttackerDelay) { [weak self] in
+            guard let self else { return }
+            if isDefenderAlive {
+                attackingHandler(isFasterAttacker: false)
 
-                if self.isDefenderAlive {
-                    self.createNewRound()
+                if isDefenderAlive {
+                    createNewRound()
                     return
                 }
             }
-            self.updateState(.gameOver)
+            updateState(.gameOver)
         }
     }
 
