@@ -71,25 +71,14 @@ class HomeRouter: ObservableObject {
     }
 
     func transitionTo(route: GameRoute, vm: HomeViewModel) {
-        let player = Player(fetchedPlayer: vm.player!, isEnemy: false)
         switch route {
         case .onlineGame:
             //show loading and let loading handle transition to online game
-            if let enemyPlayer = vm.enemyPlayer {
-                TODO("Handle returning to current online game for \(player.username) vs \(enemyPlayer.username)")
-            } else {
-//                let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(player: vm.player!,
-//                                                                          enemyPlayer: nil,
-//                                                                          account: vm.account))
-                let nextVm: HomeRoute = .loading(vm: makeLoadingViewModel(account: vm.account))
-                navigationPath.append(nextVm)
-            }
-        case .offlineGame:
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, 
-                                                              player: player,
-                                                              enemyPlayer: fakeEnemyPlayer)))
-        case .practice:
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: true, 
+            navigationPath.append(.loading(vm: makeLoadingViewModel(account: vm.account)))
+        case .offlineGame, .practice:
+            let isPracticeMode = route == .practice
+            let player = Player(fetchedPlayer: vm.player!, isEnemy: false, initiallyHasSpeedBoost: true)
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: isPracticeMode,
                                                               player: player,
                                                               enemyPlayer: fakeEnemyPlayer)))
         }
@@ -120,7 +109,10 @@ class HomeRouter: ObservableObject {
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
         if let enemyPlayer = vm.enemyPlayer {
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: Player(fetchedPlayer: vm.player, isEnemy: false), enemyPlayer: Player(fetchedPlayer: enemyPlayer, isEnemy: true))))
+            let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
+            let player = Player(fetchedPlayer: vm.player, isEnemy: false, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
+            let enemy = Player(fetchedPlayer: enemyPlayer, isEnemy: true, initiallyHasSpeedBoost: !initiallyHasSpeedBoost)
+            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: player, enemyPlayer: enemy)))
         }
     }
 

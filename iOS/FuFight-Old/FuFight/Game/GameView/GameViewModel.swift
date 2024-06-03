@@ -131,9 +131,6 @@ class GameViewModel: BaseViewModel {
 //MARK: - Private Methods
 private extension GameViewModel {
     func startNewGame() {
-        let hasSpeedBoost = Bool.random()
-        player.state.setSpeedBoost(to: hasSpeedBoost)
-        enemyPlayer?.state.setSpeedBoost(to: !hasSpeedBoost)
         isDefenderAlive = true
         createNewRound()
     }

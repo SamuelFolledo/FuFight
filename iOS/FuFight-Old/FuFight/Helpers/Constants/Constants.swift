@@ -122,7 +122,7 @@ let fakePlayer = Player(userId: "fakePlayer",
                         hp: defaultMaxHp,
                         maxHp: defaultMaxHp,
                         fighter: Fighter(type: .samuel, isEnemy: false),
-                        state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+                        state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                         moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              photoUrl: fakePhotoUrl,
@@ -130,7 +130,7 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
                              fighter: Fighter(type: .clara, isEnemy: true),
-                             state: PlayerState(boostLevel: .none, hasSpeedBoost: false),
+                             state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
 //MARK: - Constant Methods
