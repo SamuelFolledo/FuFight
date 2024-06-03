@@ -28,6 +28,7 @@ public let kENEMYFIGHTERTYPE: String = "enemyFighterType"
 public let kPLAYER: String = "player"
 public let kCHALLENGERS: String = "challengers"
 public let kOWNERID: String = "ownerId"
+public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
 public let kSTATUS: String = "status"
 
 public let kEMAIL: String = "email"

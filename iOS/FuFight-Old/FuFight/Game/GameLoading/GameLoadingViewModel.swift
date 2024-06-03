@@ -9,14 +9,35 @@ import SwiftUI
 import Combine
 import FirebaseFirestore
 
+/*
+ GameLoadingViewModel flow
+ 1. Look for rooms with status == .searching
+    - If no rooms found, player becomes the room/game owner and waits for challengers. Room owner will be in charge of setting if player or enemyPlayer has the initialSpeedBoost and creating the Game document
+    - If rooms found, player becomes a room/game owner's challenger
+ 2a) Room owner flow
+    - For room owner, listen to their Room Firestore challengers joining
+    - When challenger has been added to Room, create a Game document for both players
+    - Transition to GameView
+ 2b) Room challenger
+    - For room challenger, listen to owner's Game Firestore creation
+    - Transition to GameView
+
+ TODOs
+ [] Challengers should update the room's status (i.e. pendingOpponent)
+ [] Maybe, both players should listen Game changes along with the start time
+ */
+
 final class GameLoadingViewModel: BaseAccountViewModel {
     @Published var room: Room?
+    ///Currently logged in player
     @Published var player: FetchedPlayer
     @Published var enemyPlayer: FetchedPlayer?
     @Published var currentRoomId: String?
     let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
+    ///Set this to true if current player is first when the game begins
+    var initiallyHasSpeedBoost: Bool = false
     private var isRoomOwner: Bool = false
     private var isEnemyFound: Bool = false
     private var listener: ListenerRegistration?
@@ -44,18 +65,18 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         //After room owner receives getting a room with player and enemy, create an enemyPlayer
         $room
             .map { room in
-                FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
+                guard let room,
+                      room.isValid else { return nil }
+                return FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
             }
             .assign(to: \.enemyPlayer, on: self)
             .store(in: &subscriptions)
 
         //After receiving creating an enemyPlayer, go to GameView
         $enemyPlayer
-            .delay(for: 0.1, scheduler: RunLoop.main) // helps reduce the visual jank and this vm's enemyPlayer has been set
+            .delay(for: 0.25, scheduler: RunLoop.main)
             .sink { [weak self] enemyPlayer in
                 if let self, let enemyPlayer {
-                    //stop subscribing to changes on the room
-                    unsubscribe()
                     if isRoomOwner {
                         createGame(enemyPlayer: enemyPlayer)
                     } else {
@@ -86,6 +107,8 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             isEnemyFound = false
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
         }
+        initiallyHasSpeedBoost = false
+        isRoomOwner = false
     }
 
     //MARK: - Public Methods
@@ -157,12 +180,13 @@ private extension GameLoadingViewModel {
         guard isRoomOwner,
             let currentRoomId
         else { return }
-        LOGD("Subscribing to room changes as owner")
         let query = roomsDb.document(currentRoomId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
-                if let snapshot, snapshot.exists {
+                if let snapshot,
+                    snapshot.exists,
+                   !snapshot.metadata.hasPendingWrites {
                     do {
                         let fetchedOwnedRoom = try snapshot.data(as: Room.self)
                         if fetchedOwnedRoom.isValid {
@@ -183,17 +207,14 @@ private extension GameLoadingViewModel {
         if isOwner {
             room = gameRoom
             updateLoadingMessage(to: "Waiting for opponent")
-            if gameRoom.isValid {
-                LOGD("Valid game room against enemyPlayer \(gameRoom.challengers.first!.username)")
-                self.enemyPlayer = gameRoom.challengers.first!
-            }
         }
     }
 
     func createGame(enemyPlayer: FetchedPlayer) {
         Task {
             if isRoomOwner, let room {
-                try await GameNetworkManager.createGameFromRoom(room)
+                initiallyHasSpeedBoost = Bool.random()
+                try await GameNetworkManager.createGameFromRoom(room, ownerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
                 transitionToGameView()
             }
         }
@@ -213,12 +234,12 @@ private extension GameLoadingViewModel {
                 do {
                     guard let self,
                           let snapshot,
-                          snapshot.exists else { return }
+                          snapshot.exists,
+                          !snapshot.metadata.hasPendingWrites else { return }
                     let fetchedGameAsChallenger = try snapshot.data(as: FetchedGame.self)
-                    if fetchedGameAsChallenger.ownerId != player.userId {
+                    if fetchedGameAsChallenger.enemyPlayer.userId == player.userId {
+                        initiallyHasSpeedBoost = !fetchedGameAsChallenger.ownerInitiallyHasSpeedBoost
                         enemyPlayer = fetchedGameAsChallenger.player
-                    } else {
-                        TODO("Handle when game created is not the user")
                     }
                 } catch let error {
                     LOGE(error.localizedDescription, from: GameLoadingViewModel.self)

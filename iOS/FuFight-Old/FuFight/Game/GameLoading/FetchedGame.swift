@@ -12,6 +12,15 @@ struct FetchedGame {
     var ownerId: String { documentId! }
     private(set) var player: FetchedPlayer
     private(set) var enemyPlayer: FetchedPlayer
+    let ownerInitiallyHasSpeedBoost: Bool
+
+    ///Initializer for the owner
+    init(player: FetchedPlayer, enemyPlayer: FetchedPlayer, ownerInitiallyHasSpeedBoost: Bool) {
+        self.documentId = player.userId
+        self.player = player
+        self.enemyPlayer = enemyPlayer
+        self.ownerInitiallyHasSpeedBoost = ownerInitiallyHasSpeedBoost
+    }
 }
 
 //MARK: - Codable extension
@@ -20,6 +29,7 @@ extension FetchedGame: Codable {
         case ownerId = "ownerId"
         case player = "userPlayer"
         case enemyPlayer = "enemyPlayer"
+        case ownerInitiallyHasSpeedBoost = "ownerInitiallyHasSpeedBoost"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -27,6 +37,7 @@ extension FetchedGame: Codable {
         try container.encode(ownerId, forKey: .ownerId)
         try container.encode(player, forKey: .player)
         try container.encode(enemyPlayer, forKey: .enemyPlayer)
+        try container.encode(ownerInitiallyHasSpeedBoost, forKey: .ownerInitiallyHasSpeedBoost)
     }
 
     init(from decoder: Decoder) throws {
@@ -34,5 +45,6 @@ extension FetchedGame: Codable {
         self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
         self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)!
         self.enemyPlayer = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemyPlayer)!
+        self.ownerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .ownerInitiallyHasSpeedBoost)!
     }
 }

@@ -12,9 +12,9 @@ struct PlayerState {
     ///Keeps track of which player gets the speed boost next round. True if current player attacked first and landed it
     private(set) var hasSpeedBoost: Bool //TODO: Multiplayer game mode should be synced between games
 
-    init(boostLevel: BoostLevel, hasSpeedBoost: Bool) {
+    init(boostLevel: BoostLevel, initiallyHasSpeedBoost: Bool) {
         self.boostLevel = boostLevel
-        self.hasSpeedBoost = hasSpeedBoost
+        self.hasSpeedBoost = initiallyHasSpeedBoost
     }
 
     mutating func upgradeBoost() {
@@ -71,7 +71,7 @@ class Player: PlayerProtocol {
     }
 
     ///Room owner's initializer
-    init(fetchedPlayer: FetchedPlayer, isEnemy: Bool) {
+    init(fetchedPlayer: FetchedPlayer, isEnemy: Bool, initiallyHasSpeedBoost: Bool) {
         self.photoUrl = fetchedPlayer.photoUrl
         self.username = fetchedPlayer.username
         self.userId = fetchedPlayer.userId
@@ -82,8 +82,7 @@ class Player: PlayerProtocol {
         self.rounds = []
         self.speed = 0
         self.isEnemy = isEnemy
-        //TODO: hasSpeedBoost should not be false
-        self.state = .init(boostLevel: .none, hasSpeedBoost: false)
+        self.state = PlayerState(boostLevel: .none, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
     }
 
     func loadAnimations() {
@@ -133,6 +132,8 @@ class Player: PlayerProtocol {
         state.resetBoost()
         moves.resetMoves()
         fighter.resumeAnimations()
+        //TODO: sync initiallyHasSpeedBoost with enemy when playing an online game. Or restart the whole GameView
+        state = PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false)
     }
 }
 
