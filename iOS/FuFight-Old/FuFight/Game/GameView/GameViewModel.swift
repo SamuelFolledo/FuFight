@@ -27,7 +27,7 @@ class GameViewModel: BaseViewModel {
     @Published var state: GameState
     @Published var player: Player
     @Published var enemyPlayer: Player?
-    let isPracticeMode: Bool
+    let gameMode: GameRoute
 
     let didExitGame = PassthroughSubject<GameViewModel, Never>()
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -38,9 +38,9 @@ class GameViewModel: BaseViewModel {
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
 
-    init(isPracticeMode: Bool, player: Player, enemyPlayer: Player) {
+    init(player: Player, enemyPlayer: Player, gameMode: GameRoute) {
         self.state = .starting
-        self.isPracticeMode = isPracticeMode
+        self.gameMode = gameMode
         self.player = player
         self.enemyPlayer = enemyPlayer
         super.init()
@@ -81,14 +81,19 @@ class GameViewModel: BaseViewModel {
               let selectedAttack = Attack(moveId: selectedMove.id) else { return }
         isEnemy ? enemyPlayer.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
         let attackResult = AttackResult.damage(20)
-        if isPracticeMode,
-           let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemyPlayer.fighter.fighterType, attackResult: attackResult) {
-            playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
-                runAfterDelay(delay: 0.3) { [weak self] in
-                    guard let self else { return }
-                    enemyPlayer.fighter.showResult(attackResult)
+        switch gameMode {
+        case .practice:
+            //Play that attack's animation
+            if let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemyPlayer.fighter.fighterType, attackResult: attackResult) {
+                playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
+                    runAfterDelay(delay: 0.3) { [weak self] in
+                        guard let self else { return }
+                        enemyPlayer.fighter.showResult(attackResult)
+                    }
                 }
             }
+        case .onlineGame, .offlineGame:
+            break
         }
     }
 
@@ -153,13 +158,22 @@ private extension GameViewModel {
          TODO: Listen to enemy's move's changes
          TODO: Fetch enemy's moves if available
         */
-        if isTestingEnvironment {
-            //TODO: Remove this auto generated enemy round
+        switch gameMode {
+        case .offlineGame:
             enemyPlayer?.moves.randomlySelectMoves()
+        case .onlineGame:
+            TODO("Fetch enemy's moves and set them as selected")
+        case .practice:
+            break
         }
+
         enemyPlayer?.populateSelectedMovesAndSpeed()
         player.populateSelectedMovesAndSpeed()
-        if !isPracticeMode {
+        
+        switch gameMode {
+        case .practice:
+            break
+        case .onlineGame, .offlineGame:
             damageAndAnimate()
         }
     }

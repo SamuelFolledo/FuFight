@@ -76,11 +76,10 @@ class HomeRouter: ObservableObject {
             //show loading and let loading handle transition to online game
             navigationPath.append(.loading(vm: makeLoadingViewModel(account: vm.account)))
         case .offlineGame, .practice:
-            let isPracticeMode = route == .practice
             let player = Player(fetchedPlayer: vm.player!, isEnemy: false, initiallyHasSpeedBoost: true)
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: isPracticeMode,
-                                                              player: player,
-                                                              enemyPlayer: fakeEnemyPlayer)))
+            navigationPath.append(.game(vm: makeGameViewModel(player: player,
+                                                              enemyPlayer: fakeEnemyPlayer,
+                                                              gameMode: route)))
         }
     }
 
@@ -112,13 +111,13 @@ class HomeRouter: ObservableObject {
             let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
             let player = Player(fetchedPlayer: vm.player, isEnemy: false, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
             let enemy = Player(fetchedPlayer: enemyPlayer, isEnemy: true, initiallyHasSpeedBoost: !initiallyHasSpeedBoost)
-            navigationPath.append(.game(vm: makeGameViewModel(isPracticeMode: false, player: player, enemyPlayer: enemy)))
+            navigationPath.append(.game(vm: makeGameViewModel(player: player, enemyPlayer: enemy, gameMode: .onlineGame)))
         }
     }
 
     //MARK: - GameView Methods
-    func makeGameViewModel(isPracticeMode: Bool, player: Player, enemyPlayer: Player) -> GameViewModel {
-        let vm = GameViewModel(isPracticeMode: isPracticeMode, player: player, enemyPlayer: enemyPlayer)
+    func makeGameViewModel(player: Player, enemyPlayer: Player, gameMode: GameRoute) -> GameViewModel {
+        let vm = GameViewModel(player: player, enemyPlayer: enemyPlayer, gameMode: gameMode)
         vm.didExitGame
             .sink(receiveValue: didExitGame)
             .store(in: &subscriptions)
