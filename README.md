@@ -1,6 +1,33 @@
 # FuFight
 
-Welcome to Samuel Folledo's multiplayer turn-based iOS game. This is a side project using the latest and best practices in SwiftUI and SceneKit for the UI components, and Firebase for authentication, database, and storage. Collada (.dae) files are used to represent a 3D character, animations, and environments.
+Multiplayer turn-based 3D fighting game for iOS
+
+This project is my attempt to use the best and newest practices in Swift and popular third party libraries; Combine, Firebase (Firestore, Authentication, Storage, Crashlytics), and uses MVVM pattern.
+
+## Technologies
+1. Collada (.dae files) for 3D models and animations. Animations were downloaded from Adobe's [Mixamo](https://www.mixamo.com/) by uploading the character's .fbx file
+2. Swift
+    - App is mostly in SwiftUI, however, UIKit is required for SceneKit    
+    - [SceneKit](https://developer.apple.com/documentation/scenekit) is Apple's 3D rendering engine
+    - [Combine](https://developer.apple.com/documentation/combine) is Apple's framework to handle asynchronous events declaratively
+    - MVVM pattern, common SwiftUI pattern
+    - [Router](https://davidgarywood.com/writing/swiftui-router-pattern/) pattern in charge of handling navigations and creating views which allows flexibility and testability
+    - [Codable](https://developer.apple.com/documentation/swift/codable) mapping JSON or dictionaries into a Swift object
+    - `async` and `try await` handling background tasks asynchronously
+    - `Result` for error handling
+
+3. Firebase
+    - Firebase Firestore for database
+        - Used Firebase's new property wrappers `@DocumentID`, `@ServerTimestamp`, `@FirestoreQuery`
+    - Firebase Authentication for authenticating users. This app also features:
+        - Register and log in accounts
+        - Forgot email and password
+        - Email/username authentication
+        - Assign profile picture
+        - Update unique username
+        - Remember email/username and password
+        - Reonboard unfinished account registration
+    - Firebase Storage for storing user's photo and other files
 
 ## Set up
 1. Download repo
