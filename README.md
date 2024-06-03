@@ -32,8 +32,17 @@ This project is my attempt to use the best and newest practices in Swift and pop
 ## Set up
 1. Download repo
 2. Download Swift Packages by going to File -> Add Packages and paste the links below
-    - Firebase SDKs: https://github.com/firebase/firebase-ios-sdk
     - FLAnimatedImage (for GIFs): https://github.com/Flipboard/FLAnimatedImage
+    - Firebase SDKs: https://github.com/firebase/firebase-ios-sdk
+        - Make sure Add to Target's project these followung Package Products:
+            1. FirebaseAuth
+            2. FirebaseCrashlytics
+            3. FirebaseFirestore
+            4. FirebaseFirestoreSwift
+            5. FirebaseStorage
+3. Add GoogleService-Info.plist to the Xcode project by either:
+    1. Contact samuelfolledo@gmail.com for a copy of the file
+    2. Create your own Firebase project [here](https://console.firebase.google.com/u/0/) and download its GoogleService-Info.plist into your Xcode project. Ensure to enable Firestore, Storage, and Authentication for email and password in the Firebase project
 
 ## Game Demo
 

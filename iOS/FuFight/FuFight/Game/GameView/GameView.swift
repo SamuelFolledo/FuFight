@@ -27,7 +27,7 @@ struct GameView: View {
         }
         .background {
             if let enemyPlayer = vm.enemyPlayer {
-                GameSceneView(fighter: vm.player.fighter, enemyFighter: enemyPlayer.fighter, isPracticeMode: vm.isPracticeMode)
+                GameSceneView(fighter: vm.player.fighter, enemyFighter: enemyPlayer.fighter, isPracticeMode: vm.gameMode == .practice)
                     .ignoresSafeArea()
             }
         }
@@ -121,6 +121,6 @@ private extension GameView {
 
 #Preview {
     NavigationView {
-        GameView(vm: GameViewModel(isPracticeMode: true, player: fakePlayer, enemyPlayer: fakeEnemyPlayer))
+        GameView(vm: GameViewModel(player: fakePlayer, enemyPlayer: fakeEnemyPlayer, gameMode: .offlineGame))
     }
 }
