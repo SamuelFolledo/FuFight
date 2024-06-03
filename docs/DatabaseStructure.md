@@ -2,16 +2,22 @@
 
 ## Game
 
-- Lobbies = will contain a list of players looking for an opponent
-    - lobbyId/p1Id, p1FighterType, p1Moves, p1Rating
+- Rooms = will contain user's public information and for match making
+    - /userId
+        - ownerId
+        - status (online, offline, gaming, searching, etc.)
+        - player: FetchedPlayer
+        - challengers: [FetchedPlayer]
+    
 - Games = will contain a list of games currently happening between 2 players
     - /lobbyId
+        - ownerInitiallyHasSpeedBoost
+        - player
+        - enemyPlayer
         - /Rounds
             - /roundNumber
                 - createdAt, p1SelectedMoves, p2SelectedMoves
-        - p1Id, p2Id
-        - p1Moves, p2Moves
-        - p1FighterType, p2FighterType
+
 - Histories = will contain a list of game history results
     - /userId/History/lobbyIds
         - enemyId, username, winnerId (or didWin boolean), winnerHpLeft, roundNumber, experienceGained, createDate,
