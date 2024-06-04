@@ -8,16 +8,16 @@
 import FirebaseFirestore
 
 ///Represent a single Room in the database. This class represents the public data for an Account
-class Room: Codable {
+class Room: Identifiable, Equatable, Codable {
     @DocumentID private var documentId: String?
     var ownerId: String { documentId! }
     ///Player that owns the room
-    private(set) var player: FetchedPlayer?
+    private(set) var owner: FetchedPlayer?
     private(set) var challengers: [FetchedPlayer] = []
     private(set) var status: Status = .online
 
     var isValid: Bool {
-        player != nil && challengers.first != nil
+        owner != nil && challengers.first != nil
     }
 
     ///Returns the currently signed in account's room
@@ -28,17 +28,17 @@ class Room: Codable {
     ///Room owner initializer
     init(ownerPlayer: FetchedPlayer) {
         self.documentId = ownerPlayer.userId
-        self.player = ownerPlayer
+        self.owner = ownerPlayer
     }
 
     init(_ account: Account) {
         self.documentId = account.userId
-        self.player = FetchedPlayer(account)
+        self.owner = FetchedPlayer(account)
     }
 
     //MARK: - Codable Requirements
     private enum CodingKeys : String, CodingKey {
-        case player = "player"
+        case owner = "owner"
         case challengers = "challengers"
         case ownerId = "ownerId"
         case status = "status"
@@ -47,8 +47,8 @@ class Room: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         //This if let prevents writes to the database where the value is null
-        if let player {
-            try container.encode(player, forKey: .player)
+        if let owner {
+            try container.encode(owner, forKey: .owner)
         }
         if !challengers.isEmpty {
             try container.encode(challengers, forKey: .challengers)
@@ -59,11 +59,16 @@ class Room: Codable {
 
     required init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)
+        self.owner = try values.decodeIfPresent(FetchedPlayer.self, forKey: .owner)
         let statusId = try values.decodeIfPresent(String.self, forKey: .status)!
         self.status = Status(rawValue: statusId) ?? .online
         self.challengers = try values.decodeIfPresent(Array<FetchedPlayer>.self, forKey: .challengers) ?? []
         self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
+    }
+    
+    //MARK: Equatable and Identifiable requirements
+    static func == (lhs: Room, rhs: Room) -> Bool {
+        lhs.ownerId == rhs.ownerId
     }
 
     //MARK: - Public Methods
@@ -73,8 +78,8 @@ class Room: Codable {
         }
     }
 
-    func updatePlayer(player: FetchedPlayer?) {
-        self.player = player
+    func updateOwner(owner: FetchedPlayer?) {
+        self.owner = owner
     }
 }
 

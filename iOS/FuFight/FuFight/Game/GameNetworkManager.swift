@@ -17,11 +17,11 @@ class GameNetworkManager {
 //MARK: - Game methods
 extension GameNetworkManager {
     static func createGameFromRoom(_ room: Room, ownerInitiallyHasSpeedBoost: Bool) async throws {
-        guard let player = room.player, let enemyPlayer = room.challengers.first else { return }
+        guard let owner = room.owner, let enemy = room.challengers.first else { return }
         do {
-            let game = FetchedGame(player: player, enemyPlayer: enemyPlayer, ownerInitiallyHasSpeedBoost: ownerInitiallyHasSpeedBoost)
-            try await gamesDb.document(player.userId).setData(game.asDictionary())
-            LOGD("Room owner created a Game document against \(enemyPlayer.username). With owner has initial speed boost? \(game.ownerInitiallyHasSpeedBoost)")
+            let game = FetchedGame(owner: owner, enemy: enemy, ownerInitiallyHasSpeedBoost: ownerInitiallyHasSpeedBoost)
+            try await gamesDb.document(owner.userId).setData(game.asDictionary())
+            LOGD("Room owner created a Game document against \(enemy.username). With owner has initial speed boost? \(game.ownerInitiallyHasSpeedBoost)")
         } catch {
             throw error
         }

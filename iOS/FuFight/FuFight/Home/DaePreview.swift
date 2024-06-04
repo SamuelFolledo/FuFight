@@ -21,7 +21,7 @@ struct DaePreview: UIViewRepresentable {
     }
 
     init() {
-        self.fighterType = Room.current?.player?.fighterType ?? .samuel
+        self.fighterType = Room.current?.owner?.fighterType ?? .samuel
     }
 
     func makeUIView(context: Context) -> UIViewType {

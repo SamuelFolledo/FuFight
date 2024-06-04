@@ -76,9 +76,9 @@ class HomeRouter: ObservableObject {
             //show loading and let loading handle transition to online game
             navigationPath.append(.loading(vm: makeLoadingViewModel(account: vm.account)))
         case .offlineGame, .practice:
-            let player = Player(fetchedPlayer: vm.player!, isEnemy: false, initiallyHasSpeedBoost: true)
+            let player = Player(fetchedPlayer: vm.player!, isEnemy: false, isGameOwner: true, initiallyHasSpeedBoost: true)
             navigationPath.append(.game(vm: makeGameViewModel(player: player,
-                                                              enemyPlayer: fakeEnemyPlayer,
+                                                              enemy: fakeEnemyPlayer,
                                                               gameMode: route)))
         }
     }
@@ -107,17 +107,16 @@ class HomeRouter: ObservableObject {
     }
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
-        if let enemyPlayer = vm.enemyPlayer {
-            let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
-            let player = Player(fetchedPlayer: vm.player, isEnemy: false, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
-            let enemy = Player(fetchedPlayer: enemyPlayer, isEnemy: true, initiallyHasSpeedBoost: !initiallyHasSpeedBoost)
-            navigationPath.append(.game(vm: makeGameViewModel(player: player, enemyPlayer: enemy, gameMode: .onlineGame)))
-        }
+        guard let enemy = vm.enemy else { return }
+        let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
+        let player = Player(fetchedPlayer: vm.player, isEnemy: false, isGameOwner: vm.isRoomOwner, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
+        let enemyPlayer = Player(fetchedPlayer: enemy, isEnemy: true, isGameOwner: !vm.isRoomOwner, initiallyHasSpeedBoost: !initiallyHasSpeedBoost)
+        navigationPath.append(.game(vm: makeGameViewModel(player: player, enemy: enemyPlayer, gameMode: .onlineGame)))
     }
 
     //MARK: - GameView Methods
-    func makeGameViewModel(player: Player, enemyPlayer: Player, gameMode: GameRoute) -> GameViewModel {
-        let vm = GameViewModel(player: player, enemyPlayer: enemyPlayer, gameMode: gameMode)
+    func makeGameViewModel(player: Player, enemy: Player, gameMode: GameRoute) -> GameViewModel {
+        let vm = GameViewModel(player: player, enemy: enemy, gameMode: gameMode)
         vm.didExitGame
             .sink(receiveValue: didExitGame)
             .store(in: &subscriptions)

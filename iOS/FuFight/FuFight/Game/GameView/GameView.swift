@@ -26,10 +26,8 @@ struct GameView: View {
             createPlayerView(for: .user)
         }
         .background {
-            if let enemyPlayer = vm.enemyPlayer {
-                GameSceneView(fighter: vm.player.fighter, enemyFighter: enemyPlayer.fighter, isPracticeMode: vm.gameMode == .practice)
-                    .ignoresSafeArea()
-            }
+            GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemy.fighter, isPracticeMode: vm.gameMode == .practice)
+                .ignoresSafeArea()
         }
         .alert(title: vm.alertTitle,
                message: vm.alertMessage,
@@ -73,37 +71,33 @@ struct GameView: View {
 
     ///Returns the player's view including player's name, photo, and HP, and damages
     @ViewBuilder func createPlayerView(for playerType: PlayerType) -> some View {
-        if let enemy = vm.enemyPlayer {
-            let player = playerType.isEnemy ? enemy : vm.player
-            let enemyPlayer = playerType.isEnemy ? vm.player : enemy
-            PlayerView(player: player,
-                       enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
-                       onImageTappedAction: {
-                if playerType == .user {
-                    vm.isGamePaused = true
-                }
-            })
-            .padding(.horizontal)
-            .padding(.top, playerType.isEnemy ? 0 : 8)
-        }
+        let player = playerType.isEnemy ? vm.enemy : vm.player
+        let enemyPlayer = playerType.isEnemy ? vm.player : vm.enemy
+        PlayerView(player: player,
+                   enemyDamagesList: DamagesListView(enemyRounds: enemyPlayer.rounds, isPlayerDead: player.isDead),
+                   onImageTappedAction: {
+            if playerType == .user {
+                vm.isGamePaused = true
+            }
+        })
+        .padding(.horizontal)
+        .padding(.top, playerType.isEnemy ? 0 : 8)
     }
 
     ///Returns the attacks and defenses view for a player
     ///Note: For some reason attacks and defenses view is required to be inside an @ViewBuilder function to refresh its state and fire state
     @ViewBuilder func createMovesView(for playerType: PlayerType) -> some View {
-        if let enemy = vm.enemyPlayer {
-            let player = playerType.isEnemy ? enemy : vm.player
-            MovesView(
-                attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType, isEditing: false) {
-                    vm.attackSelected($0, isEnemy: playerType.isEnemy)
-                },
-                defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
-                    vm.defenseSelected($0, isEnemy: playerType.isEnemy)
-                },
-                playerType: playerType)
-            .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
-            .padding(playerType.isEnemy ? [.trailing] : [])
-        }
+        let player = playerType.isEnemy ? vm.enemy : vm.player
+        MovesView(
+            attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType, isEditing: false) {
+                vm.attackSelected($0, isEnemy: playerType.isEnemy)
+            },
+            defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
+                vm.defenseSelected($0, isEnemy: playerType.isEnemy)
+            },
+            playerType: playerType)
+        .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
+        .padding(playerType.isEnemy ? [.trailing] : [])
     }
 }
 
@@ -121,6 +115,6 @@ private extension GameView {
 
 #Preview {
     NavigationView {
-        GameView(vm: GameViewModel(player: fakePlayer, enemyPlayer: fakeEnemyPlayer, gameMode: .offlineGame))
+        GameView(vm: GameViewModel(player: fakePlayer, enemy: fakeEnemyPlayer, gameMode: .offlineGame))
     }
 }

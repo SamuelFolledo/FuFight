@@ -45,7 +45,7 @@ class RoomManager {
 
     static func getPlayer() -> FetchedPlayer? {
         if let room = getCurrent() {
-            return room.player
+            return room.owner
         } else if let account = Account.current {
             saveCurrent(Room(account))
             return getPlayer()
@@ -55,7 +55,7 @@ class RoomManager {
 
     static func savePlayer(player: FetchedPlayer) {
         guard let room = getCurrent() else { return }
-        room.updatePlayer(player: player)
+        room.updateOwner(owner: player)
         saveCurrent(room)
     }
 

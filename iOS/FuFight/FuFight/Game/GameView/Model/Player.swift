@@ -44,7 +44,10 @@ class Player: PlayerProtocol {
     private(set) var userId: String
     private(set) var hp: CGFloat
     private(set) var maxHp: CGFloat
+    ///True if Player is not the currently authenticated user
     private(set) var isEnemy: Bool
+    ///True if Player is the Game document's owner
+    private(set) var isGameOwner: Bool
     var fighter: Fighter
     var state: PlayerState
     var moves: Moves
@@ -68,10 +71,11 @@ class Player: PlayerProtocol {
         self.moves = moves
         self.rounds = []
         self.speed = 0
+        self.isGameOwner = true
     }
 
     ///Room owner's initializer
-    init(fetchedPlayer: FetchedPlayer, isEnemy: Bool, initiallyHasSpeedBoost: Bool) {
+    init(fetchedPlayer: FetchedPlayer, isEnemy: Bool, isGameOwner: Bool, initiallyHasSpeedBoost: Bool) {
         self.photoUrl = fetchedPlayer.photoUrl
         self.username = fetchedPlayer.username
         self.userId = fetchedPlayer.userId
@@ -83,6 +87,7 @@ class Player: PlayerProtocol {
         self.speed = 0
         self.isEnemy = isEnemy
         self.state = PlayerState(boostLevel: .none, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
+        self.isGameOwner = isGameOwner
     }
 
     func loadAnimations() {
