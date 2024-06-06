@@ -7,19 +7,19 @@
 
 import FirebaseFirestore
 
-///This class represents a Game document. The authenticated user can be the game's owner or an enemy
+///This class represents a Game document. The authenticated user can be the game's owner or an challenger
 struct FetchedGame {
     @DocumentID private var documentId: String?
     var ownerId: String { documentId! }
     private(set) var owner: FetchedPlayer
-    private(set) var enemy: FetchedPlayer
+    private(set) var challenger: FetchedPlayer
     let ownerInitiallyHasSpeedBoost: Bool
 
     ///Initializer for the owner
-    init(owner: FetchedPlayer, enemy: FetchedPlayer, ownerInitiallyHasSpeedBoost: Bool) {
+    init(owner: FetchedPlayer, challenger: FetchedPlayer, ownerInitiallyHasSpeedBoost: Bool) {
         self.documentId = owner.userId
         self.owner = owner
-        self.enemy = enemy
+        self.challenger = challenger
         self.ownerInitiallyHasSpeedBoost = ownerInitiallyHasSpeedBoost
     }
 }
@@ -29,7 +29,7 @@ extension FetchedGame: Codable {
     private enum CodingKeys : String, CodingKey {
         case ownerId = "ownerId"
         case owner = "owner"
-        case enemy = "enemy"
+        case challenger = "challenger"
         case ownerInitiallyHasSpeedBoost = "ownerInitiallyHasSpeedBoost"
     }
 
@@ -37,7 +37,7 @@ extension FetchedGame: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(ownerId, forKey: .ownerId)
         try container.encode(owner, forKey: .owner)
-        try container.encode(enemy, forKey: .enemy)
+        try container.encode(challenger, forKey: .challenger)
         try container.encode(ownerInitiallyHasSpeedBoost, forKey: .ownerInitiallyHasSpeedBoost)
     }
 
@@ -46,6 +46,6 @@ extension FetchedGame: Codable {
         self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
         self.ownerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .ownerInitiallyHasSpeedBoost)!
         self.owner = try values.decodeIfPresent(FetchedPlayer.self, forKey: .owner) ?? FetchedPlayer(fakePlayer)
-        self.enemy = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemy) ?? FetchedPlayer(fakeEnemyPlayer)
+        self.challenger = try values.decodeIfPresent(FetchedPlayer.self, forKey: .challenger) ?? FetchedPlayer(fakeEnemyPlayer)
     }
 }

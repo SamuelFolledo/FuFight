@@ -237,7 +237,7 @@ private extension GameLoadingViewModel {
                           snapshot.exists,
                           !snapshot.metadata.hasPendingWrites else { return }
                     let fetchedGameAsChallenger = try snapshot.data(as: FetchedGame.self)
-                    if fetchedGameAsChallenger.enemy.userId == player.userId {
+                    if fetchedGameAsChallenger.challenger.userId == player.userId {
                         initiallyHasSpeedBoost = !fetchedGameAsChallenger.ownerInitiallyHasSpeedBoost
                         enemy = fetchedGameAsChallenger.owner
                     }

@@ -26,21 +26,24 @@ public let kGAMESTATS: String = "gameStats"
 public let kWINLOSESTAT: String = "winLoseStat"
 public let kWINS: String = "wins"
 public let kLOSES: String = "loses"
-public let kMATCHESUID: String = "matchesUid"
 public let kEXPERIENCES: String = "experiences"
 public let kMAXEXPERIENCE: String = "maxExperience"
 public let kLEVEL: String = "level"
 public let kRESULT: String = "result"
-public let kOPPONENTUID: String = "opponentUid"
 
 //Room Keys
 public let kOWNER: String = "owner"
-public let kENEMY: String = "enemy"
+public let kCHALLENGER: String = "challenger"
 
 public let kCHALLENGERS: String = "challengers"
 public let kOWNERID: String = "ownerId"
 public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
 public let kSTATUS: String = "status"
+
+//Selected Move Keys
+public let kROUNDS: String = "rounds"
+public let kSELECTEDATTACKPOSITION: String = "selectedAttackPosition"
+public let kSELECTEDDEFENSEPOSITION: String = "selectedDefensePosition"
 
 //Firebase Storage and Database keys
 public let kACCOUNTS: String = "Accounts"
@@ -48,8 +51,7 @@ public let kPHOTOS: String = "Photos"
 public let kROOMS: String = "Rooms"
 public let kHISTORIES: String = "Histories"
 public let kGAMES: String = "Games"
-public let kOWNERMOVES: String = "OwnerMoves"
-public let kENEMYMOVES: String = "EnemyMoves"
+public let kSELECTEDMOVES: String = "SelectedMoves"
 
 //UserDefaults keys
 public let kSHOWPASSWORD: String = "showPassword"

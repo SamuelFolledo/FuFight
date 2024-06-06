@@ -157,27 +157,34 @@ private extension GameViewModel {
          TODO: Fetch enemy's moves if available
         */
         switch gameMode {
+        case .practice:
+            break
         case .offlineGame:
             enemy.moves.randomlySelectMoves()
+            damageAndAnimate()
         case .onlineGame:
             TODO("Fetch enemy's moves and set them as selected")
-        case .practice:
-            break
-        }
-
-        enemy.populateSelectedMovesAndSpeed()
-        player.populateSelectedMovesAndSpeed()
-        
-        switch gameMode {
-        case .practice:
-            break
-        case .onlineGame, .offlineGame:
-            damageAndAnimate()
+            //TODO: Upload moves and wait for enemy's moves
+            Task {
+                let gameId = player.isGameOwner ? player.userId : enemy.userId
+                do {
+                    try await GameNetworkManager.uploadSelectedMoves(moves: player.moves, round: player.rounds.count, isGameOwner: player.isGameOwner, gameId: gameId)
+                    enemy.populateSelectedMovesAndSpeed()
+                    player.populateSelectedMovesAndSpeed()
+                    damageAndAnimate()
+                } catch {
+                    LOGDE("Error uploading selected moves with: \(error.localizedDescription)")
+                }
+            }
+            return
         }
     }
 
     ///Handles both player's attack and defend damages and animations
     func damageAndAnimate() {
+        enemy.populateSelectedMovesAndSpeed()
+        player.populateSelectedMovesAndSpeed()
+
         //1. Apply and play first attacker's animations
         attackingHandler(isFasterAttacker: true)
 
