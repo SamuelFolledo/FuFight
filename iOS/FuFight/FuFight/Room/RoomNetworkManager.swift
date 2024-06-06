@@ -16,10 +16,10 @@ class RoomNetworkManager {
 extension RoomNetworkManager {
     static func createRoom(_ room: Room) async throws {
         do {
-            let userId = room.player!.userId
+            let userId = room.owner!.userId
             let roomDocument = roomsDb.document(userId)
             try roomDocument.setData(from: room)
-            LOGD("Room created for roomId: \(room.player!.username)")
+            LOGD("Room created for roomId: \(room.owner!.username)")
         } catch {
             throw error
         }
@@ -114,7 +114,7 @@ extension RoomNetworkManager {
     static func updateOwner(_ player: FetchedPlayer) async throws {
         do {
             let roomDocument = roomsDb.document(player.userId)
-            try await roomDocument.updateData([kPLAYER: player.asDictionary()])
+            try await roomDocument.updateData([kOWNER: player.asDictionary()])
             LOGD("Room's owner is updated successfully: \(player.username)")
         } catch {
             throw error

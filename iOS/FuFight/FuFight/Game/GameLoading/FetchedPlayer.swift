@@ -26,15 +26,14 @@ class FetchedPlayer: PlayerProtocol {
     ///Creates an enemy player from the room
     init?(room: Room?, isRoomOwner: Bool) {
         guard let room,
-              let player = room.player,
+              let owner = room.owner,
               let enemyPlayer = room.challengers.first
         else { return nil }
-        self.photoUrl = !isRoomOwner ? player.photoUrl : enemyPlayer.photoUrl
-        self.username = !isRoomOwner ? player.username : enemyPlayer.username
-        self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
-        self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
-        self.fighterType = !isRoomOwner ? player.fighterType : enemyPlayer.fighterType
-        LOGD("Fighter type for enemy is \(!isRoomOwner ? player.fighterType : enemyPlayer.fighterType)")
+        self.photoUrl = !isRoomOwner ? owner.photoUrl : enemyPlayer.photoUrl
+        self.username = !isRoomOwner ? owner.username : enemyPlayer.username
+        self.userId = !isRoomOwner ? owner.userId : enemyPlayer.userId
+        self.moves = !isRoomOwner ? owner.moves : enemyPlayer.moves
+        self.fighterType = !isRoomOwner ? owner.fighterType : enemyPlayer.fighterType
     }
 
     ///Default value/initializer for FetchedPlayer from current logged in account
@@ -43,11 +42,10 @@ class FetchedPlayer: PlayerProtocol {
         self.username = account.username!
         self.photoUrl = account.photoUrl!
         let room = Room.current
-        self.fighterType = room?.player?.fighterType ?? .samuel
-        let attacks = room?.player?.moves.attacks ?? defaultAllPunchAttacks
-        let defenses = room?.player?.moves.defenses ?? defaultAllDashDefenses
+        self.fighterType = room?.owner?.fighterType ?? .samuel
+        let attacks = room?.owner?.moves.attacks ?? defaultAllPunchAttacks
+        let defenses = room?.owner?.moves.defenses ?? defaultAllDashDefenses
         self.moves = Moves(attacks: attacks, defenses: defenses)
-        LOGD("Fighter type for enemy is \(room?.player?.fighterType ?? .samuel)")
     }
 
     required init(from decoder: Decoder) throws {

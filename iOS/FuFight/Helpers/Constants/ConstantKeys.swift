@@ -11,25 +11,11 @@ import Foundation
 public let kCURRENTACCOUNT: String = "currentAccount"
 public let kCURRENTROOM: String = "currentRoom"
 
-public let kUSERPLAYER: String = "userPlayer"
 public let kUSERID: String = "userId"
 public let kUSERNAME: String = "username"
 public let kPHOTOURL: String = "photoUrl"
 public let kUSERMOVES: String = "moves"
 public let kUSERFIGHTERTYPE: String = "fighterType"
-
-public let kENEMYPLAYER: String = "enemyPlayer"
-public let kENEMYID: String = "enemyId"
-public let kENEMYUSERNAME: String = "enemyUsername"
-public let kENEMYPHOTOURL: String = "enemyPhotoUrl"
-public let kENEMYMOVES: String = "enemyMoves"
-public let kENEMYFIGHTERTYPE: String = "enemyFighterType"
-
-public let kPLAYER: String = "player"
-public let kCHALLENGERS: String = "challengers"
-public let kOWNERID: String = "ownerId"
-public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
-public let kSTATUS: String = "status"
 
 public let kEMAIL: String = "email"
 public let kCREATEDAT: String = "createdAt"
@@ -40,12 +26,24 @@ public let kGAMESTATS: String = "gameStats"
 public let kWINLOSESTAT: String = "winLoseStat"
 public let kWINS: String = "wins"
 public let kLOSES: String = "loses"
-public let kMATCHESUID: String = "matchesUid"
 public let kEXPERIENCES: String = "experiences"
 public let kMAXEXPERIENCE: String = "maxExperience"
 public let kLEVEL: String = "level"
 public let kRESULT: String = "result"
-public let kOPPONENTUID: String = "opponentUid"
+
+//Room Keys
+public let kOWNER: String = "owner"
+public let kCHALLENGER: String = "challenger"
+
+public let kCHALLENGERS: String = "challengers"
+public let kOWNERID: String = "ownerId"
+public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
+public let kSTATUS: String = "status"
+
+//Selected Move Keys
+public let kROUNDS: String = "rounds"
+public let kSELECTEDATTACKPOSITION: String = "selectedAttackPosition"
+public let kSELECTEDDEFENSEPOSITION: String = "selectedDefensePosition"
 
 //Firebase Storage and Database keys
 public let kACCOUNTS: String = "Accounts"
@@ -53,6 +51,7 @@ public let kPHOTOS: String = "Photos"
 public let kROOMS: String = "Rooms"
 public let kHISTORIES: String = "Histories"
 public let kGAMES: String = "Games"
+public let kSELECTEDMOVES: String = "SelectedMoves"
 
 //UserDefaults keys
 public let kSHOWPASSWORD: String = "showPassword"

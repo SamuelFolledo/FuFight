@@ -48,7 +48,7 @@ private extension RoomViewModel {
 
     func updatePlayer(with updatedPlayer: FetchedPlayer) {
         guard let currentRoom = RoomManager.getCurrent() else { return }
-        currentRoom.updatePlayer(player: updatedPlayer)
+        currentRoom.updateOwner(owner: updatedPlayer)
         Task {
             try await RoomNetworkManager.updateOwner(updatedPlayer)
         }

@@ -12,7 +12,7 @@ import FirebaseFirestore
 /*
  GameLoadingViewModel flow
  1. Look for rooms with status == .searching
-    - If no rooms found, player becomes the room/game owner and waits for challengers. Room owner will be in charge of setting if player or enemyPlayer has the initialSpeedBoost and creating the Game document
+    - If no rooms found, player becomes the room/game owner and waits for challengers. Room owner will be in charge of setting if player or enemy has the initialSpeedBoost and creating the Game document
     - If rooms found, player becomes a room/game owner's challenger
  2a) Room owner flow
     - For room owner, listen to their Room Firestore challengers joining
@@ -29,16 +29,16 @@ import FirebaseFirestore
 
 final class GameLoadingViewModel: BaseAccountViewModel {
     @Published var room: Room?
-    ///Currently logged in player
+    ///Currently logged in player, does not necessarily means the owner
     @Published var player: FetchedPlayer
-    @Published var enemyPlayer: FetchedPlayer?
+    @Published var enemy: FetchedPlayer?
     @Published var currentRoomId: String?
     let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
     ///Set this to true if current player is first when the game begins
     var initiallyHasSpeedBoost: Bool = false
-    private var isRoomOwner: Bool = false
+    var isRoomOwner: Bool = false
     private var isEnemyFound: Bool = false
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
@@ -49,7 +49,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
         //After receiving a roomId, roomOwner will listen to room changes when challengers appears, while nonRoomOwner will listen to when a game Firestore document is created
         $currentRoomId
-            .delay(for: 0.5, scheduler: RunLoop.main) //0.5 seconds delay fixed not transitioning to GameView when enemyPlayer appears
+            .delay(for: 0.5, scheduler: RunLoop.main) //0.5 seconds delay fixed not transitioning to GameView when enemy appears
             .sink { [weak self] roomId in
                 if roomId != nil {
                     guard let self else { return }
@@ -62,23 +62,23 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             }
             .store(in: &subscriptions)
 
-        //After room owner receives getting a room with player and enemy, create an enemyPlayer
+        //After room owner receives getting a room with player and enemy, create an enemy
         $room
             .map { room in
                 guard let room,
                       room.isValid else { return nil }
                 return FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
             }
-            .assign(to: \.enemyPlayer, on: self)
+            .assign(to: \.enemy, on: self)
             .store(in: &subscriptions)
 
-        //After receiving creating an enemyPlayer, go to GameView
-        $enemyPlayer
+        //After receiving creating an enemy, go to GameView
+        $enemy
             .delay(for: 0.25, scheduler: RunLoop.main)
-            .sink { [weak self] enemyPlayer in
-                if let self, let enemyPlayer {
+            .sink { [weak self] enemy in
+                if let self, let enemy {
                     if isRoomOwner {
-                        createGame(enemyPlayer: enemyPlayer)
+                        createGame(enemy: enemy)
                     } else {
                         transitionToGameView()
                     }
@@ -92,7 +92,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     //MARK: - ViewModel Overrides
     override func onAppear() {
         super.onAppear()
-        enemyPlayer = nil
+        enemy = nil
         RoomNetworkManager.updateStatus(to: .searching, roomId: account.userId)
     }
 
@@ -100,7 +100,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         super.onDisappear()
         unsubscribe()
         room = nil
-        enemyPlayer = nil
+        enemy = nil
         currentRoomId = nil
         subscriptions.removeAll()
         if isEnemyFound {
@@ -142,7 +142,7 @@ private extension GameLoadingViewModel {
                 let ownedRoom = Room(ownerPlayer: player)
                 try await RoomNetworkManager.createOrRejoinRoom(room: ownedRoom)
                 DispatchQueue.main.async {
-                    self.updateRoom(gameRoom: ownedRoom, isOwner: true)
+                    self.updateRoom(ownedRoom, isOwner: true)
                 }
                 //TODO: Listen for changes and wait for up to 5-12 seconds
             } catch {
@@ -191,7 +191,7 @@ private extension GameLoadingViewModel {
                         let fetchedOwnedRoom = try snapshot.data(as: Room.self)
                         if fetchedOwnedRoom.isValid {
                             DispatchQueue.main.async {
-                                self.updateRoom(gameRoom: fetchedOwnedRoom, isOwner: self.isRoomOwner)
+                                self.updateRoom(fetchedOwnedRoom, isOwner: self.isRoomOwner)
                             }
                         }
                     } catch {
@@ -201,16 +201,16 @@ private extension GameLoadingViewModel {
             }
     }
 
-    @MainActor func updateRoom(gameRoom: Room, isOwner: Bool) {
+    @MainActor func updateRoom(_ gameRoom: Room, isOwner: Bool) {
         isRoomOwner = isOwner
-        currentRoomId = gameRoom.player!.userId
+        currentRoomId = gameRoom.owner!.userId
         if isOwner {
             room = gameRoom
             updateLoadingMessage(to: "Waiting for opponent")
         }
     }
 
-    func createGame(enemyPlayer: FetchedPlayer) {
+    func createGame(enemy: FetchedPlayer) {
         Task {
             if isRoomOwner, let room {
                 initiallyHasSpeedBoost = Bool.random()
@@ -237,9 +237,9 @@ private extension GameLoadingViewModel {
                           snapshot.exists,
                           !snapshot.metadata.hasPendingWrites else { return }
                     let fetchedGameAsChallenger = try snapshot.data(as: FetchedGame.self)
-                    if fetchedGameAsChallenger.enemyPlayer.userId == player.userId {
+                    if fetchedGameAsChallenger.challenger.userId == player.userId {
                         initiallyHasSpeedBoost = !fetchedGameAsChallenger.ownerInitiallyHasSpeedBoost
-                        enemyPlayer = fetchedGameAsChallenger.player
+                        enemy = fetchedGameAsChallenger.owner
                     }
                 } catch let error {
                     LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
