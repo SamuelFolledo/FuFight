@@ -6,6 +6,7 @@
 //
 
 import Combine
+import FirebaseFirestore
 import SwiftUI
 
 enum GameState {
@@ -38,6 +39,11 @@ class GameViewModel: BaseViewModel {
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
 
+    private var isPlayerRoundReady: Bool = false
+    private var isEnemyRoundReady: Bool = false
+    private var enemyMovesListener: ListenerRegistration?
+    private var subscriptions = Set<AnyCancellable>()
+
     init(player: Player, enemy: Player, gameMode: GameRoute) {
         self.state = .starting
         self.gameMode = gameMode
@@ -49,11 +55,48 @@ class GameViewModel: BaseViewModel {
     override func onAppear() {
         super.onAppear()
         updateState(.starting)
+        listenToSelectedEnemyMoves()
     }
 
     override func onDisappear() {
         super.onDisappear()
         player.prepareForRematch()
+    }
+
+    func listenToSelectedEnemyMoves() {
+        if enemyMovesListener != nil {
+            unsubscribeToEnemyMoves()
+        }
+        let gameId = player.isGameOwner ? player.userId : enemy.userId
+        let playerDocumentId = player.isGameOwner ? kCHALLENGER : kOWNER
+        let query = gamesDb.document(gameId).collection(kPLAYERS).document(playerDocumentId)
+        enemyMovesListener = query
+            .addSnapshotListener { [weak self] snapshot, error in
+                guard let self = self else { return }
+                if let snapshot,
+                   snapshot.exists,
+                   !snapshot.metadata.hasPendingWrites {
+                    do {
+                        let playerDoc = try snapshot.data(as: PlayerDocument.self)
+                        enemy.moves.updateSelected(playerDoc.selectedMoves.last!.attackPosition)
+                        enemy.moves.updateSelected(playerDoc.selectedMoves.last!.defensePosition)
+                        enemy.populateSelectedMoves()
+                        if isPlayerRoundReady {
+                            damageAndAnimate()
+                        }
+                        isEnemyRoundReady = true
+                    } catch {
+                        LOGDE("Error creating room with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
+                    }
+                }
+            }
+    }
+
+    func unsubscribeToEnemyMoves() {
+        if enemyMovesListener != nil {
+            enemyMovesListener?.remove()
+            enemyMovesListener = nil
+        }
     }
 
     //MARK: - Public Methods
@@ -147,6 +190,8 @@ private extension GameViewModel {
         secondAttackerDamageDealtReduction = 0
         isDefenderAlive = true
         isCountingDown = true
+        isPlayerRoundReady = false
+        isEnemyRoundReady = false
     }
 
     func endOfRoundHandler() {
@@ -161,29 +206,31 @@ private extension GameViewModel {
             break
         case .offlineGame:
             enemy.moves.randomlySelectMoves()
+            enemy.populateSelectedMoves()
+            player.populateSelectedMoves()
             damageAndAnimate()
         case .onlineGame:
-            TODO("Fetch enemy's moves and set them as selected")
-            //TODO: Upload moves and wait for enemy's moves
+            player.populateSelectedMoves()
             Task {
                 let gameId = player.isGameOwner ? player.userId : enemy.userId
                 do {
-                    try await GameNetworkManager.uploadSelectedMoves(moves: player.moves, round: player.rounds.count, isGameOwner: player.isGameOwner, gameId: gameId)
-                    enemy.populateSelectedMovesAndSpeed()
-                    player.populateSelectedMovesAndSpeed()
-                    damageAndAnimate()
+                    try await GameNetworkManager.uploadSelectedMoves(rounds: player.rounds, isGameOwner: player.isGameOwner, gameId: gameId)
+                    if isEnemyRoundReady {
+                        LOGD("FETCHED animating from owner")
+                        damageAndAnimate()
+                    }
+                    isPlayerRoundReady = true
                 } catch {
                     LOGDE("Error uploading selected moves with: \(error.localizedDescription)")
                 }
             }
-            return
         }
     }
 
     ///Handles both player's attack and defend damages and animations
     func damageAndAnimate() {
-        enemy.populateSelectedMovesAndSpeed()
-        player.populateSelectedMovesAndSpeed()
+        enemy.refreshSpeed()
+        player.refreshSpeed()
 
         //1. Apply and play first attacker's animations
         attackingHandler(isFasterAttacker: true)
@@ -195,7 +242,9 @@ private extension GameViewModel {
                 attackingHandler(isFasterAttacker: false)
 
                 if isDefenderAlive {
-                    createNewRound()
+                    runAfterDelay(delay: secondAttackerDelay) { [weak self] in
+                        self?.createNewRound()
+                    }
                     return
                 }
             }
@@ -208,17 +257,25 @@ private extension GameViewModel {
         let attacker: Player
         let defender: Player
         if isFasterAttacker {
-            attacker = player.speed > enemy.speed ? player : enemy
-            defender = player.speed > enemy.speed ? enemy : player
-            //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
+            if player.speed == enemy.speed {
+                attacker = player.state.hasSpeedBoost ? player : enemy
+                defender = player.state.hasSpeedBoost ? enemy : player
+            } else {
+                attacker = player.speed > enemy.speed ? player : enemy
+                defender = player.speed > enemy.speed ? enemy : player
+                //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
+            }
             secondAttackerDelay = attacker.currentRound?.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
-            secondAttackerDamageDealtReduction = attacker.currentRound?.attack?.damageReduction ?? 0
-
+            secondAttackerDamageDealtReduction = attacker.currentRound?.attack?.damageReduction ?? 1
         } else {
-            attacker = player.speed > enemy.speed ? enemy : player
-            defender = player.speed > enemy.speed ? player : enemy
-            secondAttackerDelay = 0
-            secondAttackerDamageDealtReduction = 0
+            if player.speed == enemy.speed {
+                attacker = player.state.hasSpeedBoost ? enemy : player
+                defender = player.state.hasSpeedBoost ? player : enemy
+            } else {
+                attacker = player.speed > enemy.speed ? enemy : player
+                defender = player.speed > enemy.speed ? player : enemy
+            }
+            secondAttackerDelay = attacker.currentRound?.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
         }
 
         //Get the damage results
@@ -227,7 +284,7 @@ private extension GameViewModel {
             LOGDE("Attacking handler has no current round for \(attacker.currentRound != nil ? attacker.currentRound.debugDescription : "nil") and \(defender.currentRound != nil ? defender.currentRound.debugDescription : "nil")")
             return
         }
-        let attackResult = GameService.getAttackResult(attackerRound: attackerRound, defenderRound: defenderRound, defenderHp: defender.hp, damageReduction: secondAttackerDamageDealtReduction)
+        let attackResult = GameService.getAttackResult(attackerRound: attackerRound, defenderRound: defenderRound, defenderHp: defender.hp, damageReduction: isFasterAttacker ? 1 : secondAttackerDamageDealtReduction)
 
         LOGD("AttackHandler \(attacker.fighter.fighterType.name) (\(attacker.speed)) with \(attackerRound.attack?.name ?? "no attack") \t\t vs \(defenderRound.defend?.name ?? "no defense") \t\t\(attackResult)")
 
