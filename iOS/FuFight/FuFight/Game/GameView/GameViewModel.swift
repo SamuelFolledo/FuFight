@@ -9,21 +9,6 @@ import Combine
 import FirebaseFirestore
 import SwiftUI
 
-enum GameState {
-    case starting
-    case gaming
-    case gameOver
-
-    var isGameOver: Bool {
-        switch self {
-        case .starting, .gaming:
-            false
-        case .gameOver:
-            true
-        }
-    }
-}
-
 class GameViewModel: BaseViewModel {
     @Published var state: GameState
     @Published var player: Player
@@ -55,48 +40,12 @@ class GameViewModel: BaseViewModel {
     override func onAppear() {
         super.onAppear()
         updateState(.starting)
-        listenToSelectedEnemyMoves()
+        listenToEnemyGameDocument()
     }
 
     override func onDisappear() {
         super.onDisappear()
         player.prepareForRematch()
-    }
-
-    func listenToSelectedEnemyMoves() {
-        if enemyMovesListener != nil {
-            unsubscribeToEnemyMoves()
-        }
-        let gameId = player.isGameOwner ? player.userId : enemy.userId
-        let playerDocumentId = player.isGameOwner ? kCHALLENGER : kOWNER
-        let query = gamesDb.document(gameId).collection(kPLAYERS).document(playerDocumentId)
-        enemyMovesListener = query
-            .addSnapshotListener { [weak self] snapshot, error in
-                guard let self = self else { return }
-                if let snapshot,
-                   snapshot.exists,
-                   !snapshot.metadata.hasPendingWrites {
-                    do {
-                        let playerDoc = try snapshot.data(as: PlayerDocument.self)
-                        enemy.moves.updateSelected(playerDoc.selectedMoves.last!.attackPosition)
-                        enemy.moves.updateSelected(playerDoc.selectedMoves.last!.defensePosition)
-                        enemy.populateSelectedMoves()
-                        if isPlayerRoundReady {
-                            damageAndAnimate()
-                        }
-                        isEnemyRoundReady = true
-                    } catch {
-                        LOGDE("Error creating room with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
-                    }
-                }
-            }
-    }
-
-    func unsubscribeToEnemyMoves() {
-        if enemyMovesListener != nil {
-            enemyMovesListener?.remove()
-            enemyMovesListener = nil
-        }
     }
 
     //MARK: - Public Methods
@@ -170,6 +119,17 @@ class GameViewModel: BaseViewModel {
             startNewGame()
         case .gameOver:
             gameOver()
+        }
+    }
+
+    func exitGame() {
+        didExitGame.send(self)
+        Task {
+            do {
+                if player.isGameOwner {
+                    try await GameNetworkManager.deleteGame(player.userId)
+                }
+            }
         }
     }
 }
@@ -348,5 +308,45 @@ private extension GameViewModel {
             LOGD("Enemy won", from: GameViewModel.self)
             player.defeated()
         }
+    }
+
+    func unsubscribeToEnemyGameDocument() {
+        if enemyMovesListener != nil {
+            enemyMovesListener?.remove()
+            enemyMovesListener = nil
+        }
+    }
+
+    func listenToEnemyGameDocument() {
+        if enemyMovesListener != nil {
+            unsubscribeToEnemyGameDocument()
+        }
+        let gameId = player.isGameOwner ? player.userId : enemy.userId
+        let playerDocumentId = player.isGameOwner ? kCHALLENGER : kOWNER
+        let query = gamesDb.document(gameId).collection(kPLAYERS).document(playerDocumentId)
+        enemyMovesListener = query
+            .addSnapshotListener { [weak self] snapshot, error in
+                guard let self,
+                        let snapshot,
+                      snapshot.exists,
+                      !snapshot.metadata.hasPendingWrites
+                else { return }
+                do {
+                    let playerDoc = try snapshot.data(as: PlayerDocument.self)
+                    if enemy.rounds.count != playerDoc.selectedMoves.count {
+                        LOGE("After receiving PlayerDocument changes, the count for enemy rounds and selected moves is not the same")
+                        TODO("Test if it goes here. If it does then populate enemy rounds with null selected moves until the rounds count is the same")
+                    }
+                    enemy.moves.updateSelected(playerDoc.selectedMoves.last!.attackPosition)
+                    enemy.moves.updateSelected(playerDoc.selectedMoves.last!.defensePosition)
+                    enemy.populateSelectedMoves()
+                    if isPlayerRoundReady {
+                        damageAndAnimate()
+                    }
+                    isEnemyRoundReady = true
+                } catch {
+                    LOGDE("Error creating room with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
+                }
+            }
     }
 }

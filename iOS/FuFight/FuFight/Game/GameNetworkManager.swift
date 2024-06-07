@@ -51,6 +51,5 @@ extension GameNetworkManager {
         } else {
             try await query.updateData(fetchedRounds.asDictionary())
         }
-//        LOGD("Game document updated selected moves successfully for userId: \(documentId)")
     }
 }
