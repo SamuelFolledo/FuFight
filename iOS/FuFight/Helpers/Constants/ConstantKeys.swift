@@ -41,9 +41,9 @@ public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
 public let kSTATUS: String = "status"
 
 //Selected Move Keys
-public let kROUNDS: String = "rounds"
-public let kSELECTEDATTACKPOSITION: String = "selectedAttackPosition"
-public let kSELECTEDDEFENSEPOSITION: String = "selectedDefensePosition"
+public let kSELECTEDMOVES: String = "selectedMoves"
+public let kATTACKPOSITION: String = "attackPosition"
+public let kDEFENSEPOSITION: String = "defensePosition"
 
 //Firebase Storage and Database keys
 public let kACCOUNTS: String = "Accounts"
@@ -51,7 +51,7 @@ public let kPHOTOS: String = "Photos"
 public let kROOMS: String = "Rooms"
 public let kHISTORIES: String = "Histories"
 public let kGAMES: String = "Games"
-public let kSELECTEDMOVES: String = "SelectedMoves"
+public let kPLAYERS: String = "Players"
 
 //UserDefaults keys
 public let kSHOWPASSWORD: String = "showPassword"

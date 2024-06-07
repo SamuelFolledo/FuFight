@@ -47,7 +47,7 @@ enum GameService {
             if didDodge(attack.position, defenderPosition: defenderRound.defend?.position) {
                 return .miss
             }
-            let totalDamage = getTotalDamage(attackerRound: attackerRound, defenderRound: defenderRound)
+            let totalDamage = getTotalDamage(attackerRound: attackerRound, defenderRound: defenderRound, secondAttackerDamageReduction: damageReduction)
             if defenderHp <= totalDamage {
                 return .kill(totalDamage)
             }

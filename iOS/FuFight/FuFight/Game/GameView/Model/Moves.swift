@@ -74,7 +74,8 @@ struct Moves {
     }
 
     ///Set the selected attack based on the position, the remaining available attacks will become unselected
-    mutating func updateSelected(_ position: AttackPosition) {
+    mutating func updateSelected(_ position: AttackPosition?) {
+        guard let position else { return }
         for i in attacks.indices {
             if attacks[i].isAvailable() {
                 attacks[i].setState(to: attacks[i].position == position ? .selected : .unselected)
@@ -83,7 +84,8 @@ struct Moves {
     }
 
     ///Set the selected defense based on the position, the remaining available defense will become unselected
-    mutating func updateSelected(_ position: DefensePosition) {
+    mutating func updateSelected(_ position: DefensePosition?) {
+        guard let position else { return }
         for i in defenses.indices {
             if defenses[i].isAvailable() {
                 defenses[i].setState(to: defenses[i].position == position ? .selected : .unselected)

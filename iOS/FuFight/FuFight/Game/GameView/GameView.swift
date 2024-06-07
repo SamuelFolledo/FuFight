@@ -34,11 +34,11 @@ struct GameView: View {
                isPresented: $vm.isAlertPresented)
         .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
-               secondaryButton: AlertButton(title: "Go home", action: transitionBackToHome),
+               secondaryButton: AlertButton(title: "Go home", action: vm.exitGame),
                isPresented: .constant(vm.state == .gameOver))
         .alert(title: "Game is paused",
                primaryButton: AlertButton(title: "Resume", action: {}),
-               secondaryButton: AlertButton(title: "Exit", action: transitionBackToHome),
+               secondaryButton: AlertButton(title: "Exit", action: vm.exitGame),
                isPresented: $vm.isGamePaused)
         .overlay {
             timerView
@@ -98,18 +98,6 @@ struct GameView: View {
             playerType: playerType)
         .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)
         .padding(playerType.isEnemy ? [.trailing] : [])
-    }
-}
-
-private extension GameView {
-    func transitionBackToHome() {
-        vm.didExitGame.send(vm)
-        Task {
-            do {
-                TODO("todo only delete room and game if player is owner")
-                try await GameNetworkManager.deleteGame(vm.player.userId)
-            }
-        }
     }
 }
 

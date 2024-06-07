@@ -45,9 +45,9 @@ class Player: PlayerProtocol {
     private(set) var hp: CGFloat
     private(set) var maxHp: CGFloat
     ///True if Player is not the currently authenticated user
-    private(set) var isEnemy: Bool
+    let isEnemy: Bool
     ///True if Player is the Game document's owner
-    private(set) var isGameOwner: Bool
+    let isGameOwner: Bool
     var fighter: Fighter
     var state: PlayerState
     var moves: Moves
@@ -94,12 +94,16 @@ class Player: PlayerProtocol {
         fighter.loadAnimations(animations: moves.animationTypes)
     }
 
-    func populateSelectedMovesAndSpeed() {
+    func populateSelectedMoves() {
         let selectedAttack = moves.attacks.first(where: { $0.state == .selected })
         let selectedDefend = moves.defenses.first(where: { $0.state == .selected })
         rounds[rounds.count - 1].attack = selectedAttack
         rounds[rounds.count - 1].defend = selectedDefend
+    }
 
+    func refreshSpeed() {
+        let selectedAttack = currentRound?.attack ?? moves.attacks.first(where: { $0.state == .selected })
+        let selectedDefend = currentRound?.defend ?? moves.defenses.first(where: { $0.state == .selected })
         let moveSpeed = selectedAttack?.speed ?? 0
         let speedMultiplier = selectedDefend?.speedMultiplier ?? 1
         let speedBoostMultiplier = state.hasSpeedBoost ? speedBoostMultiplier : 1
