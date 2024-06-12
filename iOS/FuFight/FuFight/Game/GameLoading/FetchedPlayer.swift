@@ -24,16 +24,16 @@ class FetchedPlayer: PlayerProtocol {
     }
 
     ///Creates an enemy player from the room
-    init?(room: Room?, isRoomOwner: Bool) {
+    init?(room: Room?, isChallenger: Bool) {
         guard let room,
               let enemyPlayer = room.challengers.first
         else { return nil }
         let player = room.player
-        self.photoUrl = !isRoomOwner ? player.photoUrl : enemyPlayer.photoUrl
-        self.username = !isRoomOwner ? player.username : enemyPlayer.username
-        self.userId = !isRoomOwner ? player.userId : enemyPlayer.userId
-        self.moves = !isRoomOwner ? player.moves : enemyPlayer.moves
-        self.fighterType = !isRoomOwner ? player.fighterType : enemyPlayer.fighterType
+        self.photoUrl = isChallenger ? player.photoUrl : enemyPlayer.photoUrl
+        self.username = isChallenger ? player.username : enemyPlayer.username
+        self.userId = isChallenger ? player.userId : enemyPlayer.userId
+        self.moves = isChallenger ? player.moves : enemyPlayer.moves
+        self.fighterType = isChallenger ? player.fighterType : enemyPlayer.fighterType
     }
 
     ///Default value/initializer for FetchedPlayer from current logged in account

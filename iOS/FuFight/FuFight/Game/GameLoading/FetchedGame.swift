@@ -46,9 +46,9 @@ extension FetchedGame: Codable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.documentId = try values.decodeIfPresent(String.self, forKey: .playerId)!
+        self.documentId = try values.decodeIfPresent(String.self, forKey: .playerId)
         self.playerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .playerInitiallyHasSpeedBoost)!
-        self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player) ?? FetchedPlayer(fakePlayer)
-        self.enemy = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemy) ?? FetchedPlayer(fakeEnemyPlayer)
+        self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)!
+        self.enemy = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemy)!
     }
 }

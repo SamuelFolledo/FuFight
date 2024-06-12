@@ -38,7 +38,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
     ///Set this to true if current player is first when the game begins
     var initiallyHasSpeedBoost: Bool = false
-    var isRoomOwner: Bool = false
+    var isChallenger: Bool = true
     private var isEnemyFound: Bool = false
     private var listener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
@@ -52,7 +52,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             .map { room in
                 guard let room,
                       !room.challengers.isEmpty else { return nil }
-                return FetchedPlayer(room: room, isRoomOwner: self.isRoomOwner)
+                return FetchedPlayer(room: room, isChallenger: self.isChallenger)
             }
             .assign(to: \.enemy, on: self)
             .store(in: &subscriptions)
@@ -79,7 +79,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
         }
         initiallyHasSpeedBoost = false
-        isRoomOwner = false
+        isChallenger = true
     }
 
     //MARK: - Public Methods
@@ -112,7 +112,7 @@ private extension GameLoadingViewModel {
             //TODO: Listen for changes and wait for up to 5-12 seconds
             guard let ownedRoom = Room.current else { return }
             DispatchQueue.main.async {
-                self.updateRoom(ownedRoom, isOwner: true)
+                self.updateRoom(ownedRoom, isChallenger: false)
             }
         }
     }
@@ -126,7 +126,7 @@ private extension GameLoadingViewModel {
                 //Update enemy's room
                 try await RoomNetworkManager.updateRoom(room)
                 DispatchQueue.main.async {
-                    self.updateRoom(room, isOwner: false)
+                    self.updateRoom(room, isChallenger: true)
                 }
             } catch {
                 updateError(MainError(type: .noOpponentFound, message: error.localizedDescription))
@@ -146,7 +146,7 @@ private extension GameLoadingViewModel {
         if listener != nil {
             unsubscribe()
         }
-        guard isRoomOwner,
+        guard !isChallenger,
               let currentRoomId
         else { return }
         let query = roomsDb.document(currentRoomId)
@@ -162,7 +162,7 @@ private extension GameLoadingViewModel {
                         if !fetchedOwnedRoom.challengers.isEmpty {
                             unsubscribe()
                             DispatchQueue.main.async {
-                                self.updateRoom(fetchedOwnedRoom, isOwner: self.isRoomOwner)
+                                self.updateRoom(fetchedOwnedRoom, isChallenger: self.isChallenger)
                             }
                         }
                     } catch {
@@ -172,29 +172,29 @@ private extension GameLoadingViewModel {
             }
     }
 
-    @MainActor func updateRoom(_ gameRoom: Room, isOwner: Bool) {
-        isRoomOwner = isOwner
+    @MainActor func updateRoom(_ gameRoom: Room, isChallenger: Bool) {
+        self.isChallenger = isChallenger
         currentRoomId = gameRoom.player.userId
         room = gameRoom
         updateLoadingMessage(to: "Waiting for opponent")
-        if isRoomOwner {
-            if let enemy = gameRoom.challengers.first {
-                prepareForGameAsOwner(enemy: enemy)
-            } else {
-                subscribeToRoomChanges()
-            }
-        } else {
+        if isChallenger {
             if gameRoom.challengers.isEmpty {
                 LOGE("Failed to join room as challenger")
             } else {
                 subscribeToEnemyGameChanges(gameRoom)
+            }
+        } else {
+            if let enemy = gameRoom.challengers.first {
+                prepareForGameAsOwner(enemy: enemy)
+            } else {
+                subscribeToRoomChanges()
             }
         }
     }
 
     func prepareForGameAsOwner(enemy: FetchedPlayer) {
         Task {
-            guard isRoomOwner else { return }
+            guard !isChallenger else { return }
             initiallyHasSpeedBoost = Bool.random()
             let game = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
             try await GameNetworkManager.createGame(game)
@@ -205,7 +205,7 @@ private extension GameLoadingViewModel {
 
     func prepareForGameAsChallenger(enemy: FetchedPlayer) {
         Task {
-            guard !isRoomOwner,
+            guard isChallenger,
                   let room else { return }
             let gameAsChallenger = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
             try await GameNetworkManager.createGame(gameAsChallenger)
@@ -228,7 +228,7 @@ private extension GameLoadingViewModel {
         if listener != nil {
             unsubscribe()
         }
-        let enemyId = isRoomOwner ? room.challengers.first!.userId : room.player.userId
+        let enemyId = !isChallenger ? room.challengers.first!.userId : room.player.userId
         updateLoadingMessage(to: "Syncing with opponent")
         let query = gamesDb.document(enemyId)
         listener = query
@@ -240,7 +240,7 @@ private extension GameLoadingViewModel {
                           !snapshot.metadata.hasPendingWrites else { return }
                     let enemyGame = try snapshot.data(as: FetchedGame.self)
 
-                    if !isRoomOwner {
+                    if isChallenger {
                         initiallyHasSpeedBoost = !enemyGame.playerInitiallyHasSpeedBoost
                         prepareForGameAsChallenger(enemy: enemyGame.player)
                     }
