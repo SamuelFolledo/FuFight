@@ -26,6 +26,7 @@ class GameViewModel: BaseViewModel {
 
     private var isPlayerRoundReady: Bool = false
     private var isEnemyRoundReady: Bool = false
+    private var isAnimating: Bool = false
     private var enemyMovesListener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
@@ -39,8 +40,9 @@ class GameViewModel: BaseViewModel {
 
     override func onAppear() {
         super.onAppear()
-        updateState(.starting)
-        listenToEnemyGameDocument()
+        runAfterDelay(delay: 1.5) {
+            self.listenToEnemyGameDocument()
+        }
     }
 
     override func onDisappear() {
@@ -126,11 +128,10 @@ class GameViewModel: BaseViewModel {
         didExitGame.send(self)
         Task {
             do {
-                if player.isGameOwner {
-                    try await GameNetworkManager.deleteGame(player.userId)
-                }
+                try await GameNetworkManager.deleteGame(player.userId)
             }
         }
+        RoomNetworkManager.updateStatus(to: .online, roomId: player.userId)
     }
 }
 
@@ -143,7 +144,7 @@ private extension GameViewModel {
 
     func createNewRound() {
         player.prepareForNewRound()
-        print("\n\n=================================== Round \(self.player.rounds.count) ============================================")
+        LOGD("=================================== Round \(self.player.rounds.count) ============================================\n")
         enemy.prepareForNewRound()
         timeRemaining = defaultMaxTime
         secondAttackerDelay = 0
@@ -152,6 +153,7 @@ private extension GameViewModel {
         isCountingDown = true
         isPlayerRoundReady = false
         isEnemyRoundReady = false
+        isAnimating = false
     }
 
     func endOfRoundHandler() {
@@ -172,16 +174,35 @@ private extension GameViewModel {
         case .onlineGame:
             player.populateSelectedMoves()
             Task {
-                let gameId = player.isGameOwner ? player.userId : enemy.userId
                 do {
-                    try await GameNetworkManager.uploadSelectedMoves(rounds: player.rounds, isGameOwner: player.isGameOwner, gameId: gameId)
-                    if isEnemyRoundReady {
-                        LOGD("FETCHED animating from owner")
-                        damageAndAnimate()
-                    }
+                    try await GameNetworkManager.uploadSelectedMoves(player)
+                    updateLoadingMessage(to: "Finished uploading. Waiting for enemy's moves")
                     isPlayerRoundReady = true
+                    if isEnemyRoundReady {
+                        damageAndAnimate()
+                    } else {
+                        //First attempt to refetch
+                        runAfterDelay(delay: 3) { [weak self] in
+                            guard let self else { return }
+                            Task {
+                                await self.refetchEnemySelectedMovesIfNeeded()
+                                if !self.isEnemyRoundReady {
+                                    //Second attempt to refetch
+                                    runAfterDelay(delay: 5) { [weak self] in
+                                        guard let self else { return }
+                                        Task {
+                                            await self.refetchEnemySelectedMovesIfNeeded()
+                                            if !self.isEnemyRoundReady {
+                                                TODO("Player won after waiting for enemy's moves for 8 seconds")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 } catch {
-                    LOGDE("Error uploading selected moves with: \(error.localizedDescription)")
+                    LOGE("Error uploading selected moves with: \(error.localizedDescription)")
                 }
             }
         }
@@ -189,6 +210,12 @@ private extension GameViewModel {
 
     ///Handles both player's attack and defend damages and animations
     func damageAndAnimate() {
+        guard !isAnimating else {
+            LOGD("Returning because already animating")
+            return
+        }
+        isAnimating = true
+        updateLoadingMessage(to: nil)
         enemy.refreshSpeed()
         player.refreshSpeed()
 
@@ -321,32 +348,56 @@ private extension GameViewModel {
         if enemyMovesListener != nil {
             unsubscribeToEnemyGameDocument()
         }
-        let gameId = player.isGameOwner ? player.userId : enemy.userId
-        let playerDocumentId = player.isGameOwner ? kCHALLENGER : kOWNER
-        let query = gamesDb.document(gameId).collection(kPLAYERS).document(playerDocumentId)
+        let query = gamesDb.document(enemy.userId)
         enemyMovesListener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self,
-                        let snapshot,
+                      let snapshot,
                       snapshot.exists,
                       !snapshot.metadata.hasPendingWrites
                 else { return }
-                do {
-                    let playerDoc = try snapshot.data(as: PlayerDocument.self)
-                    if enemy.rounds.count != playerDoc.selectedMoves.count {
-                        LOGE("After receiving PlayerDocument changes, the count for enemy rounds and selected moves is not the same")
-                        TODO("Test if it goes here. If it does then populate enemy rounds with null selected moves until the rounds count is the same")
-                    }
-                    enemy.moves.updateSelected(playerDoc.selectedMoves.last!.attackPosition)
-                    enemy.moves.updateSelected(playerDoc.selectedMoves.last!.defensePosition)
-                    enemy.populateSelectedMoves()
-                    if isPlayerRoundReady {
-                        damageAndAnimate()
-                    }
-                    isEnemyRoundReady = true
-                } catch {
-                    LOGDE("Error creating room with error: \(error.localizedDescription)\t\t and data: \(snapshot.data()?.description ?? "")")
-                }
+                updateEnemySelectedMoves(with: snapshot)
             }
+    }
+
+    ///Updates enemy'a selected moves from database. Returns false if unsucessfully updated
+    func updateEnemySelectedMoves(with gameDocument: DocumentSnapshot) {
+        guard gameDocument.exists,
+              !gameDocument.metadata.hasPendingWrites,
+              let gameDic = gameDocument.data(),
+              let selectedMovesDic = gameDic[kSELECTEDMOVES] as? [[String: String?]],
+              let currentMoveDic = selectedMovesDic.last else {
+            return
+        }
+        if enemy.rounds.count != selectedMovesDic.count {
+            LOGE("After fetching FetchedGame changes, the count for enemy rounds and selected moves is not the same")
+            return
+        }
+        var selectedAttackPosition: AttackPosition?
+        var selectedDefensePosition: DefensePosition?
+        if let attackKey = currentMoveDic[kATTACKPOSITION] as? String {
+            selectedAttackPosition = AttackPosition(rawValue: attackKey)
+        }
+        if let defenseKey = currentMoveDic[kDEFENSEPOSITION] as? String {
+            selectedDefensePosition = DefensePosition(rawValue: defenseKey)
+        }
+
+        enemy.moves.updateSelected(selectedAttackPosition)
+        enemy.moves.updateSelected(selectedDefensePosition)
+        enemy.populateSelectedMoves()
+        isEnemyRoundReady = true
+        if isPlayerRoundReady {
+            damageAndAnimate()
+        }
+    }
+
+    func refetchEnemySelectedMovesIfNeeded() async {
+        Task {
+            if !isEnemyRoundReady {
+                let enemyId = enemy.userId
+                let gameDocument = try await GameNetworkManager.getEnemySelectedMoves(enemyId: enemyId)
+                updateEnemySelectedMoves(with: gameDocument)
+            }
+        }
     }
 }

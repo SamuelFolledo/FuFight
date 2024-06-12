@@ -16,10 +16,10 @@ class RoomNetworkManager {
 extension RoomNetworkManager {
     static func createRoom(_ room: Room) async throws {
         do {
-            let userId = room.owner!.userId
+            let userId = room.player.userId
             let roomDocument = roomsDb.document(userId)
             try roomDocument.setData(from: room)
-            LOGD("Room created for roomId: \(room.owner!.username)")
+            LOGD("Room created for roomId: \(room.player.username)")
         } catch {
             throw error
         }
@@ -37,8 +37,20 @@ extension RoomNetworkManager {
     }
 
     ///Fetch an available room if there's any available. Return avaialble roomIds
-    static func findAvailableRooms(userId: String) async throws -> [String] {
-        let isRoomSearchingFilter: Filter = .whereField(kSTATUS, isEqualTo: Room.Status.searching.rawValue)
+    static func fetchAvailableRooms(userId: String) async throws -> [Room] {
+        do {
+            let searchingRooms = try await getRoomsWithStatus(.searching)
+            let availableRooms = searchingRooms.filter { $0.documentId != userId }
+            LOGD("Fetched searching and non-user rooms found: \(availableRooms.count)")
+            return availableRooms
+        } catch {
+            throw error
+        }
+    }
+
+    ///Fetches all Rooms with the status. Note this can return the user's Room
+    static func getRoomsWithStatus(_ status: Room.Status) async throws -> [Room] {
+        let isRoomSearchingFilter: Filter = .whereField(kSTATUS, isEqualTo: status.rawValue)
         do {
             let availableRooms = try await roomsDb
                 .whereFilter(Filter.andFilter([
@@ -47,29 +59,28 @@ extension RoomNetworkManager {
                 .limit(to: 3)
                 .getDocuments()
 //                .order(by: "dateAdded", descending: true)
-            let roomIds = availableRooms.documents.compactMap { $0.documentID != userId ? $0.documentID : nil }
-            LOGD("Total rooms found: \(roomIds.count)")
-            return roomIds
+            var rooms = [Room]()
+            for document in availableRooms.documents {
+                do {
+                    let room = try document.data(as: Room.self)
+                    room.documentId = document.documentID
+                    rooms.append(room)
+                } catch {
+                    LOGE("Error finding available rooms: \(error.localizedDescription)")
+                }
+            }
+            LOGD("Total rooms found with status: \(status.rawValue) is : \(rooms.count)")
+            return rooms
         } catch {
             throw error
         }
     }
 
-    ///For room owner to create a new or rejoin an existing room
-    static func createOrRejoinRoom(room: Room) async throws {
+    static func updateRoom(_ room: Room) async throws {
         do {
-            let ownerId = room.ownerId
-            let roomDocuments = try await roomsDb.whereField(kOWNERID, isEqualTo: ownerId).getDocuments()
-            if roomDocuments.isEmpty {
-                //Check if user already has a room created
-                let roomDocument = roomsDb.document(ownerId)
-                try roomDocument.setData(from: room)
-                LOGD("Current room created with id: \(roomDocument.documentID)")
-            } else {
-                //Rejoin room
-                let roomDocument = roomDocuments.documents.first!
-                LOGD("Current room rejoined at id: \(roomDocument.documentID)")
-            }
+            let roomDocument = roomsDb.document(room.player.userId)
+            try await roomDocument.setData(room.asDictionary(), merge: true)
+            LOGD("Room is updated successfully: \(room.player.username)")
         } catch {
             throw error
         }
@@ -87,7 +98,7 @@ extension RoomNetworkManager {
         LOGD("Player's room status is updated to: \(status.rawValue)")
     }
 
-    ///For room owner to delete room
+    ///For room player to delete room
     static func deleteCurrentRoom(roomId: String) async throws {
         do {
             try await roomsDb.document(roomId).delete()
@@ -110,12 +121,12 @@ extension RoomNetworkManager {
         }
     }
 
-    ///Updates room's owner in the database
+    ///Updates room's player in the database
     static func updateOwner(_ player: FetchedPlayer) async throws {
         do {
             let roomDocument = roomsDb.document(player.userId)
-            try await roomDocument.updateData([kOWNER: player.asDictionary()])
-            LOGD("Room's owner is updated successfully: \(player.username)")
+            try await roomDocument.updateData([kPLAYER: player.asDictionary()])
+            LOGD("Room is updated successfully: \(player.username)")
         } catch {
             throw error
         }

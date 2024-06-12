@@ -10,46 +10,43 @@ import FirebaseFirestore
 import FirebaseStorage
 import SwiftUI
 
-class GameNetworkManager {
+final class GameNetworkManager {
     private init() {}
 }
 
 //MARK: - Game methods
 extension GameNetworkManager {
-    static func createGameFromRoom(_ room: Room, ownerInitiallyHasSpeedBoost: Bool) async throws {
-        guard let owner = room.owner, let challenger = room.challengers.first else { return }
-        do {
-            let game = FetchedGame(owner: owner, challenger: challenger, ownerInitiallyHasSpeedBoost: ownerInitiallyHasSpeedBoost)
-            try await gamesDb.document(owner.userId).setData(game.asDictionary())
-            LOGD("Room owner created a Game document against \(challenger.username). With owner has initial speed boost? \(game.ownerInitiallyHasSpeedBoost)")
-        } catch {
-            throw error
-        }
+    static func createGame(_ game: FetchedGame) async throws {
+        try gamesDb.document(game.player.userId).setData(from: game)
+        LOGD("Successfully created a Game document. PlayerHasInitialSpeedBoost: \(game.playerInitiallyHasSpeedBoost)")
     }
 
     static func deleteGame(_ userId: String) async throws {
-        do {
-            let gameDocument = gamesDb.document(userId)
-            try await gameDocument.collection(kPLAYERS).document(kOWNER).delete()
-            try await gameDocument.collection(kPLAYERS).document(kCHALLENGER).delete()
-            try await gameDocument.delete()
-            LOGD("Game document deleted successfully for userId: \(userId)")
-        } catch {
-            throw error
-        }
+        let gameDocument = gamesDb.document(userId)
+        try await gameDocument.delete()
+        LOGD("Game document deleted successfully for userId: \(userId)")
     }
 }
 
 //MARK: - In-Game methods
 extension GameNetworkManager {
-    static func uploadSelectedMoves(rounds: [Round], isGameOwner: Bool, gameId: String) async throws {
-        let documentId = isGameOwner ? kOWNER : kCHALLENGER
-        let fetchedRounds = PlayerDocument(rounds: rounds)
-        let query = gamesDb.document(gameId).collection(kPLAYERS).document(documentId)
-        if rounds.count == 1 {
-            try query.setData(from: fetchedRounds)
-        } else {
-            try await query.updateData(fetchedRounds.asDictionary())
+    static func uploadSelectedMoves(_ player: Player) async throws {
+        let selectedMoves = player.rounds.compactMap {
+            [
+                kATTACKPOSITION: $0.attack?.position.rawValue,
+                kDEFENSEPOSITION: $0.defend?.position.rawValue,
+            ]
         }
+        let selectedMovesDic: [String: Any] = [
+            kSELECTEDMOVES: selectedMoves
+        ]
+        let query = gamesDb.document(player.userId)
+        try await query.setData(selectedMovesDic, merge: true)
+    }
+
+    ///get enemy's selected moves as dictionary
+    static func getEnemySelectedMoves(enemyId: String) async throws -> DocumentSnapshot {
+        let query = gamesDb.document(enemyId)
+        return try await query.getDocument()
     }
 }
