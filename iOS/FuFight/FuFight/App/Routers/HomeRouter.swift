@@ -112,8 +112,8 @@ class HomeRouter: ObservableObject {
             return
         }
         let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
-        let player = Player(fetchedPlayer: game.player, isEnemy: false, isGameOwner: vm.isRoomOwner, initiallyHasSpeedBoost: game.playerInitiallyHasSpeedBoost)
-        let enemyPlayer = Player(fetchedPlayer: game.enemy, isEnemy: true, isGameOwner: !vm.isRoomOwner, initiallyHasSpeedBoost: !game.playerInitiallyHasSpeedBoost)
+        let player = Player(fetchedPlayer: game.player, isEnemy: false, isGameOwner: !vm.isChallenger, initiallyHasSpeedBoost: game.playerInitiallyHasSpeedBoost)
+        let enemyPlayer = Player(fetchedPlayer: game.enemy, isEnemy: true, isGameOwner: vm.isChallenger, initiallyHasSpeedBoost: !game.playerInitiallyHasSpeedBoost)
         navigationPath.append(.game(vm: makeGameViewModel(player: player, enemy: enemyPlayer, gameMode: .onlineGame)))
     }
 

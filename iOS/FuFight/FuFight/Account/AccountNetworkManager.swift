@@ -27,71 +27,43 @@ extension AccountNetworkManager {
     ///Create a user from email and password
     ///Email and password should have been validated already before calling this method
     static func createUser(email: String, password: String) async throws -> AuthDataResult? {
-        do {
-            let authData = try await auth.createUser(withEmail: email, password: password)
-            LOGD("AUTH: Finished creating user from email: \(authData.user.email ?? "")", from: self)
-            return authData
-        } catch {
-            throw error
-        }
+        let authData = try await auth.createUser(withEmail: email, password: password)
+        LOGD("AUTH: Finished creating user from email: \(authData.user.email ?? "")", from: self)
+        return authData
     }
 
     ///Deletes and log out the current authenticated user
     static func deleteAuthData(userId: String) async throws {
-        do {
-            try await auth.currentUser?.delete()
-            LOGD("AUTH: Finished deleting and logging out the authenticated user with userId: \(userId)", from: self)
-        } catch {
-            throw error
-        }
+        try await auth.currentUser?.delete()
+        LOGD("AUTH: Finished deleting and logging out the authenticated user with userId: \(userId)", from: self)
     }
 
     static func logIn(email: String, password: String) async throws -> AuthDataResult? {
-        do {
-            let authData = try await auth.signIn(withEmail: email, password: password)
-            LOGD("AUTH: Finished logging in for \(authData.user.displayName ?? "")", from: self)
-            return authData
-        } catch {
-            throw error
-        }
+        let authData = try await auth.signIn(withEmail: email, password: password)
+        LOGD("AUTH: Finished logging in for \(authData.user.displayName ?? "")", from: self)
+        return authData
     }
 
     static func logOut() async throws {
-        do {
-            try auth.signOut()
-            LOGD("AUTH: Finished logging out", from: self)
-        } catch {
-            throw error
-        }
+        try auth.signOut()
+        LOGD("AUTH: Finished logging out", from: self)
     }
 
     static func resetPassword(withEmail email: String) async throws {
-        do {
-            try await auth.sendPasswordReset(withEmail: email)
-            LOGD("AUTH: Finished resetPassword link to \(email)", from: self)
-        } catch {
-            throw error
-        }
+        try await auth.sendPasswordReset(withEmail: email)
+        LOGD("AUTH: Finished resetPassword link to \(email)", from: self)
     }
 
     static func reauthenticateUser(password: String) async throws {
-        do {
-            let email = Account.current?.email ?? auth.currentUser!.email!
-            let credential = EmailAuthProvider.credential(withEmail: email.trimmed, password: password)
-            try await auth.currentUser?.reauthenticate(with: credential)
-            LOGD("AUTH: Finished reauthenticating user withEmail: \(email)", from: self)
-        } catch {
-            throw error
-        }
+        let email = Account.current?.email ?? auth.currentUser!.email!
+        let credential = EmailAuthProvider.credential(withEmail: email.trimmed, password: password)
+        try await auth.currentUser?.reauthenticate(with: credential)
+        LOGD("AUTH: Finished reauthenticating user withEmail: \(email)", from: self)
     }
 
     static func updatePassword(_ password: String) async throws {
-        do {
-            try await auth.currentUser?.updatePassword(to: password)
-            LOGD("AUTH: Finished updating user's password", from: self)
-        } catch {
-            throw error
-        }
+        try await auth.currentUser?.updatePassword(to: password)
+        LOGD("AUTH: Finished updating user's password", from: self)
     }
 
     ///Update current account's username and/or photUrl
@@ -109,12 +81,8 @@ extension AccountNetworkManager {
             LOGD("Updating authenticated user's photoUrl to \(photoUrlString)", from: self)
             changeRequest?.photoURL = photoUrl
         }
-        do {
-            try await changeRequest?.commitChanges()
-            LOGD("AUTH: Finished updating user's displayName to \(username) and photoUrl to \(photoUrlString)", from: self)
-        } catch {
-            throw error
-        }
+        try await changeRequest?.commitChanges()
+        LOGD("AUTH: Finished updating user's displayName to \(username) and photoUrl to \(photoUrlString)", from: self)
     }
 }
 
@@ -126,24 +94,16 @@ extension AccountNetworkManager {
         let metaData = StorageMetadata()
         metaData.contentType = "image/jpg"
         let photoReference = accountPhotoStorage.child("\(userId).jpg")
-        do {
-            let _ = try await photoReference.putDataAsync(imageData, metadata: metaData)
-            let url = try await photoReference.downloadURL()
-            LOGD("STORAGE: Finished storing account's profile photo with downloadUrl: \(url.absoluteString)", from: self)
-            return url
-        } catch {
-            throw error
-        }
+        let _ = try await photoReference.putDataAsync(imageData, metadata: metaData)
+        let url = try await photoReference.downloadURL()
+        LOGD("STORAGE: Finished storing account's profile photo with downloadUrl: \(url.absoluteString)", from: self)
+        return url
     }
 
     static func deleteStoredPhoto(_ userId: String) async throws {
         let photoReference = accountPhotoStorage.child("\(userId).jpg")
-        do {
-            try await photoReference.delete()
-            LOGD("STORAGE: Finished deleting profile photo from userId: \(userId)", from: self)
-        } catch {
-            throw error
-        }
+        try await photoReference.delete()
+        LOGD("STORAGE: Finished deleting profile photo from userId: \(userId)", from: self)
     }
 }
 
@@ -153,25 +113,17 @@ extension AccountNetworkManager {
     static func setData(account: Account?, merge: Bool = true) async throws {
         if let account {
             let accountsRef = accountsDb.document(account.userId)
-            do {
-                try accountsRef.setData(from: account, merge: merge)
-                LOGD("DB: Finished setData for \(account.displayName)", from: self)
-            } catch {
-                throw error
-            }
+            try accountsRef.setData(from: account, merge: merge)
+            LOGD("DB: Finished setData for \(account.displayName)", from: self)
         }
     }
 
     ///fetch user's data from Firestore and returns an account
     static func fetchData(userId: String) async throws -> Account? {
         let accountsRef = accountsDb.document(userId)
-        do {
-            let account = try await accountsRef.getDocument(as: Account.self)
-            LOGD("DB: Finished fetching \(account.displayName)", from: self)
-            return account
-        } catch {
-            throw error
-        }
+        let account = try await accountsRef.getDocument(as: Account.self)
+        LOGD("DB: Finished fetching \(account.displayName)", from: self)
+        return account
     }
 
     ///Get the document from the Account collections using their username
@@ -181,13 +133,9 @@ extension AccountNetworkManager {
 
     ///Delete user's data from Accounts collection
     static func deleteData(_ userId: String) async throws {
-        do {
-            let accountsRef = accountsDb.document(userId)
-            try await accountsRef.delete()
-            LOGD("DB: Finished deleting account with userId: \(userId)", from: self)
-        } catch {
-            throw error
-        }
+        let accountsRef = accountsDb.document(userId)
+        try await accountsRef.delete()
+        LOGD("DB: Finished deleting account with userId: \(userId)", from: self)
     }
 
     ///Set username to the database into Accounts collections
@@ -195,52 +143,36 @@ extension AccountNetworkManager {
         let username = username.trimmed
         guard !userId.isEmpty,
               !username.isEmpty else { return }
-        do {
-            ///Update Accounts collection
-            let accountsRef = accountsDb.document(userId)
-            try await accountsRef.setData([kUSERNAME: username], merge: true)
-        } catch {
-            throw error
-        }
+        ///Update Accounts collection
+        let accountsRef = accountsDb.document(userId)
+        try await accountsRef.setData([kUSERNAME: username], merge: true)
     }
 
     ///Check Accounts collection in database if username is unique
     static func isUnique(username: String) async throws -> Bool {
-        do {
-            if let _ = try await fetchAccountDocument(with: username) {
-                return false
-            }
-            let isUsernameUnique = true
-            LOGD("DB: Username \(username) is unique = \(isUsernameUnique)", from: self)
-            return isUsernameUnique
-        } catch {
-            throw error
+        if let _ = try await fetchAccountDocument(with: username) {
+            return false
         }
+        let isUsernameUnique = true
+        LOGD("DB: Username \(username) is unique = \(isUsernameUnique)", from: self)
+        return isUsernameUnique
     }
 
     ///Fetch the email from Usernames collection
     static func fetchEmailFrom(username: String) async throws -> String? {
-        do {
-            guard let accountDocument = try await fetchAccountDocument(with: username) else { return nil }
-            if let email = accountDocument.data()[kEMAIL] as? String {
-                LOGD("DB: Finished fetching email \(email) from username \(username)", from: self)
-                return email
-            }
-            return nil
-        } catch {
-            throw error
+        guard let accountDocument = try await fetchAccountDocument(with: username) else { return nil }
+        if let email = accountDocument.data()[kEMAIL] as? String {
+            LOGD("DB: Finished fetching email \(email) from username \(username)", from: self)
+            return email
         }
+        return nil
     }
 
     ///Returns true if user has completed onboarding
     static func isAccountValid(userId: String) async throws -> Bool {
-        do {
-            let accountsRef = accountsDb.document(userId)
-            let isValid = try await accountsRef.getDocument().exists
-            LOGD("Finished validating account \(isValid), id \(userId)")
-            return isValid
-        } catch {
-            throw error
-        }
+        let accountsRef = accountsDb.document(userId)
+        let isValid = try await accountsRef.getDocument().exists
+        LOGD("Finished validating account \(isValid), id \(userId)")
+        return isValid
     }
 }
