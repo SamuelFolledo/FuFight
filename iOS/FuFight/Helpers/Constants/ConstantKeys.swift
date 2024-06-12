@@ -32,12 +32,12 @@ public let kLEVEL: String = "level"
 public let kRESULT: String = "result"
 
 //Room Keys
-public let kOWNER: String = "owner"
-public let kCHALLENGER: String = "challenger"
+public let kPLAYER: String = "player"
+public let kENEMY: String = "enemy"
 
 public let kCHALLENGERS: String = "challengers"
-public let kOWNERID: String = "ownerId"
-public let kOWNERINITIALLYHASSPEEDBOOST: String = "ownerInitiallyHasSpeedBoost"
+public let kPLAYERID: String = "playerId"
+public let kPLAYERINITIALLYHASSPEEDBOOST: String = "playerInitiallyHasSpeedBoost"
 public let kSTATUS: String = "status"
 
 //Selected Move Keys

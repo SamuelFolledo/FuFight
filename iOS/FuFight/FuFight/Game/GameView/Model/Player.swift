@@ -9,11 +9,13 @@ import Foundation
 
 struct PlayerState {
     private(set) var boostLevel: BoostLevel
+    let initiallyHasSpeedBoost: Bool
     ///Keeps track of which player gets the speed boost next round. True if current player attacked first and landed it
     private(set) var hasSpeedBoost: Bool //TODO: Multiplayer game mode should be synced between games
 
     init(boostLevel: BoostLevel, initiallyHasSpeedBoost: Bool) {
         self.boostLevel = boostLevel
+        self.initiallyHasSpeedBoost = initiallyHasSpeedBoost
         self.hasSpeedBoost = initiallyHasSpeedBoost
     }
 

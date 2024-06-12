@@ -7,45 +7,48 @@
 
 import FirebaseFirestore
 
-///This class represents a Game document. The authenticated user can be the game's owner or an challenger
+///This class represents a Game document. The authenticated user can be the game's player or an enemy
 struct FetchedGame {
     @DocumentID private var documentId: String?
-    var ownerId: String { documentId! }
-    private(set) var owner: FetchedPlayer
-    private(set) var challenger: FetchedPlayer
-    let ownerInitiallyHasSpeedBoost: Bool
+    private(set) var player: FetchedPlayer
+    private(set) var enemy: FetchedPlayer
+    let playerInitiallyHasSpeedBoost: Bool
 
-    ///Initializer for the owner
-    init(owner: FetchedPlayer, challenger: FetchedPlayer, ownerInitiallyHasSpeedBoost: Bool) {
-        self.documentId = owner.userId
-        self.owner = owner
-        self.challenger = challenger
-        self.ownerInitiallyHasSpeedBoost = ownerInitiallyHasSpeedBoost
+    private(set) var selectedMoves: [SelectedMove] = []
+
+    ///Initializer for the player
+    init(player: FetchedPlayer, enemy: FetchedPlayer, playerInitiallyHasSpeedBoost: Bool) {
+        self.documentId = player.userId
+        self.player = player
+        self.enemy = enemy
+        self.playerInitiallyHasSpeedBoost = playerInitiallyHasSpeedBoost
     }
 }
 
 //MARK: - Codable extension
 extension FetchedGame: Codable {
     private enum CodingKeys : String, CodingKey {
-        case ownerId = "ownerId"
-        case owner = "owner"
-        case challenger = "challenger"
-        case ownerInitiallyHasSpeedBoost = "ownerInitiallyHasSpeedBoost"
+        case playerId = "playerId"
+        case player = "player"
+        case enemy = "enemy"
+        case playerInitiallyHasSpeedBoost = "playerInitiallyHasSpeedBoost"
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(ownerId, forKey: .ownerId)
-        try container.encode(owner, forKey: .owner)
-        try container.encode(challenger, forKey: .challenger)
-        try container.encode(ownerInitiallyHasSpeedBoost, forKey: .ownerInitiallyHasSpeedBoost)
+        if let documentId {
+            try container.encode(documentId, forKey: .playerId)
+        }
+        try container.encode(player, forKey: .player)
+        try container.encode(enemy, forKey: .enemy)
+        try container.encode(playerInitiallyHasSpeedBoost, forKey: .playerInitiallyHasSpeedBoost)
     }
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.documentId = try values.decodeIfPresent(String.self, forKey: .ownerId)!
-        self.ownerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .ownerInitiallyHasSpeedBoost)!
-        self.owner = try values.decodeIfPresent(FetchedPlayer.self, forKey: .owner) ?? FetchedPlayer(fakePlayer)
-        self.challenger = try values.decodeIfPresent(FetchedPlayer.self, forKey: .challenger) ?? FetchedPlayer(fakeEnemyPlayer)
+        self.documentId = try values.decodeIfPresent(String.self, forKey: .playerId)!
+        self.playerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .playerInitiallyHasSpeedBoost)!
+        self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player) ?? FetchedPlayer(fakePlayer)
+        self.enemy = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemy) ?? FetchedPlayer(fakeEnemyPlayer)
     }
 }

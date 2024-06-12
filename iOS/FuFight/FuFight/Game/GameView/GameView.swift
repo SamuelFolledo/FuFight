@@ -61,6 +61,10 @@ struct GameView: View {
             vm.decrementTimeByOneSecond()
         }
         .toolbar(.hidden, for: .tabBar)
+        .task {
+            //Must be started here in order to avoid duplicated calls on createNewRound()
+            vm.updateState(.starting)
+        }
     }
 
     var timerView: some View {

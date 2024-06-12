@@ -29,6 +29,7 @@ enum MainErrorType {
     case reauthenticatingUser
     case noOpponentFound
     case updatingAccountOrRoom
+    case noDocumentToUpdate
 
     var title: String {
         switch self {
@@ -74,6 +75,8 @@ enum MainErrorType {
             "Error finding opponent"
         case .updatingAccountOrRoom:
             "Error updating account's data"
+        case .noDocumentToUpdate:
+            "Attempting to update a data that does not exist"
         }
     }
 }
@@ -95,5 +98,12 @@ struct MainError {
         self.type = type
         self.title = type.title
         self.message = message
+    }
+
+    init?(error: Error) {
+        if error.localizedDescription.contains("No document to update") {
+            self.init(type: .noDocumentToUpdate, message: "")
+        }
+        return nil
     }
 }

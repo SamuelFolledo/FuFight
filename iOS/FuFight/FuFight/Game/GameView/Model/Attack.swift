@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-enum AttackPosition: Int {
-    case leftLight = 1
-    case rightLight = 2
-    case leftMedium = 3
-    case rightMedium = 4
-    case leftHard = 5
-    case rightHard = 6
+enum AttackPosition: String {
+    case leftLight
+    case rightLight
+    case leftMedium
+    case rightMedium
+    case leftHard
+    case rightHard
 
     var isLeft: Bool {
-        return rawValue % 2 == 1
+        return self == .leftLight || self == .leftMedium || self == .leftHard
     }
 }
 

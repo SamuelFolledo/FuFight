@@ -7,14 +7,6 @@
 
 import Foundation
 
-struct PlayerDocument: Codable {
-    var selectedMoves: [SelectedMove]
-
-    init(rounds: [Round]) {
-        self.selectedMoves = rounds.compactMap { SelectedMove(round: $0) }
-    }
-}
-
 struct SelectedMove: Codable {
     var attackPosition: AttackPosition?
     var defensePosition: DefensePosition?
@@ -37,17 +29,13 @@ struct SelectedMove: Codable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        if let attackPositionId = try values.decodeIfPresent(Int.self, forKey: .attackPosition),
+        if let attackPositionId = try values.decodeIfPresent(String.self, forKey: .attackPosition),
            let attackPosition = AttackPosition(rawValue: attackPositionId) {
             self.attackPosition = attackPosition
-        } else {
-//            LOGD("No attack position")
         }
-        if let defensePositionId = try values.decodeIfPresent(Int.self, forKey: .defensePosition),
+        if let defensePositionId = try values.decodeIfPresent(String.self, forKey: .defensePosition),
            let defensePosition = DefensePosition(rawValue: defensePositionId) {
             self.defensePosition = defensePosition
-        } else {
-//            LOGD("No defense position")
         }
     }
 }

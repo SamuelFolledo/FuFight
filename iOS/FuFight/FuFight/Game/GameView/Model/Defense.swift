@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-enum DefensePosition: Int {
-    case forward = 1
-    case left = 2
-    case backward = 3
-    case right = 4
+enum DefensePosition: String {
+    case forward
+    case left
+    case backward
+    case right
 }
 
 protocol DefenseTypeProtocol: DefenseProtocol, Move {}

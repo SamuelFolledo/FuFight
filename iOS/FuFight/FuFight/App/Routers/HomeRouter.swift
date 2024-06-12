@@ -107,10 +107,13 @@ class HomeRouter: ObservableObject {
     }
 
     func didCompleteLoading(vm: GameLoadingViewModel) {
-        guard let enemy = vm.enemy else { return }
+        guard let game = vm.game else {
+            LOGE("Failed to load GameView with missing game")
+            return
+        }
         let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
-        let player = Player(fetchedPlayer: vm.player, isEnemy: false, isGameOwner: vm.isRoomOwner, initiallyHasSpeedBoost: initiallyHasSpeedBoost)
-        let enemyPlayer = Player(fetchedPlayer: enemy, isEnemy: true, isGameOwner: !vm.isRoomOwner, initiallyHasSpeedBoost: !initiallyHasSpeedBoost)
+        let player = Player(fetchedPlayer: game.player, isEnemy: false, isGameOwner: vm.isRoomOwner, initiallyHasSpeedBoost: game.playerInitiallyHasSpeedBoost)
+        let enemyPlayer = Player(fetchedPlayer: game.enemy, isEnemy: true, isGameOwner: !vm.isRoomOwner, initiallyHasSpeedBoost: !game.playerInitiallyHasSpeedBoost)
         navigationPath.append(.game(vm: makeGameViewModel(player: player, enemy: enemyPlayer, gameMode: .onlineGame)))
     }
 
