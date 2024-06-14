@@ -77,6 +77,8 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         if isEnemyFound {
             isEnemyFound = false
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
+        } else {
+            RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
         }
         initiallyHasSpeedBoost = false
         isChallenger = true
@@ -178,10 +180,10 @@ private extension GameLoadingViewModel {
         room = gameRoom
         updateLoadingMessage(to: "Waiting for opponent")
         if isChallenger {
-            if gameRoom.challengers.isEmpty {
-                LOGE("Failed to join room as challenger")
+            if let enemy = gameRoom.challengers.first {
+                subscribeToEnemyGameChanges(enemy.userId)
             } else {
-                subscribeToEnemyGameChanges(gameRoom)
+                LOGE("Failed to join room as challenger")
             }
         } else {
             if let enemy = gameRoom.challengers.first {
@@ -199,7 +201,7 @@ private extension GameLoadingViewModel {
             let game = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
             try await GameNetworkManager.createGame(game)
             self.game = game
-            transitionToGameView()
+            subscribeToEnemyGameChanges(enemy.userId)
         }
     }
 
@@ -224,11 +226,10 @@ private extension GameLoadingViewModel {
     }
 
     ///As the player is challenged, subscribe to the enemy's game changes
-    func subscribeToEnemyGameChanges(_ room: Room) {
+    func subscribeToEnemyGameChanges(_ enemyId: String) {
         if listener != nil {
             unsubscribe()
         }
-        let enemyId = !isChallenger ? room.challengers.first!.userId : room.player.userId
         updateLoadingMessage(to: "Syncing with opponent")
         let query = gamesDb.document(enemyId)
         listener = query
@@ -239,10 +240,11 @@ private extension GameLoadingViewModel {
                           snapshot.exists,
                           !snapshot.metadata.hasPendingWrites else { return }
                     let enemyGame = try snapshot.data(as: FetchedGame.self)
-
                     if isChallenger {
                         initiallyHasSpeedBoost = !enemyGame.playerInitiallyHasSpeedBoost
                         prepareForGameAsChallenger(enemy: enemyGame.player)
+                    } else {
+                        transitionToGameView()
                     }
                 } catch let error {
                     LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
