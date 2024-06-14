@@ -352,11 +352,14 @@ private extension GameViewModel {
         enemyMovesListener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self,
-                      let snapshot,
-                      snapshot.exists,
-                      !snapshot.metadata.hasPendingWrites
-                else { return }
-                updateEnemySelectedMoves(with: snapshot)
+                      let snapshot else { return }
+                if snapshot.exists {
+                    updateEnemySelectedMoves(with: snapshot)
+                } else {
+                    //Handle deleted document
+                    LOGD("Enemy exited the game. Player won")
+                    exitGame()
+                }
             }
     }
 
