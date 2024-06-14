@@ -109,7 +109,7 @@ class Player: PlayerProtocol {
         let moveSpeed = selectedAttack?.speed ?? 0
         let speedMultiplier = selectedDefend?.speedMultiplier ?? 1
         let speedBoostMultiplier = state.hasSpeedBoost ? speedBoostMultiplier : 1
-        speed = (moveSpeed * speedMultiplier * speedBoostMultiplier).roundDecimalUpTo(1)
+        speed = (moveSpeed * speedMultiplier * speedBoostMultiplier).roundDecimalUpTo(3)
     }
 
     /// - Parameters:

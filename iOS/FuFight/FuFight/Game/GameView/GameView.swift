@@ -53,6 +53,7 @@ struct GameView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .allowsHitTesting(!vm.isBuffering)
         .navigationBarBackButtonHidden()
         .onChange(of: scenePhase) {
             vm.scenePhaseChangedHandler(scenePhase)
