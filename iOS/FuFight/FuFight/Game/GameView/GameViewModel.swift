@@ -23,6 +23,7 @@ class GameViewModel: BaseViewModel {
     var isDefenderAlive = true
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
+    var isBuffering: Bool = false
 
     private var isPlayerRoundReady: Bool = false
     private var isEnemyRoundReady: Bool = false
@@ -154,9 +155,11 @@ private extension GameViewModel {
         isPlayerRoundReady = false
         isEnemyRoundReady = false
         isAnimating = false
+        isBuffering = false
     }
 
     func endOfRoundHandler() {
+        isBuffering = true
         isCountingDown = false
         /*
          TODO: Send selected moves to database
