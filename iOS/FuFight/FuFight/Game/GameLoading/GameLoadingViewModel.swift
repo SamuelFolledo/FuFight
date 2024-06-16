@@ -77,8 +77,6 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         if isEnemyFound {
             isEnemyFound = false
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
-        } else {
-            RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
         }
         initiallyHasSpeedBoost = false
         isChallenger = true

@@ -62,5 +62,13 @@ final class HomeViewModel: BaseAccountViewModel {
     func refreshPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
         self.player = player
+        //TODO: Make sure to not set status to online if it's already online in the database
+        RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
+        Task {
+            do {
+                //TODO: Make sure to only delete the game in the database if it exist
+                try await GameNetworkManager.deleteGame(player.userId)
+            }
+        }
     }
 }
