@@ -93,6 +93,6 @@ extension RoomNetworkManager {
     static func updateOwner(_ player: FetchedPlayer) async throws {
         let roomDocument = roomsDb.document(player.userId)
         try await roomDocument.updateData([kPLAYER: player.asDictionary()])
-        LOGD("Room is updated successfully: \(player.username)")
+        LOGD("Room's owner is updated successfully: \(player.username)")
     }
 }

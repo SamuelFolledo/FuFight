@@ -97,15 +97,15 @@ class Player: PlayerProtocol {
     }
 
     func populateSelectedMoves() {
-        let selectedAttack = moves.attacks.first(where: { $0.state == .selected })
-        let selectedDefend = moves.defenses.first(where: { $0.state == .selected })
+        let selectedAttack = moves.selectedAttack
+        let selectedDefend = moves.selectedDefense
         rounds[rounds.count - 1].attack = selectedAttack
         rounds[rounds.count - 1].defend = selectedDefend
     }
 
     func refreshSpeed() {
-        let selectedAttack = currentRound?.attack ?? moves.attacks.first(where: { $0.state == .selected })
-        let selectedDefend = currentRound?.defend ?? moves.defenses.first(where: { $0.state == .selected })
+        let selectedAttack = currentRound?.attack ?? moves.selectedAttack
+        let selectedDefend = currentRound?.defend ?? moves.selectedDefense
         let moveSpeed = selectedAttack?.speed ?? 0
         let speedMultiplier = selectedDefend?.speedMultiplier ?? 1
         let speedBoostMultiplier = state.hasSpeedBoost ? speedBoostMultiplier : 1
