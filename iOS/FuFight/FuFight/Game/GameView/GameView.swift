@@ -22,6 +22,8 @@ struct GameView: View {
             Spacer()
 
             createMovesView(for: .user)
+                .allowsHitTesting(!vm.isBuffering)
+                .opacity(vm.isBuffering ? 0.4 : 1)
 
             createPlayerView(for: .user)
         }
@@ -53,7 +55,6 @@ struct GameView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-        .allowsHitTesting(!vm.isBuffering)
         .navigationBarBackButtonHidden()
         .onChange(of: scenePhase) {
             vm.scenePhaseChangedHandler(scenePhase)
