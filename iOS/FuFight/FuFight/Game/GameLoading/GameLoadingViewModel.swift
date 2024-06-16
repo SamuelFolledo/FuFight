@@ -27,12 +27,11 @@ import FirebaseFirestore
  */
 
 final class GameLoadingViewModel: BaseAccountViewModel {
-    @Published var game: FetchedGame?
+    var game: FetchedGame?
     @Published var room: Room?
     ///Currently logged in player, does not necessarily means the owner
     @Published var player: FetchedPlayer
     @Published var enemy: FetchedPlayer?
-    @Published var currentRoomId: String?
     let didFindEnemy = PassthroughSubject<GameLoadingViewModel, Never>()
     let didCancel = PassthroughSubject<GameLoadingViewModel, Never>()
 
@@ -69,11 +68,10 @@ final class GameLoadingViewModel: BaseAccountViewModel {
 
     override func onDisappear() {
         super.onDisappear()
+        subscriptions.removeAll()
         unsubscribe()
         room = nil
         enemy = nil
-        currentRoomId = nil
-        subscriptions.removeAll()
         if isEnemyFound {
             isEnemyFound = false
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
@@ -86,9 +84,7 @@ final class GameLoadingViewModel: BaseAccountViewModel {
     func cancelButtonTapped() {
         didCancel.send(self)
     }
-}
 
-private extension GameLoadingViewModel {
     ///Search for rooms the user can join. If there is no available room, creates a room and wait for challengers
     func findOpponent() {
         updateLoadingMessage(to: "Finding opponent")
@@ -105,7 +101,9 @@ private extension GameLoadingViewModel {
             }
         }
     }
+}
 
+private extension GameLoadingViewModel {
     func waitForChallenger() {
         Task {
             updateLoadingMessage(to: "Waiting for an opponent")
@@ -147,9 +145,9 @@ private extension GameLoadingViewModel {
             unsubscribe()
         }
         guard !isChallenger,
-              let currentRoomId
+              let room
         else { return }
-        let query = roomsDb.document(currentRoomId)
+        let query = roomsDb.document(room.player.userId)
         listener = query
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
@@ -174,12 +172,11 @@ private extension GameLoadingViewModel {
 
     @MainActor func updateRoom(_ gameRoom: Room, isChallenger: Bool) {
         self.isChallenger = isChallenger
-        currentRoomId = gameRoom.player.userId
         room = gameRoom
         updateLoadingMessage(to: "Waiting for opponent")
         if isChallenger {
-            if let enemy = gameRoom.challengers.first {
-                subscribeToEnemyGameChanges(enemy.userId)
+            if !gameRoom.challengers.isEmpty {
+                subscribeToEnemyGameChanges(gameRoom.player.userId)
             } else {
                 LOGE("Failed to join room as challenger")
             }
@@ -193,8 +190,8 @@ private extension GameLoadingViewModel {
     }
 
     func prepareForGameAsOwner(enemy: FetchedPlayer) {
+        guard !isChallenger else { return }
         Task {
-            guard !isChallenger else { return }
             initiallyHasSpeedBoost = Bool.random()
             let game = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
             try await GameNetworkManager.createGame(game)
@@ -204,21 +201,16 @@ private extension GameLoadingViewModel {
     }
 
     func prepareForGameAsChallenger(enemy: FetchedPlayer) {
-        Task {
-            guard isChallenger,
-                  let room else { return }
-            let gameAsChallenger = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
-            try await GameNetworkManager.createGame(gameAsChallenger)
-            self.game = gameAsChallenger
-            transitionToGameView()
-        }
+        guard isChallenger else { return }
         self.enemy = enemy
         let gameAsChallenger = FetchedGame(player: player, enemy: enemy, playerInitiallyHasSpeedBoost: initiallyHasSpeedBoost)
         Task {
-            try await GameNetworkManager.createGame(gameAsChallenger)
-            self.game = gameAsChallenger
-            DispatchQueue.main.async {
-                self.transitionToGameView()
+            do {
+                try await GameNetworkManager.createGame(gameAsChallenger)
+                game = gameAsChallenger
+                transitionToGameView()
+            } catch {
+                LOGE("Error preparing game as challenger with \(error.localizedDescription)")
             }
         }
     }
@@ -236,7 +228,11 @@ private extension GameLoadingViewModel {
                     guard let self,
                           let snapshot,
                           snapshot.exists,
-                          !snapshot.metadata.hasPendingWrites else { return }
+                          let gameDic = snapshot.data(),
+                          gameDic.keys.count > 2,
+                          !snapshot.metadata.hasPendingWrites else {
+                        return
+                    }
                     let enemyGame = try snapshot.data(as: FetchedGame.self)
                     if isChallenger {
                         initiallyHasSpeedBoost = !enemyGame.playerInitiallyHasSpeedBoost

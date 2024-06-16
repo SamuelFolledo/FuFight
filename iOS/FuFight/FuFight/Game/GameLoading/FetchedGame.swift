@@ -28,7 +28,6 @@ struct FetchedGame {
 //MARK: - Codable extension
 extension FetchedGame: Codable {
     private enum CodingKeys : String, CodingKey {
-        case playerId = "playerId"
         case player = "player"
         case enemy = "enemy"
         case playerInitiallyHasSpeedBoost = "playerInitiallyHasSpeedBoost"
@@ -36,9 +35,6 @@ extension FetchedGame: Codable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        if let documentId {
-            try container.encode(documentId, forKey: .playerId)
-        }
         try container.encode(player, forKey: .player)
         try container.encode(enemy, forKey: .enemy)
         try container.encode(playerInitiallyHasSpeedBoost, forKey: .playerInitiallyHasSpeedBoost)
@@ -46,7 +42,6 @@ extension FetchedGame: Codable {
 
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        self.documentId = try values.decodeIfPresent(String.self, forKey: .playerId)
         self.playerInitiallyHasSpeedBoost = try values.decodeIfPresent(Bool.self, forKey: .playerInitiallyHasSpeedBoost)!
         self.player = try values.decodeIfPresent(FetchedPlayer.self, forKey: .player)!
         self.enemy = try values.decodeIfPresent(FetchedPlayer.self, forKey: .enemy)!

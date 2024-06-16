@@ -26,6 +26,7 @@ struct GameView: View {
                 .opacity(vm.isBuffering ? 0.4 : 1)
 
             createPlayerView(for: .user)
+                .allowsHitTesting(true)
         }
         .background {
             GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemy.fighter, isPracticeMode: vm.gameMode == .practice)
