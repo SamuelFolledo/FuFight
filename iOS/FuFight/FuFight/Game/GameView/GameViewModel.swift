@@ -161,11 +161,7 @@ private extension GameViewModel {
     func endOfRoundHandler() {
         isBuffering = true
         isCountingDown = false
-        /*
-         TODO: Send selected moves to database
-         TODO: Listen to enemy's move's changes
-         TODO: Fetch enemy's moves if available
-        */
+
         switch gameMode {
         case .practice:
             break
@@ -173,16 +169,23 @@ private extension GameViewModel {
             enemy.moves.randomlySelectMoves()
             enemy.populateSelectedMoves()
             player.populateSelectedMoves()
-            damageAndAnimate()
+            currentRoundPopulatedHandler()
         case .onlineGame:
             player.populateSelectedMoves()
             Task {
                 do {
+                    /*
+                     - Since we are already listening to enemy's game document containing their selected moves each round, we will just need to upload this player's selected moves and check if we already have the enemy's selected moves.
+                     - If already have enemy's selected moves, then
+                     Send selected moves to database
+                    2. Listen to enemy's move's changes
+                    3. Fetch enemy's moves if available
+                     */
                     try await GameNetworkManager.uploadSelectedMoves(player)
                     updateLoadingMessage(to: "Finished uploading. Waiting for enemy's moves")
                     isPlayerRoundReady = true
                     if isEnemyRoundReady {
-                        damageAndAnimate()
+                        currentRoundPopulatedHandler()
                     } else {
                         //First attempt to refetch
                         runAfterDelay(delay: 3) { [weak self] in
@@ -212,25 +215,26 @@ private extension GameViewModel {
     }
 
     ///Handles both player's attack and defend damages and animations
-    func damageAndAnimate() {
+    ///Note: Call after populate player and enemy's selected moves
+    func currentRoundPopulatedHandler() {
         guard !isAnimating else {
             LOGD("Returning because already animating")
             return
         }
         isAnimating = true
         updateLoadingMessage(to: nil)
+        //Populate both players's speed
         enemy.refreshSpeed()
         player.refreshSpeed()
-
-        //1. Apply and play first attacker's animations
+        //Handle first attacker's damage and attack animation, and defender's animation
         attackingHandler(isFasterAttacker: true)
-
-        //2. Apply and play second attacker's animations after a delay
+        //After a delay of the length of the first attacker's, attack and first defender's defense animation...
         runAfterDelay(delay: secondAttackerDelay) { [weak self] in
             guard let self else { return }
+            //After first attacker's attack and second attacker is still alive, handle second attacker's damage and animations
             if isDefenderAlive {
                 attackingHandler(isFasterAttacker: false)
-
+                //If first attacker is still alive after second attacker's attacks, then create a new round
                 if isDefenderAlive {
                     runAfterDelay(delay: secondAttackerDelay) { [weak self] in
                         self?.createNewRound()
@@ -253,9 +257,10 @@ private extension GameViewModel {
             } else {
                 attacker = player.speed > enemy.speed ? player : enemy
                 defender = player.speed > enemy.speed ? enemy : player
-                //Second attacker will have their damage dealt reduced and have a delay before playing the next animation
             }
+            //Set second attacker's delay before playing their attackHandler flow
             secondAttackerDelay = attacker.currentRound?.attack?.animationType.animationDuration(for: attacker.fighter.fighterType) ?? 0
+            //Second attacker will have their damage dealt reduced
             secondAttackerDamageDealtReduction = attacker.currentRound?.attack?.damageReduction ?? 1
         } else {
             if player.speed == enemy.speed {
@@ -393,7 +398,7 @@ private extension GameViewModel {
         enemy.populateSelectedMoves()
         isEnemyRoundReady = true
         if isPlayerRoundReady {
-            damageAndAnimate()
+            currentRoundPopulatedHandler()
         }
     }
 
