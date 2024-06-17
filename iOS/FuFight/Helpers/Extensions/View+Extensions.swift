@@ -30,6 +30,13 @@ extension View {
         return modifier(MainAlertModifier(title: title, message: message, primaryButton: primaryButton, secondaryButton: secondaryButton, isPresented: isPresented))
     }
 
+    ///Present alert with a primary button only
+    func alert(title: String = "", message: String = "", primaryButton: AlertButton, isPresented: Binding<Bool>) -> some View {
+        let title   = NSLocalizedString(title, comment: "")
+        let message = NSLocalizedString(message, comment: "")
+        return modifier(MainAlertModifier(title: title, message: message, primaryButton: primaryButton, isPresented: isPresented))
+    }
+
     ///alerts with a TextField
     func alert(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AlertButton?, secondaryButton: AlertButton? = AlertButton(type: .cancel), isPresented: Binding<Bool>) -> some View {
         return modifier(MainAlertModifier(withText: text, fieldType: fieldType, title: title, primaryButton: primaryButton, secondaryButton: secondaryButton, isPresented: isPresented))

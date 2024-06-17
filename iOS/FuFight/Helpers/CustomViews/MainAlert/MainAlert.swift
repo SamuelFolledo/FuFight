@@ -120,9 +120,10 @@ struct MainAlert: View {
         HStack(spacing: 12) {
             if dismissButton != nil {
                 dismissButtonView
-
             } else if primaryButton != nil, secondaryButton != nil {
                 secondaryButtonView
+                primaryButtonView
+            } else if primaryButton != nil {
                 primaryButtonView
             }
         }
