@@ -38,7 +38,11 @@ struct GameView: View {
         .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AlertButton(title: "Rematch", action: vm.rematch),
                secondaryButton: AlertButton(title: "Go home", action: vm.exitGame),
-               isPresented: .constant(vm.state == .gameOver))
+               isPresented: .constant(vm.player.isDead || vm.enemy.isDead))
+        .alert(title: "You won!",
+               message: "Congrats! Enemy rage quitted",
+               primaryButton: AlertButton(title: "Go home", action: vm.exitGame),
+               isPresented: $vm.enemyExited)
         .alert(title: "Game is paused",
                primaryButton: AlertButton(title: "Resume", action: {}),
                secondaryButton: AlertButton(title: "Exit", action: vm.exitGame),

@@ -24,6 +24,7 @@ class GameViewModel: BaseViewModel {
     var secondAttackerDamageDealtReduction: CGFloat = 0
     var secondAttackerDelay: CGFloat = 0
     var isBuffering: Bool = false
+    var enemyExited: Bool = false
 
     private var isPlayerRoundReady: Bool = false
     private var isEnemyRoundReady: Bool = false
@@ -176,10 +177,8 @@ private extension GameViewModel {
                 do {
                     /*
                      - Since we are already listening to enemy's game document containing their selected moves each round, we will just need to upload this player's selected moves and check if we already have the enemy's selected moves.
-                     - If already have enemy's selected moves, then
-                     Send selected moves to database
-                    2. Listen to enemy's move's changes
-                    3. Fetch enemy's moves if available
+                        - If already have enemy's selected moves, then current round is ready
+                        - If we dont have enemy's selected moves, manually refresh 3 seconds later, and try again after another 5 seconds
                      */
                     try await GameNetworkManager.uploadSelectedMoves(player)
                     updateLoadingMessage(to: "Finished uploading. Waiting for enemy's moves")
@@ -226,6 +225,7 @@ private extension GameViewModel {
         //Populate both players's speed
         enemy.refreshSpeed()
         player.refreshSpeed()
+
         //Handle first attacker's damage and attack animation, and defender's animation
         attackingHandler(isFasterAttacker: true)
         //After a delay of the length of the first attacker's, attack and first defender's defense animation...
@@ -235,12 +235,12 @@ private extension GameViewModel {
             if isDefenderAlive {
                 attackingHandler(isFasterAttacker: false)
                 //If first attacker is still alive after second attacker's attacks, then create a new round
-                if isDefenderAlive {
-                    runAfterDelay(delay: secondAttackerDelay) { [weak self] in
-                        self?.createNewRound()
+                runAfterDelay(delay: secondAttackerDelay) { [weak self] in
+                    if let self, self.isDefenderAlive {
+                        createNewRound()
                     }
-                    return
                 }
+                return
             }
             updateState(.gameOver)
         }
@@ -337,11 +337,15 @@ private extension GameViewModel {
 
     func gameOver() {
         if enemy.isDead {
-            LOGD("Player won", from: GameViewModel.self)
+            LOGD("GAMEOVER RESULT: Player won", from: GameViewModel.self)
             enemy.defeated()
         } else if player.isDead {
-            LOGD("Enemy won", from: GameViewModel.self)
+            LOGD("GAMEOVER RESULT: Enemy won", from: GameViewModel.self)
             player.defeated()
+        } else {
+            LOGD("GAMEOVER RESULT: Player won by enemy leaving", from: GameViewModel.self)
+            //TODO: Maybe if enemy's HP is within 1 attack, play out the kill animation?
+            enemyExited = true
         }
     }
 
@@ -364,9 +368,8 @@ private extension GameViewModel {
                 if snapshot.exists {
                     updateEnemySelectedMoves(with: snapshot)
                 } else {
-                    //Handle deleted document
-                    LOGD("Enemy exited the game. Player won")
-                    exitGame()
+                    LOGD("Enemy deleted their game document")
+                    updateState(.gameOver)
                 }
             }
     }

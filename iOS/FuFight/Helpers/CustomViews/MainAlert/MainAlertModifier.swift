@@ -64,6 +64,17 @@ extension MainAlertModifier {
         _text = .constant("")
     }
 
+    ///Initializer for primary button only alert
+    init(title: String = "", message: String = "", primaryButton: AlertButton, isPresented: Binding<Bool>) {
+        self.title         = title
+        self.message       = message
+        self.dismissButton = nil
+        self.primaryButton   = primaryButton
+        self.secondaryButton = nil
+        _isPresented = isPresented
+        _text = .constant("")
+    }
+
     ///Initializer for alerts with a TextField
     init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AlertButton?, secondaryButton: AlertButton?, isPresented: Binding<Bool>) {
         self.fieldType = fieldType
