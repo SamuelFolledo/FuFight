@@ -360,6 +360,7 @@ private extension GameViewModel {
     }
 
     func listenToEnemyGameDocument() {
+        guard gameMode == .onlineGame else { return }
         if enemyMovesListener != nil {
             unsubscribeToEnemyGameDocument()
         }
