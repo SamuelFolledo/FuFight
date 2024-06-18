@@ -40,7 +40,6 @@ final class HomeViewModel: BaseAccountViewModel {
                         LOGD("Account verified", from: HomeViewModel.self)
                         isAccountVerified = true
                         refreshPlayer()
-                        RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
                         return
                     }
                     LOGE("Account is invalid \(account.displayName) with id \(account.userId)", from: HomeViewModel.self)
@@ -60,15 +59,8 @@ final class HomeViewModel: BaseAccountViewModel {
     }
 
     func refreshPlayer() {
-        guard let player = RoomManager.getPlayer() else { return }
-        self.player = player
-        //TODO: Make sure to not set status to online if it's already online in the database
-        RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
-        Task {
-            do {
-                //TODO: Make sure to only delete the game in the database if it exist
-                try await GameNetworkManager.deleteGame(player.userId)
-            }
-        }
+        guard let room = Room.current else { return }
+        self.player = room.player
+        RoomManager.goOnlineIfNeeded()
     }
 }

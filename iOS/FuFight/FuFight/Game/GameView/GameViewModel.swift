@@ -33,7 +33,7 @@ class GameViewModel: BaseViewModel {
     private var subscriptions = Set<AnyCancellable>()
 
     init(player: Player, enemy: Player, gameMode: GameRoute) {
-        self.state = .starting
+        self.state = .gameOver
         self.gameMode = gameMode
         self.player = player
         self.enemy = enemy
@@ -98,7 +98,10 @@ class GameViewModel: BaseViewModel {
     }
 
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {
-        if isTestingEnvironment {
+        switch gameMode {
+        case .onlineGame:
+            break
+        case .offlineGame, .practice:
             switch scenePhase {
             case .background, .inactive:
                 isCountingDown = false
@@ -112,6 +115,7 @@ class GameViewModel: BaseViewModel {
     }
 
     func updateState(_ newState: GameState) {
+        guard state != newState else { return }
         self.state = newState
         switch newState {
         case .starting:
@@ -133,14 +137,13 @@ class GameViewModel: BaseViewModel {
                 try await GameNetworkManager.deleteGame(player.userId)
             }
         }
-        RoomNetworkManager.updateStatus(to: .online, roomId: player.userId)
+        RoomManager.goOnlineIfNeeded()
     }
 }
 
 //MARK: - Private Methods
 private extension GameViewModel {
     func startNewGame() {
-        isDefenderAlive = true
         createNewRound()
     }
 
@@ -357,6 +360,7 @@ private extension GameViewModel {
     }
 
     func listenToEnemyGameDocument() {
+        guard gameMode == .onlineGame else { return }
         if enemyMovesListener != nil {
             unsubscribeToEnemyGameDocument()
         }

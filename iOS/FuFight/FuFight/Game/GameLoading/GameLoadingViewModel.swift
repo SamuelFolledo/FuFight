@@ -75,6 +75,10 @@ final class GameLoadingViewModel: BaseAccountViewModel {
         if isEnemyFound {
             isEnemyFound = false
             RoomNetworkManager.updateStatus(to: .gaming, roomId: account.userId)
+            let room = Room.current!
+            room.currentGame = game
+            room.status = .gaming
+            RoomManager.saveCurrent(room)
         }
         initiallyHasSpeedBoost = false
         isChallenger = true
@@ -248,8 +252,6 @@ private extension GameLoadingViewModel {
 
     func transitionToGameView() {
         isEnemyFound = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.didFindEnemy.send(self)
-        }
+        didFindEnemy.send(self)
     }
 }
