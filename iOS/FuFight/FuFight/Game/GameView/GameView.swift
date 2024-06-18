@@ -22,11 +22,11 @@ struct GameView: View {
             Spacer()
 
             createMovesView(for: .user)
+                .allowsHitTesting(vm.loadingMessage == nil)
                 .allowsHitTesting(!vm.isBuffering)
                 .opacity(vm.isBuffering ? 0.4 : 1)
 
             createPlayerView(for: .user)
-                .allowsHitTesting(true)
         }
         .background {
             GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemy.fighter, isPracticeMode: vm.gameMode == .practice)
@@ -59,7 +59,6 @@ struct GameView: View {
         .onDisappear {
             vm.onDisappear()
         }
-        .allowsHitTesting(vm.loadingMessage == nil)
         .navigationBarBackButtonHidden()
         .onChange(of: scenePhase) {
             vm.scenePhaseChangedHandler(scenePhase)

@@ -10,6 +10,7 @@ import Foundation
 //Account Keys
 public let kCURRENTACCOUNT: String = "currentAccount"
 public let kCURRENTROOM: String = "currentRoom"
+public let kCURRENTGAME: String = "currentGame"
 
 public let kUSERID: String = "userId"
 public let kUSERNAME: String = "username"

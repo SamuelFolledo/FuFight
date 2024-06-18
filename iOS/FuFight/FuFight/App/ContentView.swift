@@ -202,23 +202,11 @@ private extension ContentView {
     }
 
     func appTerminatedHandler() {
-        //Delete game
-        Task {
-            do {
-                try await GameNetworkManager.deleteGame(account.userId)
-            } catch let error {
-                LOGE(error.localizedDescription, from: GameLoadingViewModel.self)
-            }
-        }
-        //Set status to offline
-        RoomNetworkManager.updateStatus(to: .offline, roomId: account.userId)
-        //TODO: Maybe check and/or save game locally in order to rejoin
+        RoomManager.goOffline()
     }
 
     func appIsForegroundedHandler() {
-        //Set status to online
-        RoomNetworkManager.updateStatus(to: .online, roomId: account.userId)
-        //TODO: Maybe check and/or save game locally in order to rejoin
+        RoomManager.goOnlineIfNeeded()
     }
 }
 

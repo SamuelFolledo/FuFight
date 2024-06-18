@@ -58,7 +58,10 @@ extension RoomNetworkManager {
 
     static func updateRoom(_ room: Room) async throws {
         let roomDocument = roomsDb.document(room.player.userId)
-        try await roomDocument.setData(room.asDictionary(), merge: true)
+        //Ignoring Room's currentGame because it is used for internal storage purposes only
+        let ignoredRoomKeys = [kCURRENTGAME]
+        let keysToMerge: [String] = try room.asDictionary().keys.compactMap { ignoredRoomKeys.contains($0) ? nil : $0 }
+        try await roomDocument.setData(room.asDictionary(), mergeFields: keysToMerge)
         LOGD("Room is updated successfully: \(room.player.username)")
     }
 

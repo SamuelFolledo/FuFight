@@ -111,7 +111,6 @@ class HomeRouter: ObservableObject {
             LOGE("Failed to load GameView with missing game")
             return
         }
-        let initiallyHasSpeedBoost = vm.initiallyHasSpeedBoost
         let player = Player(fetchedPlayer: game.player, isEnemy: false, isGameOwner: !vm.isChallenger, initiallyHasSpeedBoost: game.playerInitiallyHasSpeedBoost)
         let enemyPlayer = Player(fetchedPlayer: game.enemy, isEnemy: true, isGameOwner: vm.isChallenger, initiallyHasSpeedBoost: !game.playerInitiallyHasSpeedBoost)
         navigationPath.append(.game(vm: makeGameViewModel(player: player, enemy: enemyPlayer, gameMode: .onlineGame)))
