@@ -11,7 +11,7 @@ struct Moves {
     let animationTypes: [AnimationType]
     var attacks: [Attack]
     var defenses: [Defense]
-    let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
+    private let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
     var availableAttacks: [Attack] { attacks.filter{ $0.state != .cooldown } }
     var unavailableAttacks: [Attack] { attacks.filter{ $0.state == .cooldown } }
@@ -32,9 +32,13 @@ struct Moves {
         //TODO: Remove this auto generated enemy round
         guard let randomAttack = availableAttacks.randomElement() else { return }
         updateSelected(randomAttack.position)
-//        let randomDefense: Defense = availableDefenses.randomElement()!
-        let randomDefense: Defense = availableDefenses.filter { $0.state != .cooldown }.filter { $0.position == .left || $0.position == .right }.randomElement()!
-        updateSelected(randomDefense.position)
+        if isTestingEnvironment {
+            let randomLeftOrRightDefense: Defense = availableDefenses.filter { $0.state != .cooldown }.filter { $0.position == .left || $0.position == .right }.randomElement()!
+            updateSelected(randomLeftOrRightDefense.position)
+        } else {
+            let randomDefense: Defense = availableDefenses.randomElement()!
+            updateSelected(randomDefense.position)
+        }
     }
 
     mutating func resetMoves() {

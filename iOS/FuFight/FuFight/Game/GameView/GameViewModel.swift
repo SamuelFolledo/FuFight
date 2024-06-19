@@ -145,6 +145,8 @@ class GameViewModel: BaseViewModel {
 private extension GameViewModel {
     func startNewGame() {
         createNewRound()
+        player.fighter.playAnimation(.idle)
+        enemy.fighter.playAnimation(.idle)
     }
 
     func createNewRound() {
@@ -163,7 +165,7 @@ private extension GameViewModel {
     }
 
     func endOfRoundHandler() {
-        isBuffering = true
+        isBuffering = gameMode == .practice ? false : true
         isCountingDown = false
 
         switch gameMode {
