@@ -15,13 +15,7 @@ enum FighterType: String {
     }
 
     var defaultDaePath: String {
-        switch self {
-        case .samuel:
-//            return "3DAssets.scnassets/Characters/Samuel/assets/samuel"
-            animationPath(.idle)
-        case .clara:
-            animationPath(.idle)
-        }
+        "3DAssets.scnassets/Characters/\(name)/assets/\(name.lowercased())"
     }
 
     var name: String {

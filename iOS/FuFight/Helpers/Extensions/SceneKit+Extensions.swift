@@ -13,6 +13,9 @@ extension CAAnimation {
         let animation = CAAnimationGroup()
         let sub = full.copy() as! SCNAnimation
         sub.timeOffset = 0
+//        sub.isAdditive = type.isAdditive
+//        sub.isAppliedOnCompletion = type.isAppliedOnCompletion
+//        sub.isCumulative
         animation.animations = [CAAnimation(scnAnimation: sub)]
         animation.duration = type.animationDuration(for: fighterType)
         animation.isRemovedOnCompletion = type.isRemovedFromCompletion
@@ -20,6 +23,8 @@ extension CAAnimation {
         animation.fadeOutDuration = type.fadeOutDuration
         animation.usesSceneTimeBase = type.usesSceneTimeBase
         animation.repeatCount = type.repeatCount
+//        animation.autoreverses = type.autoReverses
+//        animation.fillMode = .both
         return animation as CAAnimation
     }
 }

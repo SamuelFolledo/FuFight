@@ -43,9 +43,7 @@ enum Tab: String, CaseIterable, Identifiable {
 ///Source: https://betterprogramming.pub/flow-navigation-with-swiftui-4-e006882c5efa
 struct ContentView: View {
     @StateObject var homeRouter: HomeRouter = HomeRouter()
-//    @StateObject var account: Account// = Account.current ?? Account()
     @StateObject var account: Account = Account.current ?? Account()
-//    @StateObject var player: FetchedPlayer// = Room.current?.player ?? Room(account)
     @State var showTab: Bool = true
     @State var tab: Tab = .home
     private let tabs: [Tab] = [.edit, .home, .store]

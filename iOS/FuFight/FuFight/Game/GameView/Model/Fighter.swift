@@ -67,6 +67,7 @@ class Fighter {
         self.isEnemy = isEnemy
         defaultAnimation = .idle
         createNode()
+        playAnimation(defaultAnimation)
     }
 
     required init?(coder: NSCoder) {
@@ -107,20 +108,33 @@ class Fighter {
 
     ///Plays an animation if animationType is new
     func playAnimation(_ animationType: AnimationType) {
-        let isNewAnimation = currentAnimation == nil || currentAnimation! != animationType
-        guard isNewAnimation else { return }
-        currentAnimation = animationType
+        //Get and stop the default animation
+        guard //isNewAnimation,
+              let defaultAnimationPlayer = animationsNode.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
+        let blendDuration: CGFloat = 0.3
+        if animationType != defaultAnimation {
+            //Stopping withBlendOutDuration prevents node from going back to T-position before playing the next animation
+            defaultAnimationPlayer.stop(withBlendOutDuration: blendDuration)
+        }
+        //Play next animation
         guard let player = animationsNode.animationPlayer(forKey: animationType.rawValue) else {
-            LOGDE("No player found to play for \(animationType)", from: Fighter.self)
+            LOGDE("Animation played not loaded \(animationType)", from: Fighter.self)
             return
         }
         player.play()
-        currentAnimation = nil
+        //Handle end of animation
         if animationType.isKillAnimationType {
             //Pause fighter's animations after playing the kill animation. Reduce duration by 0.2 to not let the fighter stand back up
-            runAfterDelay(delay: player.animation.duration - 0.2) { [weak self] in
+            runAfterDelay(delay: player.animation.duration - blendDuration) { [weak self] in
                 guard let self else { return }
                 pauseAnimations()
+            }
+        } else {
+            //At the end of the played animation, resume to default animation if we're not playing it already
+            if animationType != defaultAnimation {
+                runAfterDelay(delay: player.animation.duration - blendDuration) {
+                    defaultAnimationPlayer.play()
+                }
             }
         }
     }

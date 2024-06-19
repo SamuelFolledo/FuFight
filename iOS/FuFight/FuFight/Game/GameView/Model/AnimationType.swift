@@ -172,7 +172,9 @@ enum AnimationType: String, CaseIterable {
     ///how many times the animation will be repeated
     var repeatCount: Float {
         switch self {
-        case .idle, .idleStand, .stop:
+        case .idle, .idleStand:
+            .greatestFiniteMagnitude
+        case .stop:
             0
         case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             1
@@ -334,8 +336,10 @@ extension AnimationType {
         switch self {
         case .idleStand:
             fighter == .samuel ? 4.46667 : 38.833332
-        case .idle, .stop:
-            0 //fighter == .samuel ? 2.2 : 2.966667
+        case .stop:
+            0
+        case .idle:
+            fighter == .samuel ? 2.2 : 2.966667
         case .punchHeadLeftLight, .punchHeadRightLight:
             fighter == .samuel ? 1.13333 : 1.53333
         case .punchHeadLeftMedium, .punchHeadRightMedium:
