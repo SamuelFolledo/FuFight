@@ -9,15 +9,17 @@ import SceneKit
 
 ///3D model of the fighter
 class Fighter {
+    //MARK: Properties
     let fighterType: FighterType
     let isEnemy: Bool
     private(set) var defaultAnimation: AnimationType
 
-    ///parent of all animation nodes
-    private(set) var animationsNode: SCNNode!
-    private(set) var currentAnimation: AnimationType?
-    ///Will contain all of the fighter node
+    ///The parent node which contain all of the nodes
     private(set) var daeHolderNode = SCNNode()
+    ///Bone node that contains the animation players
+    private(set) var animationsNode: SCNNode!
+
+    //MARK: Get-only properties
     private(set) lazy var textNode: SCNNode = {
         let node = SCNNode(geometry: damageText)
         node.name = "textNode"
@@ -109,8 +111,7 @@ class Fighter {
     ///Plays an animation if animationType is new
     func playAnimation(_ animationType: AnimationType) {
         //Get and stop the default animation
-        guard //isNewAnimation,
-              let defaultAnimationPlayer = animationsNode.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
+        guard let defaultAnimationPlayer = animationsNode.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
         let blendDuration: CGFloat = 0.3
         if animationType != defaultAnimation {
             //Stopping withBlendOutDuration prevents node from going back to T-position before playing the next animation

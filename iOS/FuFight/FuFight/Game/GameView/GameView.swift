@@ -98,12 +98,16 @@ struct GameView: View {
     ///Note: For some reason attacks and defenses view is required to be inside an @ViewBuilder function to refresh its state and fire state
     @ViewBuilder func createMovesView(for playerType: PlayerType) -> some View {
         let player = playerType.isEnemy ? vm.enemy : vm.player
+        let attacks = player.moves.attacks
+        let defenses = player.moves.defenses
         MovesView(
-            attacksView: AttacksView(attacks: player.moves.attacks, playerType: playerType, isEditing: false) {
-                vm.attackSelected($0, isEnemy: playerType.isEnemy)
+            attacksView: AttacksView(attacks: attacks, playerType: playerType, isEditing: false) {
+                vm.attackSelected(attacks.getAttack(with: $0).position, 
+                                  isEnemy: playerType.isEnemy)
             },
-            defensesView: DefensesView(defenses: player.moves.defenses, playerType: playerType) {
-                vm.defenseSelected($0, isEnemy: playerType.isEnemy)
+            defensesView: DefensesView(defenses: defenses, playerType: playerType) {
+                vm.defenseSelected(defenses.getDefense(with: $0).position, 
+                                   isEnemy: playerType.isEnemy)
             },
             playerType: playerType)
         .frame(width: playerType.isEnemy ? 100 : nil, height: playerType.isEnemy ? 120 : nil)

@@ -116,31 +116,31 @@ enum AnimationType: String, CaseIterable {
     }
 
     var animationPath: String {
-        "animations/\(folder)/\(subfolder)/\(animationName)"
+        "animations\(folder)\(subfolder)/\(animationName)"
     }
 
     var folder: String {
         switch self {
         case .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard:
-            "punch"
+            "/punch"
         case .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             //TODO: Change to Kick
-            "punch"
+            "/punch"
         case .dodgeHeadRight, .dodgeHeadLeft:
-            "dodge"
+            "/dodge"
         case .hitHeadRightMedium, .hitHeadRightHard, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard:
-            "hit"
+            "/hit"
         case .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard:
-            "kill"
+            "/kill"
         case .stop:
             ""
         case .idle, .idleStand:
-            "idle"
+            "/idle"
         }
     }
     var subfolder: String {
         if let isHigh {
-            return isHigh ? "head" : "body"
+            return isHigh ? "/head" : "/body"
         }
         return ""
     }

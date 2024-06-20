@@ -70,16 +70,18 @@ class GameViewModel: BaseViewModel {
         updateState(.starting)
     }
 
-    func attackSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
-        guard selectedMove.state != .cooldown,
-              let selectedAttack = Attack(moveId: selectedMove.id) else { return }
-        isEnemy ? enemy.moves.updateSelected(selectedAttack.position) : player.moves.updateSelected(selectedAttack.position)
-        let attackResult = AttackResult.damage(20)
+    func attackSelected(_ position: AttackPosition, isEnemy: Bool) {
+        let moves = isEnemy ? enemy.moves : player.moves
+        let selectedMove = moves.attacks.getAttack(at: position)
+        guard selectedMove.isAvailable() else { return }
+        isEnemy ? enemy.moves.updateSelected(selectedMove.position) : player.moves.updateSelected(selectedMove.position)
+
         switch gameMode {
         case .practice:
             //Play that attack's animation
-            if let defenderAnimation = GameService.getDefenderAnimation(attack: selectedAttack, attackerType: enemy.fighter.fighterType, attackResult: attackResult) {
-                playFightersAnimation(attackAnimation: selectedAttack.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
+            let attackResult = AttackResult.damage(20)
+            if let defenderAnimation = GameService.getDefenderAnimation(attack: selectedMove, attackerType: enemy.fighter.fighterType, attackResult: attackResult) {
+                playFightersAnimation(attackAnimation: selectedMove.animationType, defenderAnimation: defenderAnimation, isAttackerEnemy: false) {
                     runAfterDelay(delay: 0.3) { [weak self] in
                         guard let self else { return }
                         self.enemy.fighter.showResult(attackResult)
@@ -91,10 +93,11 @@ class GameViewModel: BaseViewModel {
         }
     }
 
-    func defenseSelected(_ selectedMove: any MoveProtocol, isEnemy: Bool) {
-        guard selectedMove.state != .cooldown,
-              let selectedDefense = Defense(moveId: selectedMove.id) else { return }
-        isEnemy ? enemy.moves.updateSelected(selectedDefense.position) : player.moves.updateSelected(selectedDefense.position)
+    func defenseSelected(_ position: DefensePosition, isEnemy: Bool) {
+        let moves = isEnemy ? enemy.moves : player.moves
+        let selectedMove = moves.defenses.getDefense(at: position)
+        guard selectedMove.isAvailable() else { return }
+        isEnemy ? enemy.moves.updateSelected(selectedMove.position) : player.moves.updateSelected(selectedMove.position)
     }
 
     func scenePhaseChangedHandler(_ scenePhase: ScenePhase) {

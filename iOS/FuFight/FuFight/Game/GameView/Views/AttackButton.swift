@@ -11,7 +11,7 @@ struct AttackButton: View {
     let move: Attack
     let playerType: PlayerType
     var isEditing: Bool
-    let moveSelected: ((any MoveProtocol) -> Void)?
+    let moveSelected: ((_ moveId: String) -> Void)?
 
     private var width: CGFloat { playerType.isEnemy ? 160 : 800 }
     private var trailingPadding: CGFloat { playerType.isEnemy ? 4 : 30 }
@@ -73,6 +73,6 @@ struct AttackButton: View {
 #Preview {
     let attack = Attack(Punch.leftPunchMedium)
     return AttackButton(move: attack, playerType: .user, isEditing: false) {
-        LOGD("Attack selected = \($0.name)")
+        LOGD("Attack selected = \($0)")
     }
 }

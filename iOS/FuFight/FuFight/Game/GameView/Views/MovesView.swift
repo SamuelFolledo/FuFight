@@ -34,10 +34,10 @@ struct MovesView<AttacksView: View, DefensesView: View>: View {
 
     return MovesView(
         attacksView: AttacksView(attacks: defaultAllPunchAttacks, playerType: playerType, isEditing: false) {
-            LOGD("Selected attack is \($0.name)")
+            LOGD("Selected attack is \($0)")
         },
         defensesView: DefensesView(defenses: defaultAllDashDefenses, playerType: playerType) {
-            LOGD("Selected defense is \($0.name)")
+            LOGD("Selected defense is \($0)")
         },
         playerType: playerType)
 }

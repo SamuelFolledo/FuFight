@@ -10,7 +10,7 @@ import SwiftUI
 struct DefensesView: View {
     var defenses: [Defense]
     var playerType: PlayerType
-    var moveSelected: ((any MoveProtocol) -> Void)?
+    var moveSelected: ((_ moveId: String) -> Void)?
 
     var body: some View {
         HStack(alignment: .bottom) {

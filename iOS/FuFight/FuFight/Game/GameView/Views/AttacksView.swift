@@ -11,7 +11,7 @@ struct AttacksView: View {
     let attacks: [Attack]
     let playerType: PlayerType
     var isEditing: Bool
-    var moveSelected: ((any MoveProtocol) -> Void)?
+    var moveSelected: ((_ moveId: String) -> Void)?
 
     var body: some View {
         VStack {
