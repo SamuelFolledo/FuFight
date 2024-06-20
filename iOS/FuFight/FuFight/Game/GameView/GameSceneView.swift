@@ -93,13 +93,14 @@ private extension GameSceneView {
                 attacksView: AttacksView(
                     attacks: defaultAllPunchAttacks,
                     playerType: .enemy, 
-                    isEditing: false) { move in
+                    isEditing: false) { moveId in
+                        let move = defaultAllPunchAttacks.getAttack(with: moveId)
                         fighter.playAnimation(move.animationType)
                     },
                 defensesView: DefensesView(
                     defenses: defaultAllDashDefenses,
-                    playerType: .enemy) { move in
-                        guard let defense = Defense(moveId: move.id) else { return }
+                    playerType: .enemy) { defenseId in
+                        guard let defense = Defense(moveId: defenseId) else { return }
                         switch defense.position {
                         case .forward:
                             fighter.playAnimation(.idleStand)

@@ -133,6 +133,9 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
+let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
+let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
+
 //MARK: - Constant Methods
 ///Run action after a delayed time in seconds
 func runAfterDelay(delay: TimeInterval, action: @escaping () -> Void) {

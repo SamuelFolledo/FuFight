@@ -74,20 +74,22 @@ struct RoomView: View {
 
     @ViewBuilder var movesView: some View {
         if vm.player != nil {
+            let attacks = vm.player.moves.attacks
+            let defenses = vm.player.moves.defenses
             MovesView(
-                attacksView: AttacksView(attacks: vm.player.moves.attacks, playerType: vm.playerType, isEditing: true) {
-                    vm.attackSelected($0 as! AttackProtocol)
+                attacksView: AttacksView(attacks: attacks, playerType: vm.playerType, isEditing: true) {
+                    vm.attackSelected(attacks.getAttack(with: $0).position)
                 },
-                defensesView: DefensesView(defenses: vm.player.moves.defenses, playerType: vm.playerType) {
-                    vm.defenseSelected($0)
+                defensesView: DefensesView(defenses: defenses, playerType: vm.playerType) {
+                    vm.defenseSelected(defenses.getDefense(with: $0).position)
                 },
                 playerType: vm.playerType)
         }
     }
 
     @ViewBuilder var fighterView: some View {
-        if vm.player != nil {
-            DaePreview(fighterType: vm.player.fighterType, animationType: vm.animationType)
+        if vm.fighter != nil {
+            FighterView(vm.fighter)
         }
     }
 }

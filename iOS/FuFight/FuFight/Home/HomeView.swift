@@ -11,47 +11,42 @@ struct HomeView: View {
     @StateObject var vm: HomeViewModel
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                ZStack {
-                    DaePreview()
-                        .frame(width: proxy.size.width, height: proxy.size.height)
+        ZStack {
+            fighterView
 
-                    VStack {
-                        navigationView
+            VStack {
+                navigationView
 
-                        VStack {
-                            Spacer()
-                        }
-                        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                        .padding()
-                    }
-                }
-            }
-            .overlay {
-                LoadingView(message: vm.loadingMessage)
-            }
-            .background(
-                backgroundImage
-                    .padding(.leading, 30)
-            )
-            .safeAreaInset(edge: .bottom) {
-                HStack {
+                VStack {
                     Spacer()
-
-                    VStack {
-                        practiceButton
-
-                        offlinePlayButton
-
-                        playButton
-                    }
                 }
-                .padding(.bottom, 90)
+                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                .padding()
             }
-            .navigationBarHidden(true)
-            .frame(maxWidth: .infinity)
         }
+        .overlay {
+            LoadingView(message: vm.loadingMessage)
+        }
+        .background(
+            backgroundImage
+                .padding(.leading, 30)
+        )
+        .safeAreaInset(edge: .bottom) {
+            HStack {
+                Spacer()
+
+                VStack {
+                    practiceButton
+
+                    offlinePlayButton
+
+                    playButton
+                }
+            }
+            .padding(.bottom, 90)
+        }
+        .navigationBarHidden(true)
+        .frame(maxWidth: .infinity)
         .onAppear {
             vm.onAppear()
         }
@@ -129,6 +124,14 @@ struct HomeView: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 4)
+    }
+
+    @ViewBuilder var fighterView: some View {
+        if vm.fighter != nil {
+            FighterView(vm.fighter)
+                .frame(maxWidth: .infinity)
+                .ignoresSafeArea(edges: .vertical)
+        }
     }
 }
 

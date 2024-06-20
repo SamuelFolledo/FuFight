@@ -10,6 +10,7 @@ import SwiftUI
 
 final class RoomViewModel: BaseAccountViewModel {
     @Published var player: FetchedPlayer!
+    @Published var fighter: Fighter!
     @Published var path = NavigationPath()
     @Published var animationType: AnimationType = .idle
 
@@ -22,14 +23,15 @@ final class RoomViewModel: BaseAccountViewModel {
     }
 
     //MARK: - Public Methods
-    func attackSelected(_ selectedMove: any AttackProtocol) {
-        let tempPlayer = player!
-        tempPlayer.moves.toggleType(at: selectedMove.position)
-        updatePlayer(with: tempPlayer)
+    func attackSelected(_ position: AttackPosition) {
+        updateMove(position)
+        let animation = player.moves.attacks.getAnimation(at: position)
+        fighter.playAnimation(animation)
     }
 
-    func defenseSelected(_ selectedMove: any MoveProtocol) {
-
+    func defenseSelected(_ position: DefensePosition) {
+        let animation = player.moves.defenses.getAnimation(at: position)
+        fighter.playAnimation(animation)
     }
 
     func switchButtonSelected() {
@@ -44,6 +46,7 @@ private extension RoomViewModel {
     func refreshPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
         self.player = player
+        self.fighter = Fighter(type: player.fighterType, isEnemy: false)
     }
 
     func updatePlayer(with updatedPlayer: FetchedPlayer) {
@@ -54,5 +57,11 @@ private extension RoomViewModel {
         }
         RoomManager.saveCurrent(currentRoom)
         player = updatedPlayer
+    }
+
+    func updateMove(_ position: AttackPosition) {
+        let tempPlayer = player!
+        tempPlayer.moves.toggleType(at: position)
+        updatePlayer(with: tempPlayer)
     }
 }

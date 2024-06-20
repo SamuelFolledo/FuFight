@@ -11,11 +11,11 @@ import SwiftUI
 struct MoveButton: View {
     let move: any MoveProtocol
     let playerType: PlayerType
-    let moveSelected: ((any MoveProtocol) -> Void)?
+    let moveSelected: ((_ moveId: String) -> Void)?
 
     var body: some View {
         Button(action: {
-            moveSelected?(move)
+            moveSelected?(move.id)
         }, label: {
             Image(move.iconName)
                 .defaultImageModifier()
@@ -40,6 +40,6 @@ struct MoveButton: View {
     let attack = Attack(Punch.leftPunchMedium)
 
     return MoveButton(move: attack, playerType: .user) {
-        LOGD("Attack selected = \($0.name)")
+        LOGD("Attack selected = \($0)")
     }
 }

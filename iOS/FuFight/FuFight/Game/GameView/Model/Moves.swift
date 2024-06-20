@@ -11,7 +11,6 @@ struct Moves {
     let animationTypes: [AnimationType]
     var attacks: [Attack]
     var defenses: [Defense]
-    private let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
     var availableAttacks: [Attack] { attacks.filter{ $0.state != .cooldown } }
     var unavailableAttacks: [Attack] { attacks.filter{ $0.state == .cooldown } }
@@ -98,10 +97,9 @@ struct Moves {
     }
 
     mutating func toggleType(at position: AttackPosition) {
-        for i in attacks.indices {
-            let currentAttack = attacks[i]
-            if currentAttack.position == position {
-                attacks[i].toggleAttackType(at: currentAttack.position)
+        for (i, attack) in attacks.enumerated() {
+            if attack.position == position {
+                attacks[i].toggleAttackType(at: attack.position)
                 break
             }
         }
