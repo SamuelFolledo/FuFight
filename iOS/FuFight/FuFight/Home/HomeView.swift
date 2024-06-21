@@ -129,6 +129,7 @@ struct HomeView: View {
     @ViewBuilder var fighterView: some View {
         if let fighter = vm.fighter {
             DaePreview(scene: createFighterScene(fighterType: fighter.fighterType, animation: fighter.defaultAnimation))
+                .ignoresSafeArea()
         }
     }
 }

@@ -11,32 +11,30 @@ struct RoomView: View {
     @StateObject var vm: RoomViewModel
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                ZStack {
-                    fighterView
+        ZStack {
+            fighterView
 
-                    VStack {
-                        navigationView
+            VStack {
+                navigationView
+                
+                Spacer()
 
-                        VStack {
-                            movesView
-                        }
-                        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                        .padding()
-                    }
+                VStack {
+                    movesView
                 }
+                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                .padding()
             }
-            .overlay {
-                LoadingView(message: vm.loadingMessage)
-            }
-            .background(
-                backgroundImage
-                    .padding(.leading, 30)
-            )
-            .navigationBarHidden(true)
-            .frame(maxWidth: .infinity)
         }
+        .overlay {
+            LoadingView(message: vm.loadingMessage)
+        }
+        .background(
+            backgroundImage
+                .padding(.leading, 30)
+        )
+        .navigationBarHidden(true)
+        .frame(maxWidth: .infinity)
         .onAppear {
             vm.onAppear()
         }
@@ -84,12 +82,14 @@ struct RoomView: View {
                     vm.defenseSelected(defenses.getDefense(with: $0).position)
                 },
                 playerType: vm.playerType)
+            .padding(.bottom)
         }
     }
 
     @ViewBuilder var fighterView: some View {
         if let fighterScene = vm.fighterScene {
             DaePreview(scene: fighterScene)
+                .ignoresSafeArea()
         }
     }
 }
