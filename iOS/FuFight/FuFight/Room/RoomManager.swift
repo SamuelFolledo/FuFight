@@ -73,7 +73,6 @@ class RoomManager {
 
     static func goOnlineIfNeeded() {
         guard let currentRoom = Room.current else { return }
-        LOGD("Room is going online from \(currentRoom.status)")
         switch currentRoom.status {
         case .online:
             break

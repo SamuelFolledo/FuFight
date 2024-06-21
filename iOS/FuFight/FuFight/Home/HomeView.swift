@@ -127,10 +127,8 @@ struct HomeView: View {
     }
 
     @ViewBuilder var fighterView: some View {
-        if vm.fighter != nil {
-            FighterView(vm.fighter)
-                .frame(maxWidth: .infinity)
-                .ignoresSafeArea(edges: .vertical)
+        if let fighter = vm.fighter {
+            DaePreview(scene: createFighterScene(fighterType: fighter.fighterType, animation: fighter.defaultAnimation))
         }
     }
 }

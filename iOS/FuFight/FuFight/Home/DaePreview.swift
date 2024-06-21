@@ -10,23 +10,13 @@ import SceneKit
 
 /// A Preview of fighter
 struct DaePreview: UIViewRepresentable {
-    typealias UIViewType = SCNView
-
-    var fighterType: FighterType = .samuel
-    var animationType: AnimationType = .idle
     var scene: SCNScene
 
+    typealias UIViewType = SCNView
     private let cameraNode = SCNNode()
 
-    init(fighterType: FighterType, animationType: AnimationType) {
-        self.fighterType = fighterType
-        self.animationType = animationType
-        self.scene = SCNScene(named: fighterType.animationPath(.idle))!
-    }
-
-    init() {
-        self.fighterType = Room.current?.player.fighterType ?? .samuel
-        self.scene = SCNScene(named: fighterType.animationPath(.idle))!
+    init(scene: SCNScene) {
+        self.scene = scene
     }
 
     func makeUIView(context: Context) -> UIViewType {
@@ -40,8 +30,7 @@ struct DaePreview: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIViewType, context: Context) {
-        let path = fighterType.animationPath(animationType)
-        uiView.scene = SCNScene(named: path)
+        uiView.scene = scene
     }
 }
 
@@ -52,7 +41,7 @@ extension DaePreview {
 //        view.defaultCameraController.inertiaEnabled = true
 //        view.defaultCameraController.maximumVerticalAngle = 89
 //        view.defaultCameraController.minimumVerticalAngle = -89
-        
+
         // Using custom camera
         let camera = SCNCamera()
         camera.usesOrthographicProjection = true
@@ -64,6 +53,8 @@ extension DaePreview {
         cameraNode.camera = camera
         let cameraOrbit = SCNNode()
         cameraOrbit.addChildNode(cameraNode)
+//        cameraOrbit.eulerAngles.y = Float(-2 * M_PI) * widthRatio
+//        cameraOrbit.eulerAngles.x = Float(-M_PI) * heightRatio
         scene.rootNode.addChildNode(cameraOrbit)
     }
 }

@@ -10,6 +10,7 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 import SwiftUI
+import SceneKit
 
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
@@ -150,4 +151,16 @@ func runAfterDelay(delay: TimeInterval, action: @escaping () -> Void) {
             action()
         }
     }
+}
+
+func createFighterScene(fighterType: FighterType, animation: AnimationType) -> SCNScene {
+    let path = fighterType.animationPath(animation)
+    let scene = SCNScene(named: path)!
+    scene.rootNode.enumerateChildNodes { (child, stop) in
+        if let partName = child.name,
+           let part = SkeletonType(rawValue: partName) {
+            child.geometry?.firstMaterial = part.material
+        }
+    }
+    return scene
 }
