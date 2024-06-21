@@ -33,6 +33,8 @@ final class AccountViewModel: BaseAccountViewModel {
     @Published var isReauthenticationAlertPresented = false
     @Published var password = ""
     @Published private var reauthenticationReasonType: ReauthenticateReasonType = .editAccount
+    let didBack = PassthroughSubject<AccountViewModel, Never>()
+    let didChangePassword = PassthroughSubject<AccountViewModel, Never>()
 
     override func onAppear() {
         super.onAppear()
@@ -130,6 +132,10 @@ final class AccountViewModel: BaseAccountViewModel {
                 updateError(MainError(type: .reauthenticatingUser, message: error.localizedDescription))
             }
         }
+    }
+
+    func changePasswordButtonTapped() {
+        didChangePassword.send(self)
     }
 }
 

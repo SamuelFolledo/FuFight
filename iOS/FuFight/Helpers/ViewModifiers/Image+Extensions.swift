@@ -13,6 +13,11 @@ extension Image {
             .aspectRatio(1.0, contentMode: .fit)
     }
 
+    func buttonImageModifier() -> some View {
+        self.resizable()
+            .aspectRatio(contentMode: .fill)
+    }
+
     func backgroundImageModifier() -> some View {
         self.resizable()
             .aspectRatio(contentMode: .fill)

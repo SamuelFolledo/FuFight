@@ -9,11 +9,12 @@ import SwiftUI
 
 struct UpdatePasswordView: View {
     @StateObject var vm = UpdatePasswordViewModel()
-    @Environment(\.presentationMode) private var presentationMode
+//    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
+                navigationView
 
                 VStack(spacing: 12) {
                     currentPasswordField
@@ -24,30 +25,29 @@ struct UpdatePasswordView: View {
 
                     Spacer()
                 }
+                .padding(.horizontal, horizontalPadding)
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-            .padding(.vertical)
-            .padding(.horizontal, horizontalPadding)
+            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
         }
+        .overlay {
+            VStack {
+                Spacer()
+
+                updatePasswordButton
+            }
+        }
         .onAppear {
             vm.onAppear()
-            vm.dismissAction = {
-                DispatchQueue.main.async {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }
         }
         .onDisappear {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-        .navigationTitle(Str.updatePasswordTitle)
-        .safeAreaInset(edge: .bottom) {
-            updatePasswordButton
-        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -55,6 +55,7 @@ struct UpdatePasswordView: View {
             backgroundImage
                 .padding(.trailing, 800)
         )
+        .navigationBarHidden(true)
         .toolbar(.hidden, for: .tabBar)
     }
 
@@ -102,7 +103,20 @@ struct UpdatePasswordView: View {
         .appButton(.primary)
         .disabled(!vm.isUpdatePasswordButtonEnabled)
         .padding(.horizontal, horizontalPadding)
-        .padding(.bottom, 8)
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
+    }
+    var navigationView: some View {
+        HStack(alignment: .center) {
+            Button(action: {
+                vm.didBack.send(vm)
+            }, label: {
+                backButtonImage
+                    .padding(.leading, smallerHorizontalPadding)
+                    .frame(width: 104, height: 30)
+            })
+
+            Spacer()
+        }
     }
 }
 

@@ -83,16 +83,16 @@ let cityBackgroundImage: some View = Image("cityBackground").defaultImageModifie
 let timerBackgroundImage: some View = Image("timerBackground").defaultImageModifier()
 
 //Buttons Folder
-let backButtonImage: some View = Image("backButton").defaultImageModifier()
-let homeButtonImage: some View = Image("homeButton").defaultImageModifier()
-let homeButtonSelectedImage: some View = Image("homeButtonSelected").defaultImageModifier()
-let noButtonImage: some View = Image("noButton").defaultImageModifier()
-let playButtonImage: some View = Image("playButton").defaultImageModifier()
+let backButtonImage: some View = Image("backButton").buttonImageModifier()
+let homeButtonImage: some View = Image("homeButton").buttonImageModifier()
+let homeButtonSelectedImage: some View = Image("homeButtonSelected").buttonImageModifier()
+let noButtonImage: some View = Image("noButton").buttonImageModifier()
+let playButtonImage: some View = Image("playButton").buttonImageModifier()
 let plusImage: some View = Image("plus").defaultImageModifier()
 let plusButtonImage: some View = Image("plusButton").defaultImageModifier()
-let restartButtonImage: some View = Image("restartButton").defaultImageModifier()
-let resumeButtonImage: some View = Image("resumeButton").defaultImageModifier()
-let yesButtonButtonImage: some View = Image("yesButton").defaultImageModifier()
+let restartButtonImage: some View = Image("restartButton").buttonImageModifier()
+let resumeButtonImage: some View = Image("resumeButton").buttonImageModifier()
+let yesButtonButtonImage: some View = Image("yesButton").buttonImageModifier()
 
 //Icons
 let coinImage: some View = Image("coin").defaultImageModifier()

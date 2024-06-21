@@ -5,6 +5,7 @@
 //  Created by Samuel Folledo on 2/26/24.
 //
 
+import Combine
 import SwiftUI
 
 final class UpdatePasswordViewModel: BaseViewModel {
@@ -31,6 +32,8 @@ final class UpdatePasswordViewModel: BaseViewModel {
     @Published var confirmPasswordIsSecure = true
     @Published var confirmPasswordHasError = false
     @Published var confirmPasswordIsActive = false
+    let didBack = PassthroughSubject<UpdatePasswordViewModel, Never>()
+
     var isUpdatePasswordButtonEnabled: Bool {
         if currentPassword.isEmpty || password.isEmpty || confirmPassword.isEmpty {
             return false

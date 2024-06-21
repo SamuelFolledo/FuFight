@@ -21,8 +21,9 @@ struct HomeView: View {
                     Spacer()
                 }
                 .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                .padding()
             }
+            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
@@ -43,7 +44,7 @@ struct HomeView: View {
                     playButton
                 }
             }
-            .padding(.bottom, 90)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 90)
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)

@@ -33,27 +33,24 @@ enum ViewType {
 
 extension View {
     ///Create an app's button
-    func appButton(_ type: ViewType, isBordered: Bool = false) -> some View {
-        self.modifier(AppButtonModifier(type, isBordered: isBordered))
+    func appButton(_ type: ViewType, isBordered: Bool = false, hasPadding: Bool = true) -> some View {
+        self.modifier(AppButtonModifier(viewType: type, isBordered: isBordered, hasPadding: hasPadding))
     }
 }
 
 struct AppButtonModifier: ViewModifier {
     var viewType: ViewType
     var isBordered: Bool
+    var hasPadding: Bool
 
     let disabledColor: UIColor = .systemGray
     @Environment(\.isEnabled) private var isEnabled: Bool
 
-    init(_ viewType: ViewType, isBordered: Bool) {
-        self.viewType = viewType
-        self.isBordered = isBordered
-    }
-
     func body(content: Content) -> some View {
         content
             .font(buttonFont)
-            .padding()
+            .padding(.vertical, hasPadding ? 8 : 0)
+            .padding(.horizontal)
             .background(background)
             .foregroundColor(
                 Color(uiColor: foregroundColor))
