@@ -54,37 +54,46 @@ struct ContentView: View {
 
     //MARK: - Views
     var body: some View {
-        switch account.status {
-        case .loggedIn:
-            ZStack(alignment: .bottom) {
-                //Go to home page
+        GeometryReader { reader in
+            switch account.status {
+            case .loggedIn:
+                //Views for each Tab
                 TabView(selection: $tab) {
                     ForEach(tabs, id: \.self) { tab in
                         tabBarView(tab)
                     }
                 }
-                .navigationViewStyle(.stack)
-                .edgesIgnoringSafeArea(.vertical)
+                .tabViewStyle(.page(indexDisplayMode: .never)) //adds swipe gesture and sliding effect when switching between tabs
+                .overlay {
+                    VStack {
+                        Spacer()
 
-                //MARK: - TabBar
-                if showTab {
-                    HStack(spacing: 1) {
-                        ForEach(tabs, id: \.self) { tab in
-                            tabBarItem(tab)
+                        if showTab {
+                            //MARK: - TabBar
+                            HStack(spacing: 1) {
+                                ForEach(tabs, id: \.self) { tab in
+                                    tabBarItem(tab)
+                                }
+                            }
+                            .transition(.move(edge: .bottom))
+                            .clipShape(Rectangle())
+                            .frame(height: 140, alignment: .center)
                         }
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .frame(height: 80, alignment: .center)
-                    .frame(maxWidth: 320)
                 }
-            }
-        case .unfinished:
-            //Finish creating account
-            createAuthenticationView(step: .onboard)
+                .onAppear {
+                    UserDefaults.topSafeAreaInset = reader.safeAreaInsets.top
+                    UserDefaults.bottomSafeAreaInset = reader.safeAreaInsets.bottom
+                }
+                .ignoresSafeArea()
+            case .unfinished:
+                //Finish creating account
+                createAuthenticationView(step: .onboard)
 
-        case .loggedOut:
-            //Log in
-            createAuthenticationView(step: .logIn)
+            case .loggedOut:
+                //Log in
+                createAuthenticationView(step: .logIn)
+            }
         }
     }
 
@@ -97,27 +106,28 @@ struct ContentView: View {
 
     var homeView: some View {
         NavigationStack(path: $homeRouter.navigationPath) {
-            VStack {
-                HomeView(vm: homeRouter.makeHomeViewModel(account: account))
-            }
-            .navigationDestination(for: HomeRoute.self) { screen in
-                switch screen {
-                case .loading(vm: let vm):
-                    GameLoadingView(vm: vm)
-                case .game(vm: let vm):
-                    GameView(vm: vm)
-                case .account(vm: let vm):
-                    AccountView(vm: vm)
+            HomeView(vm: homeRouter.makeHomeViewModel(account: account))
+                .navigationDestination(for: HomeRoute.self) { screen in
+                    switch screen {
+                    case .loading(vm: let vm):
+                        GameLoadingView(vm: vm)
+                    case .game(vm: let vm):
+                        GameView(vm: vm)
+                    case .account(vm: let vm):
+                        AccountView(vm: vm)
+                    case .updatePassword(vm: let vm):
+                        UpdatePasswordView(vm: vm)
+                    }
                 }
-            }
         }
         .tag(Tab.home)
-        .navigationViewStyle(.stack)
         .onChange(of: scenePhase) { oldPhase, newPhase in
             scenePhaseChangedHandler(newPhase)
         }
         .onChange(of: homeRouter.navigationPath) { _, newValue in
-            showTab = newValue.isEmpty
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.showTab = newValue.isEmpty
+            }
         }
     }
 
@@ -161,6 +171,7 @@ private extension ContentView {
             .frame(maxWidth: .infinity)
             .padding(4)
             .background(
+                //Selected tab background
                 Group {
                     if currentTab == tab {
                         RoundedRectangle(cornerRadius: cornerRadius)

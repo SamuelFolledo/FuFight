@@ -13,9 +13,11 @@ struct AccountView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                profilePicture
+                navigationView
 
                 VStack(spacing: 12) {
+                    profilePicture
+
                     usernameField
 
                     emailField
@@ -28,6 +30,7 @@ struct AccountView: View {
 
                     logOutButton
                 }
+                .padding(.horizontal, horizontalPadding)
             }
             .alert(title: vm.alertTitle, 
                    message: vm.alertMessage,
@@ -41,12 +44,8 @@ struct AccountView: View {
                    title: Str.recentReauthenticationIsRequiredToMakeChanges,
                    primaryButton: AlertButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
-            .padding(.horizontal, horizontalPadding)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    editSaveButton
-                }
-            }
+            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
@@ -65,6 +64,7 @@ struct AccountView: View {
         .onTapGesture {
             hideKeyboard()
         }
+        .navigationBarHidden(true)
         .toolbar(.hidden, for: .tabBar)
     }
 
@@ -72,7 +72,7 @@ struct AccountView: View {
         Button(action: vm.editSaveButtonTapped) {
             Text(vm.isViewingMode ? Str.editTitle : Str.saveTitle)
         }
-        .appButton(.tertiary)
+        .appButton(.tertiary, hasPadding: false)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -99,8 +99,8 @@ struct AccountView: View {
             isDisabled: .constant(true))
     }
     var changePasswordButton: some View {
-        NavigationLink {
-            UpdatePasswordView()
+        Button {
+            vm.changePasswordButtonTapped()
         } label: {
             Text(Str.changePasswordTitle)
                 .frame(maxWidth: .infinity)
@@ -120,6 +120,21 @@ struct AccountView: View {
                 .frame(maxWidth: .infinity)
         }
         .appButton(.destructive, isBordered: true)
+    }
+    var navigationView: some View {
+        HStack(alignment: .center) {
+            Button(action: {
+                vm.didBack.send(vm)
+            }, label: {
+                backButtonImage
+                    .padding(.leading, smallerHorizontalPadding)
+                    .frame(width: 104, height: 30)
+            })
+
+            Spacer()
+
+            editSaveButton
+        }
     }
 }
 

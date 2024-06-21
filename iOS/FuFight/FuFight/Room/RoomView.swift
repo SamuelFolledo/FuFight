@@ -25,6 +25,8 @@ struct RoomView: View {
                 .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                 .padding()
             }
+            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 40)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)

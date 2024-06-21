@@ -12,6 +12,7 @@ enum HomeRoute: Hashable, Identifiable {
     case loading(vm: GameLoadingViewModel)
     case game(vm: GameViewModel)
     case account(vm: AccountViewModel)
+    case updatePassword(vm: UpdatePasswordViewModel)
 
     var id: String {
         switch self {
@@ -21,6 +22,8 @@ enum HomeRoute: Hashable, Identifiable {
             "game"
         case .account(_):
             "account"
+        case .updatePassword(_):
+            "updatePassword"
         }
     }
 
@@ -89,7 +92,35 @@ class HomeRouter: ObservableObject {
 
     //MARK: - AccountView Methods
     func makeAccountViewModel(account: Account) -> AccountViewModel {
-        return AccountViewModel(account: account)
+        let vm = AccountViewModel(account: account)
+        vm.didBack
+            .sink(receiveValue: { _ in
+                self.navigateBack()
+            })
+            .store(in: &subscriptions)
+        vm.didChangePassword
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                navigationPath.append(.updatePassword(vm: makeUpdatePasswordViewModel(account: account)))
+            })
+            .store(in: &subscriptions)
+        return vm
+    }
+
+
+    func transitionToUpdatePassword(vm: AccountViewModel) {
+        navigationPath.append(.account(vm: makeAccountViewModel(account: vm.account)))
+    }
+
+    //MARK: - UpdatePassword Methods
+    func makeUpdatePasswordViewModel(account: Account) -> UpdatePasswordViewModel {
+        let vm = UpdatePasswordViewModel()
+        vm.didBack
+            .sink(receiveValue: { _ in
+                self.navigateBack()
+            })
+            .store(in: &subscriptions)
+        return vm
     }
 
     //MARK: - GameLoadingView Methods

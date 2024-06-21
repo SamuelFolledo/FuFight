@@ -24,6 +24,8 @@ struct StoreView: View {
                         .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                         .padding()
                     }
+                    .padding(.top, UserDefaults.topSafeAreaInset)
+                    .padding(.bottom, UserDefaults.bottomSafeAreaInset)
                 }
             }
             .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
