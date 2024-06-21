@@ -88,8 +88,8 @@ struct RoomView: View {
     }
 
     @ViewBuilder var fighterView: some View {
-        if vm.fighter != nil {
-            FighterView(vm.fighter)
+        if let fighterScene = vm.fighterScene {
+            DaePreview(scene: fighterScene)
         }
     }
 }

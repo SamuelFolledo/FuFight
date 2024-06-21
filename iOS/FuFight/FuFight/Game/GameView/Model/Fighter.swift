@@ -10,7 +10,7 @@ import SceneKit
 ///3D model of the fighter
 class Fighter {
     //MARK: Properties
-    let fighterType: FighterType
+    var fighterType: FighterType
     let isEnemy: Bool
     private(set) var defaultAnimation: AnimationType
 
@@ -69,14 +69,18 @@ class Fighter {
         self.isEnemy = isEnemy
         defaultAnimation = .idle
         createNode()
-        playAnimation(defaultAnimation)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    //MARK: - Public Methods.
+    //MARK: - Public Methods
+    func switchFighter() {
+        let nextFighterType: FighterType = fighterType == .clara ? .samuel : .clara
+        fighterType = nextFighterType
+    }
+
     func positionNode(asHorizontal: Bool = false) {
         daeHolderNode.scale = SCNVector3Make(fighterType.scale, fighterType.scale, fighterType.scale)
         var xPosition: Float = isEnemy ? 1.5 : 0    //further
