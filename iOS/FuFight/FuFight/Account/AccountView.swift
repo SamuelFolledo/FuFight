@@ -65,7 +65,6 @@ struct AccountView: View {
             hideKeyboard()
         }
         .navigationBarHidden(true)
-        .toolbar(.hidden, for: .tabBar)
     }
 
     var editSaveButton: some View {

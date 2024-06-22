@@ -70,14 +70,13 @@ struct ContentView: View {
 
                         if showTab {
                             //MARK: - TabBar
-                            HStack(spacing: 1) {
-                                ForEach(tabs, id: \.self) { tab in
-                                    tabBarItem(tab)
+                            HStack(alignment: .bottom, spacing: 1) {
+                                ForEach(tabs, id: \.self) { currentTab in
+                                    tabBarItem(currentTab)
                                 }
                             }
                             .transition(.move(edge: .bottom))
-                            .clipShape(Rectangle())
-                            .frame(height: 140, alignment: .center)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                     }
                 }
@@ -158,36 +157,50 @@ private extension ContentView {
     }
 
     func tabBarItem(_ currentTab: Tab) -> some View {
-        let cornerRadius: CGFloat = 4
-        return Button(action: { withAnimation(.easeInOut) {
-            tab = currentTab
-        }}) {
-            VStack {
-                Image(systemName: currentTab.systemImage)
-                    .frame(width: 20, height: 20)
-                Text(currentTab.title)
-                    .font(tabFontSize)
+        let selectedColor = Color.yellow
+        let unselectedColor = Color.white
+        return VStack(spacing: 0) {
+            //Selected TabBar item's extra padding
+            Group {
+                tab == currentTab ? selectedColor : unselectedColor
             }
-            .frame(maxWidth: .infinity)
-            .padding(4)
-            .background(
-                //Selected tab background
-                Group {
-                    if currentTab == tab {
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .foregroundColor(.yellow)
-                            .matchedGeometryEffect(id: "selectedTabRoundedRectangle", in: namespace)
-                    } else {
-                        EmptyView()
-                    }
+            .frame(height: tab == currentTab ? 8 : 0)
+
+            //TabBar item
+            Button(action: { withAnimation(.easeInOut) {
+                tab = currentTab
+            }}) {
+                VStack {
+                    Spacer()
+                        .frame(height: 10)
+                    Image(systemName: currentTab.systemImage)
+                        .frame(width: 25, height: 25)
+                    Text(currentTab.title)
+                        .font(tabFont)
+                    Spacer()
+                        .frame(height: UserDefaults.bottomSafeAreaInset / 2)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(4)
+                .background(
+                    //Selected tab background
+                    Group {
+                        if currentTab == tab {
+                            Rectangle()
+                                .foregroundColor(selectedColor)
+                                .matchedGeometryEffect(id: "selectedTabRoundedRectangle", in: namespace)
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                )
+            }
+            .foregroundColor(tab == currentTab ? blackColor : unselectedTabColor)
+            .background(
+                Rectangle()
+                    .foregroundColor(unselectedColor)
             )
         }
-        .foregroundColor(tab == currentTab ? primaryColor : unselectedTabColor)
-        .background(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .foregroundColor(.white)
-        )
     }
 
     func tabBarView(_ currentTab: Tab) -> some View {

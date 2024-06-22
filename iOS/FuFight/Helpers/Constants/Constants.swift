@@ -45,6 +45,7 @@ var animationToTest: AnimationType = .punchHeadRightHard
 //Fonts
 let tabFontSize: Font = .caption
 let defaultFontSize: CGFloat = 16
+let tabFont = Font.headline
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
 let textFont = Font.system(size: defaultFontSize, weight: .regular)
 let mediumTextFont = textFont.weight(.medium)
@@ -69,6 +70,7 @@ let disabledColor = Color(uiColor: disabledUiColor)
 let destructiveUiColor = UIColor.systemRed
 let destructiveColor = Color(uiColor: destructiveUiColor)
 let unselectedTabColor: Color = Color(uiColor: .lightGray)
+let blackColor = Color.black
 
 //MARK: - Constant Assets
 //Backgrounds
