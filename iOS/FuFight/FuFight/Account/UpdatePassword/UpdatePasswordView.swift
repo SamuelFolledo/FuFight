@@ -56,7 +56,6 @@ struct UpdatePasswordView: View {
                 .padding(.trailing, 800)
         )
         .navigationBarHidden(true)
-        .toolbar(.hidden, for: .tabBar)
     }
 
     var currentPasswordField: some View {
