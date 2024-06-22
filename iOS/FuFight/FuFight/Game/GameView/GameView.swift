@@ -28,6 +28,8 @@ struct GameView: View {
 
             createPlayerView(for: .user)
         }
+        .padding(.top, UserDefaults.topSafeAreaInset + 6)
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         .background {
             GameSceneView(fighter: vm.player.fighter, enemyFighter: vm.enemy.fighter, isPracticeMode: vm.gameMode == .practice)
                 .ignoresSafeArea()
@@ -66,7 +68,6 @@ struct GameView: View {
         .onReceive(vm.timer) { time in
             vm.decrementTimeByOneSecond()
         }
-        .toolbar(.hidden, for: .tabBar)
         .task {
             //Must be started here in order to avoid duplicated calls on createNewRound()
             vm.updateState(.starting)

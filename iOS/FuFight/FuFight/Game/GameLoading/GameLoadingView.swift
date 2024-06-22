@@ -20,6 +20,8 @@ struct GameLoadingView: View {
                    message: vm.alertMessage,
                    isPresented: $vm.isAlertPresented)
             .padding(.horizontal, horizontalPadding)
+            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .frame(maxWidth: .infinity)
         .overlay {
@@ -40,7 +42,6 @@ struct GameLoadingView: View {
             cancelButton
         }
         .navigationBarHidden(true)
-        .frame(maxWidth: .infinity)
     }
 
     var cancelButton: some View {
@@ -56,7 +57,7 @@ struct GameLoadingView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .padding(.horizontal)
-        .padding(.bottom, 4)
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
     }
 }
 

@@ -50,6 +50,7 @@ class GameViewModel: BaseViewModel {
     override func onDisappear() {
         super.onDisappear()
         player.prepareForRematch()
+        enemy.prepareForRematch()
     }
 
     //MARK: - Public Methods
