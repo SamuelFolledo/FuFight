@@ -107,33 +107,33 @@ extension Kick {
     var damage: Double {
         switch self {
         case .leftKickLight, .rightKickLight:
-            10
-        case .leftKickMedium, .rightKickMedium:
             15
+        case .leftKickMedium, .rightKickMedium:
+            20
         case .leftKickHard, .rightKickHard:
-            25
+            30
         }
     }
 
     var speed: Double {
         switch self {
         case .leftKickLight, .rightKickLight:
-            50
+            45
         case .leftKickMedium, .rightKickMedium:
-            35
+            30
         case .leftKickHard, .rightKickHard:
-            25
+            20
         }
     }
 
     var damageReduction: Double {
         switch self {
         case .leftKickLight, .rightKickLight:
-            0.85
+            0.8
         case .leftKickMedium, .rightKickMedium:
-            0.75
+            0.7
         case .leftKickHard, .rightKickHard:
-            0.65
+            0.6
         }
     }
 

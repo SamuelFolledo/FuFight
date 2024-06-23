@@ -13,23 +13,29 @@ struct DefensesView: View {
     var moveSelected: ((_ moveId: String) -> Void)?
 
     var body: some View {
-        HStack(alignment: .bottom) {
-            createButtonFrom(.left)
+        GeometryReader { geometry in
+            let spacing: CGFloat = playerType.isEnemy ? 2 : 8
+            let size = abs(geometry.size.height * (1/2) - (spacing * 2 / 3))
 
-            VStack {
-                createButtonFrom(.forward)
+            HStack(alignment: .bottom, spacing: spacing) {
+                createButtonFrom(.left, size: size)
 
-                createButtonFrom(.backward)
+                VStack {
+                    createButtonFrom(.forward, size: size)
+
+                    createButtonFrom(.backward, size: size)
+                }
+
+                createButtonFrom(.right, size: size)
             }
-
-            createButtonFrom(.right)
+            .frame(maxWidth: .infinity)
         }
     }
 
-    @ViewBuilder func createButtonFrom(_ position: DefensePosition) -> some View {
+    @ViewBuilder func createButtonFrom(_ position: DefensePosition, size: CGFloat) -> some View {
         if let move = defenses.first(where: { $0.position == position }) {
             MoveButton(move: move, playerType: playerType, moveSelected: moveSelected)
-                .frame(width: playerType.shouldFlip ? 18 : 100)
+                .frame(height: playerType.shouldFlip ? 18 : size)
         }
     }
 }
