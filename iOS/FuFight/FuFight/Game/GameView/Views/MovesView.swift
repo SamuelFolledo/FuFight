@@ -13,19 +13,25 @@ struct MovesView<AttacksView: View, DefensesView: View>: View {
     var playerType: PlayerType
 
     var body: some View {
-        VStack {
-            attacksView
+        GeometryReader { geometry in
+            let spacing: CGFloat = playerType.isEnemy ? 2 : 8
+            VStack(spacing: spacing) {
+                attacksView
+                    .frame(height: abs(geometry.size.height * (3/5) - spacing))
 
-            defensesView
+                defensesView
+                    .frame(height: abs(geometry.size.height * (2/5) - spacing))
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .scaleEffect(x: playerType.shouldFlip ? -1 : 1, y: playerType.shouldFlip ? -1 : 1) // flip vertically and horizontally
+            .background(
+                playerType.background
+                    .cornerRadius(16)
+                    .opacity(0.5)
+                    .padding(.horizontal, 2)
+                    .padding(.vertical, -4)
+            )
         }
-        .scaleEffect(x: playerType.shouldFlip ? -1 : 1, y: playerType.shouldFlip ? -1 : 1) // flip vertically and horizontally
-        .background(
-            playerType.background
-                .cornerRadius(16)
-                .opacity(0.5)
-                .padding(.horizontal, 2)
-                .padding(.vertical, -4)
-        )
     }
 }
 
