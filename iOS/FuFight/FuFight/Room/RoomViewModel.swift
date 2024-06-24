@@ -35,9 +35,8 @@ final class RoomViewModel: BaseAccountViewModel {
         updateAnimation(animation)
     }
 
-    func switchButtonSelected() {
+    func switchFighterTo(_ nextFighterType: FighterType) {
         let updatedPlayer = player!
-        let nextFighterType: FighterType = updatedPlayer.fighterType == .clara ? .samuel : .clara
         updatedPlayer.fighterType = nextFighterType
         updatePlayer(with: updatedPlayer)
     }

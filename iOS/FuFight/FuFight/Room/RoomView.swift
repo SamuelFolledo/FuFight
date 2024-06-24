@@ -24,6 +24,8 @@ struct RoomView: View {
                 }
                 .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                 .padding()
+
+                fightersView
             }
             .padding(.top, UserDefaults.topSafeAreaInset + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 40)
@@ -50,22 +52,17 @@ struct RoomView: View {
         ZStack {
             HStack {
                 Spacer()
-
-                Button {
-                    vm.switchButtonSelected()
-                } label: {
-                    Image(systemName: "arrow.2.squarepath")
-                        .foregroundStyle(.white)
-                }
             }
 
             HStack {
                 Spacer()
+                
+                if vm.fighter != nil {
+                    Text("\(vm.fighter.fighterType.name)")
+                        .font(mediumTitleFont)
+                        .foregroundStyle(.white)
 
-                Text("Edit")
-                    .font(mediumTitleFont)
-                    .foregroundStyle(.white)
-
+                }
                 Spacer()
             }
         }
@@ -85,6 +82,16 @@ struct RoomView: View {
                 },
                 playerType: vm.playerType)
             .padding(.bottom)
+        }
+    }
+
+    @ViewBuilder var fightersView: some View {
+        if vm.fighter != nil {
+            FightersCollectionView(selectedFighter: vm.fighter.fighterType) { fighterType in
+                vm.switchFighterTo(fighterType)
+            }
+            .frame(height: fighterCellSize)
+            .padding(.bottom, UserDefaults.bottomSafeAreaInset)
         }
     }
 

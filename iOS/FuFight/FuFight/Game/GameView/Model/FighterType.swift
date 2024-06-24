@@ -7,16 +7,10 @@
 
 import Foundation
 
-enum FighterType: String {
+enum FighterType: String, CaseIterable, Identifiable {
     case samuel, clara
 
-    var daeUrl: URL? {
-        return Bundle.main.url(forResource: defaultDaePath, withExtension: "dae")
-    }
-
-    var defaultDaePath: String {
-        "3DAssets.scnassets/Characters/\(name)/assets/\(name.lowercased())"
-    }
+    var id: String { rawValue }
 
     var name: String {
         switch self {
@@ -27,6 +21,10 @@ enum FighterType: String {
         }
     }
 
+    var headShotImageName: String {
+        "\(rawValue)HeadShot"
+    }
+
     var bonesName: String {
         switch self {
         case .samuel:
@@ -34,6 +32,14 @@ enum FighterType: String {
         case .clara:
             "Armature-001"
         }
+    }
+
+    var daeUrl: URL? {
+        return Bundle.main.url(forResource: defaultDaePath, withExtension: "dae")
+    }
+
+    var defaultDaePath: String {
+        "3DAssets.scnassets/Characters/\(name)/assets/\(name.lowercased())"
     }
 
     var scale: Float {
