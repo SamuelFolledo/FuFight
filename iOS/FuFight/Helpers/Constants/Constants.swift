@@ -38,7 +38,7 @@ let accountImagePickerHeight: CGFloat = 160
 let defaultMaxTime: Int = 5
 let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
-
+let fighterCellSize: CGFloat = 80
 
 var animationToTest: AnimationType = .punchHeadRightHard
 
