@@ -58,6 +58,8 @@ class FighterType(Enum):
 #################################################### Constants ##################################################
 #----------------------------------------------------------------------------------------------------------------
 
+ANIMATION_CATEGORIES = ["dodge", "hit", "idle", "kick", "kill", "punch"]
+
 #Can get after downloading the .dae zipped files
 MIXAMO_FOLDERNAMES = {
     FighterType.samuel: "samuel", 
@@ -361,8 +363,11 @@ def updateFighters(fighterType, fighterPath):
             renamePath(fullPath, newFolderName)
             LOGA(f"Renamed textures to assets {fullPath}")
     
-    #3. Create an empty animations folder
-    createFolder(f"{fighterPath}/animations")
+    #3. Create an empty animation folders
+    animationsPath = f"{fighterPath}/animations"
+    createFolder(animationsPath)
+    for categories in ANIMATION_CATEGORIES:
+        createFolder(f"{animationsPath}/{categories}")
 
     #4. Update the name of the .png files in assets
     assetsPath = f"{fighterPath}/assets"

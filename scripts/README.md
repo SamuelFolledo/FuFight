@@ -12,7 +12,7 @@ Use these character and animation scripts to prepare .dae files downloaded from 
 #### Each dae.zip file will: 
 1. Update the .dae's name in fighterPath
 2. Update the textures folder to assets in fighterPath
-3. Create an empty animations folder
+3. Create an animations folder and more folders for each animation categories
 4. Update the name of the .png files in fighterPath/assets
 5. Rename the root fighter's path to its name
 6. Delete old fighterPath
