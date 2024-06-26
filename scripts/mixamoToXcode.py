@@ -371,7 +371,7 @@ def updateFighters(fighterType, fighterPath):
     #4. Rename the root fighter's path to its name
     pathName = getNameFromPath(fighterPath)
     pathDir = getFolderFromPath(fighterPath)
-    newName = pathName.replace(fighter.folderName, fighter.fighterType.value)
+    newName = pathName.replace(fighter.folderName, fighter.name) #TODO captiali
     newFighterPath = f"{pathDir}/{newName}"
     renamePath(fighterPath, newFighterPath)
 
