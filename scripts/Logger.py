@@ -12,7 +12,7 @@ class LogType(Enum):
     all = 5
 
 
-MINIMUMLOGLEVEL = LogType.debug #Set between 0-5, the lower the number, the less logs
+MINIMUMLOGLEVEL = LogType.error #Set between 0-5, the lower the number, the less logs
 
 
 def LOG(message):

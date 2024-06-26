@@ -1,7 +1,7 @@
 # This script is to convert a downloaded .dae file from mixamo as .zip or unzipped into a format that FuFight project can just accept
 # This will do the following
 # 1. Unzip files and properly rename its files and folders
-# 2. TODO: Update the .dae file's texture
+# 2. Update the .dae file's texture
 # 3. Run the ConvertToXcodeCollada script to the .dae files
 
 import os
@@ -210,7 +210,7 @@ def getTextureOldName(fighterType, filePath):
             textureName += "_1001"
 
     fighter = Fighter(fighterType)
-    LOG(f"Texture's OLD name for {fighter.name} from {filePath} IS {textureName}")
+    LOGA(f"Texture's OLD name for {fighter.name} from {filePath} IS {textureName}")
     return textureName
 
 def getTextureNewName(fighterType, filePath):
@@ -308,20 +308,23 @@ def updateDaeFile(fighterType, daePath):
 
 def executeConvertToXcodeColladaWorkflow(daePath):
     """Executes ConvertXcodeCollada workflow and to the dae path, then deletes the unneeded .dae file"""
-    if os.path.exists(WORKFLOWPATH_ConvertToXcodeCollada):
-        try:
-            # Execute the workflow
-            proc = subprocess.check_output(["/usr/bin/automator", "-i", daePath, WORKFLOWPATH_ConvertToXcodeCollada],                                
-                                           stderr=DEVNULL)
-            #Remove unneeded .dae file
-            uneededDaeFileName = f"{getNameFromPath(daePath, withExtension=True)}-e"
-            uneededDaePath = f"{getFolderFromPath(daePath)}/{uneededDaeFileName}"
-            os.remove(uneededDaePath)
-            LOGD(f"Executed ConvertToXcodeCollada to daePath: {daePath} and deleted {uneededDaeFileName}")
-        except subprocess.CalledProcessError as e:
-            LOGE(f"Failed to execute script at path: {daePath}")
-            LOGE('Python Error executing ConvertToXcodeCollada workflow with error: [%d]\n{!r}'.format(e.returncode, e.output))
-            sys.exit(1)
+    if not exist(WORKFLOWPATH_ConvertToXcodeCollada):
+        LOGE(f"File missing for ConvertToXcodeCollada {WORKFLOWPATH_ConvertToXcodeCollada}")
+    if not exist(daePath):
+        LOGE(f"File missing for dae to convert {daePath}")
+    try:
+        # Execute the workflow
+        proc = subprocess.check_output(["/usr/bin/automator", "-i", daePath, WORKFLOWPATH_ConvertToXcodeCollada],                                
+                                        stderr=DEVNULL)
+        #Remove unneeded .dae file the workflow generated
+        uneededDaeFileName = f"{getNameFromPath(daePath, withExtension=True)}-e"
+        uneededDaePath = f"{getFolderFromPath(daePath)}/{uneededDaeFileName}"
+        os.remove(uneededDaePath)
+        LOGA(f"Executed ConvertToXcodeCollada to daePath: {daePath} and deleted {uneededDaeFileName}")
+    except subprocess.CalledProcessError as e:
+        LOGE(f"Failed to execute script at path: {daePath}\n\tWith error code: {e.returncode} \tand output: {e.output}")
+        # LOGE('Python Error executing ConvertToXcodeCollada workflow with error: [%d]\n{!r}'.format(e.returncode, e.output))
+        sys.exit(1)
 
 def updateFighters(fighterType, fighterPath):
     """
