@@ -23,11 +23,15 @@ This script is used to prepare animations to Xcode.
 Note: This script will perform differently depending on the arguments passed
 
 1. If zip file is passed, unzip and convert into a usable .dae file
+
     `python3 "mixamoAnimToXcode.py" <path_to_zip> <optional_new_name>`
+    
     e.g. `python3 "mixamoAnimToXcode.py" '~/Downloads/Hard Head Nod.zip' idleStand`
 
 2. If folder is passed, unzip the contents and convert into a usable .dae files
+
     `python3 "mixamoAnimToXcode.py" <path_to_folder>`
+    
     e.g. `python3 "mixamoAnimToXcode.py" '/Users/samuelfolledo/Downloads/Hard Head Nod.zip' idleStand`   
 
 License under [MIT License](https://github.com/SamuelFolledo/FuFight/blob/master/LICENSE)
