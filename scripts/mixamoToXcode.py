@@ -134,6 +134,9 @@ def getNameFromPath(path, withExtension = False):
         name = os.path.splitext(os.path.basename(path))[0]
     return name
 
+def createFolder(path):
+    os.mkdir(path)
+
 def getFolderFromPath(path):
     return os.path.dirname(path)
 
@@ -330,11 +333,12 @@ def updateFighters(fighterType, fighterPath):
     """
     1. Update the .dae's name in fighterPath
     2. Update the textures folder to assets in fighterPath
-    3. Update the name of the .png files in fighterPath/assets
-    4. Rename the root fighter's path to its name
-    5. Delete old fighterPath
-    6. Update .dae file's contents to still point to the updated assets
-    7. Run the script ConvertToXcodeCollada on the .dae file
+    3. Create an empty animations folder
+    4. Update the name of the .png files in fighterPath/assets
+    5. Rename the root fighter's path to its name
+    6. Delete old fighterPath
+    7. Update .dae file's contents to still point to the updated assets
+    8. Run the script ConvertToXcodeCollada on the .dae file
     """
     LOGA(f"Updating fighterType: {fighterType.value}")
 
@@ -356,7 +360,11 @@ def updateFighters(fighterType, fighterPath):
             newFolderName = os.path.join(fighterPath, "assets")
             renamePath(fullPath, newFolderName)
             LOGA(f"Renamed textures to assets {fullPath}")
-    #3. Update the name of the .png files in assets
+    
+    #3. Create an empty animations folder
+    createFolder(f"{fighterPath}/animations")
+
+    #4. Update the name of the .png files in assets
     assetsPath = f"{fighterPath}/assets"
     if exist(assetsPath):
         for filePath in os.scandir(assetsPath):
@@ -368,21 +376,21 @@ def updateFighters(fighterType, fighterPath):
     else:
         print(f"TODO: Handle or manually convert assets for fighter: {fighterType.value}")
 
-    #4. Rename the root fighter's path to its name
+    #5. Rename the root fighter's path to its name
     pathName = getNameFromPath(fighterPath)
     pathDir = getFolderFromPath(fighterPath)
-    newName = pathName.replace(fighter.folderName, fighter.name) #TODO captiali
+    newName = pathName.replace(fighter.folderName, fighter.name)
     newFighterPath = f"{pathDir}/{newName}"
     renamePath(fighterPath, newFighterPath)
 
-    #5. Delete old fighterPath
+    #6. Delete old fighterPath
     deleteAllFromPath(fighterPath)
 
-    #6. Update .dae's file content to correct texture
+    #7. Update .dae's file content to correct texture
     daePath = os.path.join(newFighterPath, f"{fighterType.value}.dae")
     updateDaeFile(fighterType, daePath)
 
-    #7. Execute ConvertXcodeCollada and delete the unneeded .dae file
+    #8. Execute ConvertXcodeCollada and delete the unneeded .dae file
     executeConvertToXcodeColladaWorkflow(daePath)
     
 #----------------------------------------------------------------------------------------------------------------
