@@ -4,18 +4,16 @@
 # 2. TODO: Update the .dae file's texture
 # 3. Run the ConvertToXcodeCollada script to the .dae files
 
-import fileinput
-import keyboard
 import os
-import re
 import shutil
 import subprocess
 import sys
-import time
 import zipfile
 
 from enum import Enum
 from os.path import abspath, expanduser
+
+from Logger import *
 
 try:
     from subprocess import DEVNULL  # python3
@@ -25,11 +23,6 @@ except ImportError:
 #----------------------------------------------------------------------------------------------------------------
 ############################################### CUSTOMIZABLE SETTINGS ###########################################
 #----------------------------------------------------------------------------------------------------------------
-LOGCOMMON = True
-LOGDETAILS = False
-LOGERRORS = True
-LOGWARNING = False
-
 SHOULDUNZIP = True
 
 USERDOWNLOADSFOLDER = abspath(expanduser("~/") + '/Downloads')
@@ -150,6 +143,9 @@ def getExtensionFromPath(path):
 def exist(path):
     return os.path.exists(path)
 
+def isFolder(path):
+    return os.path.isdir(path)
+
 def deleteAllFromPath(path):
     if exist(path):
         try:
@@ -158,7 +154,7 @@ def deleteAllFromPath(path):
             elif os.path.isdir(path):
                 shutil.rmtree(path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (path, e))
+            LOGE('Failed to delete %s. Reason: %s' % (path, e))
 
 def renamePath(path, newPath):
     if exist(newPath):
@@ -173,8 +169,7 @@ def getMixamoKey(fighterType):
         # If fighter's folder name contains Ch, then 
         # its key is the first 4 characters e.g. Ch02
         mixamoKey = mixamoKey[:4]
-    if LOGDETAILS:
-        print(f"Mixamo key for {fighterType.value} is {mixamoKey}")
+    LOGA(f"Mixamo key for {fighterType.value} is {mixamoKey}")
     return mixamoKey
 
 def getTextureKey(fighterType):
@@ -200,7 +195,7 @@ def getTextureOldName(fighterType, filePath):
     textureName = getMixamoKey(fighterType)
     folderPath = getFolderFromPath(filePath)
     hasMultipleVersion = MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION[fighterType]
-    print(f"texture name is {textureName} at {filePath}")
+    LOGD(f"texture name is {textureName} at {filePath}")
     if not textureName.startswith("Ch"):
         if fighterType == FighterType.samuel:
             textureName = FighterType.samuel.value
@@ -215,9 +210,7 @@ def getTextureOldName(fighterType, filePath):
             textureName += "_1001"
 
     fighter = Fighter(fighterType)
-    if LOGCOMMON:
-        # print(f"Texture's new name for {fighter.name} is {newName} from {folderPath}/{fileName}")
-        print(f"Texture's OLD name for {fighter.name} from {filePath} IS {textureName}")
+    LOG(f"Texture's OLD name for {fighter.name} from {filePath} IS {textureName}")
     return textureName
 
 def getTextureNewName(fighterType, filePath):
@@ -225,9 +218,7 @@ def getTextureNewName(fighterType, filePath):
     oldTextureKeyToReplace = getTextureKey(fighterType)
     currentTextureName = os.path.basename(filePath)
     textureName = currentTextureName.replace(oldTextureKeyToReplace, f"{fighterType.value}Texture")
-    # if LOGCOMMON:
-    if LOGDETAILS:
-        print(f"Texture's NEW name for {fighterType.value} with old key {oldTextureKeyToReplace} is {textureName}")
+    LOGA(f"Texture's NEW name for {fighterType.value} with old key {oldTextureKeyToReplace} is {textureName}")
     return textureName
 
 def check_path_contains_files_with_type(path, file_type):
@@ -236,18 +227,21 @@ def check_path_contains_files_with_type(path, file_type):
             return True
     return False
 
-def unzipFile(path):
+def unzipFile(path, isOneFile = False):
+    """Unzips the path provided. 
+    Set isOneFile to True for zip containing multiple files, and this method will extract into a new directory.
+    isOneFile = false will place the extracted files into the same directory"""
     with zipfile.ZipFile(path, 'r') as zip_ref:
-        unzippedPath = getFolderFromPath(path) + "/" + getNameFromPath(path)
+        unzippedPath = path if isOneFile else getFolderFromPath(path) + "/" + getNameFromPath(path)
         #If path already exist, delete previous folder contents before unzipping
         if exist(unzippedPath):
             deleteAllFromPath(unzippedPath)
-            if LOGDETAILS:
-                print(f"Fighter's folder already exist. Deleting old folder {unzippedPath}")
-        #Unzip
-        zip_ref.extractall(unzippedPath)
-        if LOGDETAILS:
-            print(f"Finished unzipping file in {path} to {unzippedPath}")
+            LOGA(f"Fighter's folder already exist. Deleting old folder {unzippedPath}")
+        if isOneFile:
+            zip_ref.extractall(getFolderFromPath(path))
+        else:
+            zip_ref.extractall(unzippedPath)
+        LOGA(f"Finished unzipping file in {path} to {unzippedPath}")
 
 #----------------------------------------------------------------------------------------------------------------
 #################################################### Methods ####################################################
@@ -258,14 +252,12 @@ def getPathToConvert():
     # Defaults to converting user's Downloads folder if path is not provided
     pathToConvert = ""
     if len(sys.argv) == 2:
-        # print(f"Converting .dae files in folder: {pathToConvert}") 
         pathToConvert = sys.argv[1]
     if len(sys.argv) == 1:
-        # print(f"Converting .dae files in default folder: {pathToConvert}")
         pathToConvert = USERDOWNLOADSFOLDER
     else:
-        print("Error Usage: python mixamoToFuFight.py <optional_directory_path>")
-        print("""WARNING: Executing this script will default to converting files downloaded in 
+        LOGE("Error Usage: python mixamoToXcode.py <optional_directory_path>")
+        LOGW("""WARNING: Executing this script will default to converting files downloaded in 
               your Downloads folder if a path is not provided""")
         sys.exit(1)
     return pathToConvert
@@ -288,8 +280,7 @@ def getFighterPaths(fromPath):
                 for fighterType, mixamoFolderName in MIXAMO_FOLDERNAMES.items():
                     if fileName.startswith(mixamoFolderName):
                         if fullPath.endswith(".zip"):
-                            if LOGDETAILS:
-                                print(f"Unzipping file at {fullPath}")
+                            LOGA(f"Unzipping file at {fullPath}")
                             unzipFile(fullPath)
                             #Add path to the new unzipped file
                             unzippedPath = f"{getFolderFromPath(fullPath)}/{getNameFromPath(fullPath)}"
@@ -313,8 +304,7 @@ def updateDaeFile(fighterType, daePath):
         # Write the file out again
         with open(daePath, 'w') as file:
             file.write(filedata)
-            if LOGDETAILS:
-                print(f"Finished updating dae file in {daePath}. Replacing all contents from {textToReplace} into {fighterType.value}Texture")
+            LOGA(f"Finished updating dae file in {daePath}. Replacing all contents from {textToReplace} into {fighterType.value}Texture")
 
 def executeConvertToXcodeColladaWorkflow(daePath):
     """Executes ConvertXcodeCollada workflow and to the dae path, then deletes the unneeded .dae file"""
@@ -327,10 +317,10 @@ def executeConvertToXcodeColladaWorkflow(daePath):
             uneededDaeFileName = f"{getNameFromPath(daePath, withExtension=True)}-e"
             uneededDaePath = f"{getFolderFromPath(daePath)}/{uneededDaeFileName}"
             os.remove(uneededDaePath)
-            if LOGDETAILS:
-                print(f"Executed ConvertToXcodeCollada to daePath: {daePath} and deleted {uneededDaeFileName}")
+            LOGD(f"Executed ConvertToXcodeCollada to daePath: {daePath} and deleted {uneededDaeFileName}")
         except subprocess.CalledProcessError as e:
-            print('Python Error executing ConvertToXcodeCollada workflow: [%d]\n{!r}'.format(e.returncode, e.output))
+            LOGE(f"Failed to execute script at path: {daePath}")
+            LOGE('Python Error executing ConvertToXcodeCollada workflow with error: [%d]\n{!r}'.format(e.returncode, e.output))
             sys.exit(1)
 
 def updateFighters(fighterType, fighterPath):
@@ -343,11 +333,10 @@ def updateFighters(fighterType, fighterPath):
     6. Update .dae file's contents to still point to the updated assets
     7. Run the script ConvertToXcodeCollada on the .dae file
     """
-    if LOGDETAILS:
-        print(f"Updating fighterType: {fighterType.value}")
+    LOGA(f"Updating fighterType: {fighterType.value}")
 
     if not os.path.isdir(fighterPath) or not check_path_contains_files_with_type(fighterPath, ".dae"):
-        print(f"Path is invalid: {fighterPath}")
+        LOGE(f"Path is invalid: {fighterPath}")
         return
     fighter = Fighter(fighterType)
     for filePath in os.scandir(fighterPath):
@@ -358,14 +347,12 @@ def updateFighters(fighterType, fighterPath):
             daePath = f"{fighterPath}/{fileName}"
             newDaeFileName = f"{fighterPath}/{fighter.fighterType.value}.dae"
             renamePath(daePath, newDaeFileName)
-            if LOGDETAILS:
-                print(f"Renamed .dae file from {fileName} to {fighter.fighterType.value}.dae")
+            LOGA(f"Renamed .dae file from {fileName} to {fighter.fighterType.value}.dae")
         elif fileName == "textures":
             #2. Update the textures folder to assets
             newFolderName = os.path.join(fighterPath, "assets")
             renamePath(fullPath, newFolderName)
-            if LOGDETAILS:
-                print(f"Renamed textures to assets {fullPath}")
+            LOGA(f"Renamed textures to assets {fullPath}")
     #3. Update the name of the .png files in assets
     assetsPath = f"{fighterPath}/assets"
     if exist(assetsPath):
@@ -374,8 +361,7 @@ def updateFighters(fighterType, fighterPath):
             newName = getTextureNewName(fighterType, filePath)
             newPath = f"{assetsPath}/{newName}"
             renamePath(fullPath, newPath)
-            if LOGDETAILS:
-                print(f"Finished renaming image from {fullPath} to {newPath}")
+            LOGA(f"Finished renaming image from {fullPath} to {newPath}")
     else:
         print(f"TODO: Handle or manually convert assets for fighter: {fighterType.value}")
 
@@ -407,9 +393,7 @@ if __name__ == "__main__":
     fighterPathsDic = getFighterPaths(pathToConvert)
     for (index, (fighterType, fighterPath)) in enumerate(fighterPathsDic.items()):
         updateFighters(fighterType, fighterPath)
-        if LOGDETAILS:
-            print(f"Finished converting fighter#{index+1} in path {fighterPath} to {fighterType.name}")
+        LOGA(f"Finished converting fighter#{index+1} in path {fighterPath} to {fighterType.name}")
     
-    if LOGCOMMON:
-        print(f"RESULT: Total converted paths in <{pathToConvert}> is {len(fighterPathsDic)}")
-    print(f"✅✅✅")
+    LOG(f"RESULT: Total converted paths in <{pathToConvert}> is {len(fighterPathsDic)}")
+    LOG(f"✅✅✅")
