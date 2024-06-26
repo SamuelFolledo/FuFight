@@ -88,7 +88,7 @@ if __name__ == "__main__":
         e.g. python3 "mixamoAnimToXcode.py" '~/Downloads/Hard Head Nod.zip' idleStand
     2. If folder is passed, unzip the contents and convert into a usable .dae files
         python3 "mixamoAnimToXcode.py" <path_to_folder>
-        e.g. python3 "mixamoAnimToXcode.py" '/Users/samuelfolledo/Downloads/Hard Head Nod.zip' idleStand   
+        e.g. python3 "mixamoAnimToXcode.py" '~/Downloads/samuel/animations'
     """
     pathToConvert, newAnimationName = validateAndGetInput()
     if isFolder(pathToConvert):
