@@ -64,15 +64,15 @@ def unzipDae(daePath):
 
 def prepareAnimation(unzippedDaePath, newAnimationName):
     """Renames the daePath if needed, runs the workflow script, and delete unneeded .dae"""
+    # Run the ConvertToXcodeCollada script and delete the unneeded .dae file
+    executeConvertToXcodeColladaWorkflow(unzippedDaePath)
     # Rename the unzipped dae if needed
     folderName = getFolderFromPath(unzippedDaePath)
     isNewNameEmpty = len(newAnimationName) == 0
     daePath = unzippedDaePath if isNewNameEmpty else f"{folderName}/{newAnimationName}.dae"
-    if unzippedDaePath != daePath and isNewNameEmpty:
+    if not isNewNameEmpty or (unzippedDaePath != daePath and isNewNameEmpty):
         renamePath(unzippedDaePath, daePath)
         LOGD(f"Renamed unzipped dae from: {unzippedDaePath} to {daePath}")
-    # Run the ConvertToXcodeCollada script and delete the unneeded .dae file
-    executeConvertToXcodeColladaWorkflow(daePath)
     LOG(f"Completed preparing animation from: {unzippedDaePath} to {daePath}")
 
 #----------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,14 @@ def prepareAnimation(unzippedDaePath, newAnimationName):
 if __name__ == "__main__":
     """
     Must have ConvertToXcodeCollada in Desktop/StreamCodes/scripts/ConvertToXcodeCollada/ConvertToXcodeCollada.workflow
-    Currently, this only takes a zip file
+
+    Execute by
+    1. If zip file is passed, unzip and convert into a usable .dae file
+        python3 "mixamoAnimToXcode.py" <path_to_zip> <optional_new_name>
+        e.g. python3 "mixamoAnimToXcode.py" '~/Downloads/Hard Head Nod.zip' idleStand
+    2. If folder is passed, unzip the contents and convert into a usable .dae files
+        python3 "mixamoAnimToXcode.py" <path_to_folder>
+        e.g. python3 "mixamoAnimToXcode.py" '/Users/samuelfolledo/Downloads/Hard Head Nod.zip' idleStand   
     """
     pathToConvert, newAnimationName = validateAndGetInput()
     if isFolder(pathToConvert):
@@ -93,7 +100,6 @@ if __name__ == "__main__":
             if os.path.isfile(filePath):
                 # Handle zip file
                 if getExtensionFromPath(filePath) == ".zip":
-                    LOG(f"Converting animations in {filePath}")
                     # Unzip file and get the unzipped .dae file
                     unzippedDaePath = unzipDae(filePath)
                     prepareAnimation(unzippedDaePath, "")
