@@ -46,6 +46,7 @@ class FighterType(Enum):
     michelle = "michelle"
     eric = "eric"
     olivia = "olivia" #corrupted .dae
+    roth = "roth"
     jad = "jad"
     pete = "pete"
     david = "david"
@@ -53,6 +54,7 @@ class FighterType(Enum):
     manuel = "manuel"
     jennifer = "jennifer" #unused for now
     neverRight = "neverRight"
+    eve = "eve" #the ".Gonzales" in zip file name's "Eve By J.Gonzales.zip" us causing the character's folder to be named as "Eve By J"
 
 #----------------------------------------------------------------------------------------------------------------
 #################################################### Constants ##################################################
@@ -68,6 +70,7 @@ MIXAMO_FOLDERNAMES = {
     FighterType.michelle: "Ch03_nonPBR",
     FighterType.eric: "Ch08_nonPBR",
     FighterType.olivia: "Ch11_nonPBR",
+    FighterType.roth: "Ch13_nonPBR",
     FighterType.jad: "Ch16_nonPBR",
     FighterType.pete: "Ch17_nonPBR",
     FighterType.david: "Ch28_nonPBR",
@@ -75,6 +78,7 @@ MIXAMO_FOLDERNAMES = {
     FighterType.manuel: "Ch42_nonPBR",
     FighterType.jennifer: "Ch47_nonPBR",
     FighterType.neverRight: "Prisoner B Styperek",
+    FighterType.eve: "Eve By J.Gonzales",
 }
 
 MIXAMO_NAMES = {
@@ -84,6 +88,7 @@ MIXAMO_NAMES = {
     FighterType.michelle: "Michelle",
     FighterType.eric: "Adam",
     FighterType.olivia: "Olivia",
+    FighterType.roth: "Roth",
     FighterType.jad: "Chad",
     FighterType.pete: "Pete",
     FighterType.david: "David",
@@ -91,6 +96,7 @@ MIXAMO_NAMES = {
     FighterType.manuel: "Bryce",
     FighterType.jennifer: "Jennifer",
     FighterType.neverRight: "Prisoner B Styperek",
+    FighterType.eve: "Eve By J.Gonzales",
 }
 
 FIGHTER_NAMES = {
@@ -100,6 +106,7 @@ FIGHTER_NAMES = {
     FighterType.michelle: "Michelle",
     FighterType.eric: "Eric",
     FighterType.olivia: "Olivia",
+    FighterType.roth: "Roth",
     FighterType.jad: "Jad",
     FighterType.pete: "Pete",
     FighterType.david: "David",
@@ -107,6 +114,7 @@ FIGHTER_NAMES = {
     FighterType.manuel: "Manuel",
     FighterType.jennifer: "Jennifer",
     FighterType.neverRight: "Never Right",
+    FighterType.eve: "Eve",
 }
 
 # Set to true if after downloading .dae zipped files, and the textures 
@@ -118,6 +126,7 @@ MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.michelle: False,
     FighterType.eric: True,
     FighterType.olivia: True,
+    FighterType.roth: True,
     FighterType.jad: True,
     FighterType.pete: True,
     FighterType.david: False,
@@ -125,6 +134,7 @@ MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.manuel: True,
     FighterType.jennifer: True,
     FighterType.neverRight: False,
+    FighterType.eve: False,
 }
 
 #----------------------------------------------------------------------------------------------------------------
@@ -198,6 +208,8 @@ def getTextureKey(fighterType):
             textureName = FighterType.clara.value
         elif fighterType == FighterType.neverRight:
             textureName = "prisoner"
+        elif fighterType == FighterType.eve:
+            textureName = "SpacePirate"
     else:
         if hasMultipleVersion:
             textureName += "_100"
@@ -218,6 +230,8 @@ def getTextureOldName(fighterType, filePath):
             textureName = FighterType.clara.value
         elif fighterType == FighterType.neverRight:
             textureName = "prisoner"
+        elif fighterType == FighterType.eve:
+            textureName = "SpacePirate"
     else:
         if hasMultipleVersion:
             textureName += "_100"
@@ -256,8 +270,27 @@ def unzipFile(path, isAnimation = False):
             LOGA(f"Fighter's folder already exist. Deleting old folder {unzippedPath}")
         destinationPath = ""
         if isAnimation:
+            # if len(zip_ref.namelist()) > 2: #>2 to ignore weird file: '__MACOSX/._medium.dae 
+            #     # LOG(f"RESULT1 Zip file has multiple files {daeFolderName}/{zipName}")
+            #     destinationPath = f"{daeFolderName}/{zipName}"
+            #     # LOGD(f"The stuff are {zip_ref.namelist()}")
+            # else:
+            #     # LOGA(f"RESULT2 Zip file only has 1 valid file at: {daeFolderName}")
+            #     destinationPath = daeFolderName
             destinationPath = f"{daeFolderName}/{zipName}"
             LOGA(f"Unzipping animation file from {path} TO {destinationPath}")
+            # for zipinfo in zip_ref.infolist():
+            #     # This will do the renaming
+            #     # LOGD(f"Unzipping {zipinfo.filename} AND {getExtensionFromPath(zipinfo.filename)}")
+            #     if zipinfo.is_dir and getExtensionFromPath(zipinfo.filename) == ".dae":
+            #         if not "__MACOSX" in zipinfo.filename:
+            #             newFileName = f"{zipName}.dae"
+            #             file_name = os.path.join(daeFolderName, zipinfo.filename)
+            #             LOGD(f"CHANGING NAME from {zipinfo.filename} TO {newFileName} \t\t\t {file_name}")
+            #             zipinfo.filename = newFileName
+            #             # zip_ref.extract(zipinfo)
+            #             zip_ref.extract(file_name)
+            #             LOGD(f"CHANGED NAME EXTRACTED {zipinfo.filename}")
         else:
             destinationPath = unzippedPath
 
