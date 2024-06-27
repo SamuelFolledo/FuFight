@@ -136,6 +136,10 @@ def getNameFromPath(path, withExtension = False):
         name = os.path.splitext(os.path.basename(path))[0]
     return name
 
+def moveFile(path, newPath):
+    # os.rename(path, newPath)
+    shutil.move(path, newPath)
+
 def createFolder(path):
     os.mkdir(path)
 
@@ -150,6 +154,9 @@ def exist(path):
 
 def isFolder(path):
     return os.path.isdir(path)
+
+def getFileCount(path):
+    return len([name for name in os.listdir(path) if os.path.isfile(name)])
 
 def deleteAllFromPath(path):
     if exist(path):
@@ -232,22 +239,28 @@ def check_path_contains_files_with_type(path, file_type):
             return True
     return False
 
-def unzipFile(path, isOneFile = False):
+def unzipFile(path, isAnimation = False):
     """Unzips the path provided. 
-    Set isOneFile to True for zip containing multiple files, and this method will extract into a new directory.
-    isOneFile = false will place the extracted files into the same directory"""
+    Set isAnimation to True if zip file is an animation because animations requires different
+    handling based on number of files"""
     with zipfile.ZipFile(path, 'r') as zip_ref:
-        unzippedPath = path if isOneFile else getFolderFromPath(path) + "/" + getNameFromPath(path)
+        daeFolderName = getFolderFromPath(path)
+        zipName = getNameFromPath(path)
+        unzippedPath = path if isAnimation else daeFolderName + "/" + zipName
         #If path already exist, delete previous folder contents before unzipping
-        if exist(unzippedPath):
+        if unzippedPath != path and exist(unzippedPath):
             deleteAllFromPath(unzippedPath)
             LOGA(f"Fighter's folder already exist. Deleting old folder {unzippedPath}")
-        if isOneFile:
-            zip_ref.extractall(getFolderFromPath(path))
+        destinationPath = ""
+        if isAnimation:
+            destinationPath = f"{daeFolderName}/{zipName}"
+            LOGA(f"Unzipping animation file from {path} TO {destinationPath}")
         else:
-            zip_ref.extractall(unzippedPath)
-        LOGA(f"Finished unzipping file in {path} to {unzippedPath}")
+            destinationPath = unzippedPath
 
+        zip_ref.extractall(destinationPath)
+        LOGA(f"DONE Unzipping file from {path} to \t\t {destinationPath}")
+        return destinationPath
 #----------------------------------------------------------------------------------------------------------------
 #################################################### Methods ####################################################
 #----------------------------------------------------------------------------------------------------------------
@@ -335,7 +348,7 @@ def updateFighters(fighterType, fighterPath):
     """
     1. Update the .dae's name in fighterPath
     2. Update the textures folder to assets in fighterPath
-    3. Create an empty animations folder
+    3. Create an animations folder and more folders for each categories
     4. Update the name of the .png files in fighterPath/assets
     5. Rename the root fighter's path to its name
     6. Delete old fighterPath
@@ -363,7 +376,7 @@ def updateFighters(fighterType, fighterPath):
             renamePath(fullPath, newFolderName)
             LOGA(f"Renamed textures to assets {fullPath}")
     
-    #3. Create an empty animation folders
+    #3. Create an animations folder and more folders for each categories
     animationsPath = f"{fighterPath}/animations"
     createFolder(animationsPath)
     for categories in ANIMATION_CATEGORIES:
