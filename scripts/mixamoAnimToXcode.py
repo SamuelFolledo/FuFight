@@ -136,11 +136,11 @@ if __name__ == "__main__":
                 for root, dirs, files in os.walk(pathToConvert):
                     for file in files:
                         filePath = os.path.join(root, file)
-                        handleZippedDae(filePath)
+                        handleZippedDae(filePath, newAnimationName)
             else:
                 for filename in os.listdir(pathToConvert):
                     filePath = os.path.join(pathToConvert, filename)
-                    handleZippedDae(filePath)
+                    handleZippedDae(filePath, newAnimationName)
         else:
-            handleZippedDae(pathToConvert)
+            handleZippedDae(pathToConvert, newAnimationName)
     LOG(f"✅✅✅")
