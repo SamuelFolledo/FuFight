@@ -152,6 +152,9 @@ def getExtensionFromPath(path):
 def exist(path):
     return os.path.exists(path)
 
+def isFile(path):
+    return os.path.isfile(path)
+
 def isFolder(path):
     return os.path.isdir(path)
 

@@ -32,25 +32,27 @@ DELETE_TEXTURES = True #When True, it will delete animations with textures
 #----------------------------------------------------------------------------------------------------------------
 def validateAndGetInput():
     """Validates inputs and returns the path to convert and new animation name"""
-    userPath = expanduser("~/")
-    # Defaults to converting user's Downloads folder if path is not provided
-    pathToConvert = ""
-    newAnimationName = ""
-    if len(sys.argv) != 2 and len(sys.argv) != 3:
-        LOGE("Error Usage: python3 mixamoAnimToXcode.py <dae_or_zip_file> <optional_new_animation_name>")
+    if len(sys.argv) < 2:
+        LOGE("Error Usage: python3 mixamoAnimToXcode.py <list_of_files> <optional_new_animation_name>")
         LOGW("Running this script requires 1-2 additional parameters")
         sys.exit(1)
-    if len(sys.argv) > 2:
-        pathToConvert = sys.argv[1]
-        newAnimationName = sys.argv[2]
-    else:
-        pathToConvert = sys.argv[1]
-        # newAnimationName = getNameFromPath(pathToConvert)
-    if not exist(pathToConvert):
-        LOGE(f"Path to convert does not exist {pathToConvert}")
-        sys.exit(1)
-    LOGA(f"Converting {pathToConvert} and renaming to {newAnimationName}")
-    return pathToConvert, newAnimationName
+    # Defaults to converting user's Downloads folder if path is not provided
+    pathsToConvert = []
+    newAnimationName = ""
+    for (index, arg) in enumerate(sys.argv):
+        if index == 0:
+            continue
+        isLastIndex = index == len(sys.argv) - 1
+        if isLastIndex:
+            if (isFolder(arg) or isFile(arg)) and exist(arg):
+                pathsToConvert.append(arg)
+            else:
+                LOGD(f"New animation name is found: {arg}")
+                newAnimationName = arg
+        else:
+            pathsToConvert.append(arg)
+    LOGA(f"Converting paths: {pathsToConvert} and optionally renaming zip file to {newAnimationName}")
+    return pathsToConvert, newAnimationName
 
 def prepareDaeAnimation(daePath, newAnimationName):
     """Unzips daePath and returns the unzipped dae file's path"""
@@ -121,23 +123,24 @@ if __name__ == "__main__":
     2. If folder is passed, unzip the contents and convert into a usable .dae files
         python3 "mixamoAnimToXcode.py" <path_to_folder>
         e.g. python3 "mixamoAnimToXcode.py" '~/Downloads/samuel/animations/idle'
-        
+
         a. If the folder's name is "animations", then the script will convert .zip files including subdirectories
         b. Any other names of a folder will not convert subdirectories
     """
-    pathToConvert, newAnimationName = validateAndGetInput()
-    if isFolder(pathToConvert):
-        # If folder, then get all zip files to unzip
-        if getNameFromPath(pathToConvert) == "animations":
-            #If folder's name == animations, then check zip files including subdirectories
-            for root, dirs, files in os.walk(pathToConvert):
-                for file in files:
-                    filePath = os.path.join(root, file)
+    pathsToConvert, newAnimationName = validateAndGetInput()
+    for pathToConvert in pathsToConvert:
+        if isFolder(pathToConvert):
+            # If folder, then get all zip files to unzip
+            if getNameFromPath(pathToConvert) == "animations":
+                #If folder's name == animations, then check zip files including subdirectories
+                for root, dirs, files in os.walk(pathToConvert):
+                    for file in files:
+                        filePath = os.path.join(root, file)
+                        handleZippedDae(filePath)
+            else:
+                for filename in os.listdir(pathToConvert):
+                    filePath = os.path.join(pathToConvert, filename)
                     handleZippedDae(filePath)
         else:
-            for filename in os.listdir(pathToConvert):
-                filePath = os.path.join(pathToConvert, filename)
-                handleZippedDae(filePath)
-    else:
-        handleZippedDae(pathToConvert)
+            handleZippedDae(pathToConvert)
     LOG(f"✅✅✅")
