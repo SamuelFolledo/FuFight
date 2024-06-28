@@ -397,14 +397,15 @@ def updateFighters(fighterType, fighterPath):
         LOGE(f"Path is invalid: {fighterPath}")
         return
     fighter = Fighter(fighterType)
+    newDaeFilePath = None
     for filePath in os.scandir(fighterPath):
         fileName = os.path.basename(filePath)
         fullPath = os.path.join(fighterPath, filePath)
         if fileName.endswith(".dae"):
             #1. Update the .dae's name
             daePath = f"{fighterPath}/{fileName}"
-            newDaeFileName = f"{fighterPath}/{fighter.fighterType.value}.dae"
-            renamePath(daePath, newDaeFileName)
+            newDaeFilePath = f"{fighterPath}/{fighter.fighterType.value}.dae"
+            renamePath(daePath, newDaeFilePath)
             LOGA(f"Renamed .dae file from {fileName} to {fighter.fighterType.value}.dae")
         elif fileName == "textures":
             #2. Update the textures folder to assets
@@ -446,6 +447,13 @@ def updateFighters(fighterType, fighterPath):
 
     #8. Execute ConvertXcodeCollada and delete the unneeded .dae file
     executeConvertToXcodeColladaWorkflow(daePath)
+
+    #8.5 Move .dae inside assets folder
+    if exist(daePath):
+        LOGD("Moving .dae character to assets folder")
+        daeInAssetsPath = f"{getFolderFromPath(daePath)}/assets/{getNameFromPath(daePath, withExtension=True)}"
+        moveFile(daePath, daeInAssetsPath)
+        daePath = daeInAssetsPath
     
 #----------------------------------------------------------------------------------------------------------------
 #################################################### Main #######################################################
