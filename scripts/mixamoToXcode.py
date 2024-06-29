@@ -127,7 +127,7 @@ MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.jad: True,
     # FighterType.olivia: True,
     FighterType.ruby: True,
-    FighterType.jad: True,
+    FighterType.cain: True,
     FighterType.andrew: True,
     FighterType.david: False,
     FighterType.alexis: True,
@@ -210,6 +210,8 @@ def getTextureKey(fighterType):
             textureName = "prisoner"
         elif fighterType == FighterType.eve:
             textureName = "SpacePirate"
+        else:
+            LOGE(f"This texture's key might be unexpected: {textureName}")
     else:
         if hasMultipleVersion:
             textureName += "_100"
