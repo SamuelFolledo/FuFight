@@ -43,15 +43,15 @@ class FighterType(Enum):
     samuel = "samuel"
     clara = "clara"
     sophie = "sophie"
-    michelle = "michelle"
-    eric = "eric"
-    olivia = "olivia" #corrupted .dae
-    roth = "roth"
+    michelle = "deejay"
     jad = "jad"
-    pete = "pete"
+    # olivia = "olivia" #corrupted .dae
+    ruby = "ruby"
+    cain = "cain"
+    andrew = "andrew"
     david = "david"
-    jody = "jody"
-    manuel = "manuel"
+    alexis = "alexis"
+    marco = "marco"
     jennifer = "jennifer" #unused for now
     neverRight = "neverRight"
     eve = "eve" #the ".Gonzales" in zip file name's "Eve By J.Gonzales.zip" us causing the character's folder to be named as "Eve By J"
@@ -60,7 +60,7 @@ class FighterType(Enum):
 #################################################### Constants ##################################################
 #----------------------------------------------------------------------------------------------------------------
 
-ANIMATION_CATEGORIES = ["dodge", "hit", "idle", "kick", "kill", "punch"]
+ANIMATION_CATEGORIES = ["dodge", "hit", "idle", "kick", "kill", "punch", "others"]
 
 #Can get after downloading the .dae zipped files
 MIXAMO_FOLDERNAMES = {
@@ -68,14 +68,14 @@ MIXAMO_FOLDERNAMES = {
     FighterType.clara: "clara",
     FighterType.sophie: "Ch02_nonPBR",
     FighterType.michelle: "Ch03_nonPBR",
-    FighterType.eric: "Ch08_nonPBR",
-    FighterType.olivia: "Ch11_nonPBR",
-    FighterType.roth: "Ch13_nonPBR",
-    FighterType.jad: "Ch16_nonPBR",
-    FighterType.pete: "Ch17_nonPBR",
+    FighterType.jad: "Ch08_nonPBR",
+    # FighterType.olivia: "Ch11_nonPBR",
+    FighterType.ruby: "Ch13_nonPBR",
+    FighterType.cain: "Ch16_nonPBR",
+    FighterType.andrew: "Ch17_nonPBR",
     FighterType.david: "Ch28_nonPBR",
-    FighterType.jody: "Ch37_nonPBR",
-    FighterType.manuel: "Ch42_nonPBR",
+    FighterType.alexis: "Ch37_nonPBR",
+    FighterType.marco: "Ch42_nonPBR",
     FighterType.jennifer: "Ch47_nonPBR",
     FighterType.neverRight: "Prisoner B Styperek",
     FighterType.eve: "Eve By J.Gonzales",
@@ -86,14 +86,14 @@ MIXAMO_NAMES = {
     FighterType.clara: "fiverr-clara",
     FighterType.sophie: "Sophie",
     FighterType.michelle: "Michelle",
-    FighterType.eric: "Adam",
-    FighterType.olivia: "Olivia",
-    FighterType.roth: "Roth",
-    FighterType.jad: "Chad",
-    FighterType.pete: "Pete",
+    FighterType.jad: "Adam",
+    # FighterType.olivia: "Olivia",
+    FighterType.ruby: "Roth",
+    FighterType.alexis: "Jody",
+    FighterType.cain: "Chad",
+    FighterType.andrew: "Pete",
     FighterType.david: "David",
-    FighterType.jody: "Jody",
-    FighterType.manuel: "Bryce",
+    FighterType.marco: "Bryce",
     FighterType.jennifer: "Jennifer",
     FighterType.neverRight: "Prisoner B Styperek",
     FighterType.eve: "Eve By J.Gonzales",
@@ -104,14 +104,14 @@ FIGHTER_NAMES = {
     FighterType.clara: "Clara",
     FighterType.sophie: "Sophie",
     FighterType.michelle: "Michelle",
-    FighterType.eric: "Eric",
-    FighterType.olivia: "Olivia",
-    FighterType.roth: "Roth",
     FighterType.jad: "Jad",
-    FighterType.pete: "Pete",
-    FighterType.david: "David",
-    FighterType.jody: "Jody",
-    FighterType.manuel: "Manuel",
+    # FighterType.olivia: "Olivia",
+    FighterType.ruby: "Ruby",
+    FighterType.cain: "Cain",
+    FighterType.andrew: "Andrew",
+    FighterType.david: "Corey",
+    FighterType.alexis: "Alexis",
+    FighterType.marco: "Marco",
     FighterType.jennifer: "Jennifer",
     FighterType.neverRight: "Never Right",
     FighterType.eve: "Eve",
@@ -124,14 +124,14 @@ MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.clara: False,
     FighterType.sophie: True,
     FighterType.michelle: False,
-    FighterType.eric: True,
-    FighterType.olivia: True,
-    FighterType.roth: True,
     FighterType.jad: True,
-    FighterType.pete: True,
+    # FighterType.olivia: True,
+    FighterType.ruby: True,
+    FighterType.jad: True,
+    FighterType.andrew: True,
     FighterType.david: False,
-    FighterType.jody: True,
-    FighterType.manuel: True,
+    FighterType.alexis: True,
+    FighterType.marco: True,
     FighterType.jennifer: True,
     FighterType.neverRight: False,
     FighterType.eve: False,
