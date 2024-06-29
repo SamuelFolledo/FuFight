@@ -49,7 +49,7 @@ class FighterType(Enum):
     ruby = "ruby"
     cain = "cain"
     andrew = "andrew"
-    david = "david"
+    corey = "corey"
     alexis = "alexis"
     marco = "marco"
     jennifer = "jennifer" #unused for now
@@ -73,7 +73,7 @@ MIXAMO_FOLDERNAMES = {
     FighterType.ruby: "Ch13_nonPBR",
     FighterType.cain: "Ch16_nonPBR",
     FighterType.andrew: "Ch17_nonPBR",
-    FighterType.david: "Ch28_nonPBR",
+    FighterType.corey: "Ch28_nonPBR",
     FighterType.alexis: "Ch37_nonPBR",
     FighterType.marco: "Ch42_nonPBR",
     FighterType.jennifer: "Ch47_nonPBR",
@@ -92,7 +92,7 @@ MIXAMO_NAMES = {
     FighterType.alexis: "Jody",
     FighterType.cain: "Chad",
     FighterType.andrew: "Pete",
-    FighterType.david: "David",
+    FighterType.corey: "David",
     FighterType.marco: "Bryce",
     FighterType.jennifer: "Jennifer",
     FighterType.neverRight: "Prisoner B Styperek",
@@ -109,7 +109,7 @@ FIGHTER_NAMES = {
     FighterType.ruby: "Ruby",
     FighterType.cain: "Cain",
     FighterType.andrew: "Andrew",
-    FighterType.david: "Corey",
+    FighterType.corey: "Corey",
     FighterType.alexis: "Alexis",
     FighterType.marco: "Marco",
     FighterType.jennifer: "Jennifer",
@@ -129,7 +129,7 @@ MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.ruby: True,
     FighterType.cain: True,
     FighterType.andrew: True,
-    FighterType.david: False,
+    FighterType.corey: False,
     FighterType.alexis: True,
     FighterType.marco: True,
     FighterType.jennifer: True,
