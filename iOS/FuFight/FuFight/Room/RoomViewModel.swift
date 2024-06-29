@@ -48,7 +48,8 @@ private extension RoomViewModel {
         self.player = player
         if let fighter = fighter {
             if player.fighterType != fighter.fighterType {
-                fighter.switchFighter()
+                LOGD("Switching fighter type from \(player.fighterType) to \(fighter.fighterType)")
+                fighter.switchFighter(to: player.fighterType)
                 fighterScene = createFighterScene(fighterType: fighter.fighterType, animation: animationType)
             }
         } else {
@@ -62,10 +63,14 @@ private extension RoomViewModel {
         currentRoom.updatePlayer(player: updatedPlayer)
         updateLoadingMessage(to: "")
         Task {
-            try await RoomManager.saveCurrent(currentRoom)
-            refreshPlayer()
-            try await RoomNetworkManager.updateOwner(updatedPlayer)
-            updateLoadingMessage(to: nil)
+            do {
+                try await RoomManager.saveCurrent(currentRoom)
+                refreshPlayer()
+                try await RoomNetworkManager.updateOwner(updatedPlayer)
+                updateLoadingMessage(to: nil)
+            } catch {
+                updateLoadingMessage(to: nil)
+            }
         }
     }
 

@@ -157,11 +157,18 @@ func runAfterDelay(delay: TimeInterval, action: @escaping () -> Void) {
 
 func createFighterScene(fighterType: FighterType, animation: AnimationType) -> SCNScene {
     let path = fighterType.animationPath(animation)
-    let scene = SCNScene(named: path)!
+    guard let scene = SCNScene(named: path) else {
+        LOGE("No dae scene found from \(path)")
+        return SCNScene()
+    }
     scene.rootNode.enumerateChildNodes { (child, stop) in
         if let partName = child.name,
            let part = SkeletonType(rawValue: partName) {
-            child.geometry?.firstMaterial = part.material
+            let partMaterial = fighterType.getMaterial(for: part)
+            if let geometry = child.geometry,
+               geometry.firstMaterial != partMaterial {
+                geometry.firstMaterial = partMaterial
+            }
         }
     }
     return scene
