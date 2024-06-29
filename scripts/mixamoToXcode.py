@@ -42,8 +42,8 @@ class Fighter:
 class FighterType(Enum):
     samuel = "samuel"
     clara = "clara"
-    sophie = "sophie"
-    michelle = "deejay"
+    kim = "kim"
+    deeJay = "deejay"
     jad = "jad"
     # olivia = "olivia" #corrupted .dae
     ruby = "ruby"
@@ -66,8 +66,8 @@ ANIMATION_CATEGORIES = ["dodge", "hit", "idle", "kick", "kill", "punch", "others
 MIXAMO_FOLDERNAMES = {
     FighterType.samuel: "samuel", 
     FighterType.clara: "clara",
-    FighterType.sophie: "Ch02_nonPBR",
-    FighterType.michelle: "Ch03_nonPBR",
+    FighterType.kim: "Ch02_nonPBR",
+    FighterType.deeJay: "Ch03_nonPBR",
     FighterType.jad: "Ch08_nonPBR",
     # FighterType.olivia: "Ch11_nonPBR",
     FighterType.ruby: "Ch13_nonPBR",
@@ -84,8 +84,8 @@ MIXAMO_FOLDERNAMES = {
 MIXAMO_NAMES = {
     FighterType.samuel: "fiverr-samuel",
     FighterType.clara: "fiverr-clara",
-    FighterType.sophie: "Sophie",
-    FighterType.michelle: "Michelle",
+    FighterType.kim: "Sophie",
+    FighterType.deeJay: "Michelle",
     FighterType.jad: "Adam",
     # FighterType.olivia: "Olivia",
     FighterType.ruby: "Roth",
@@ -102,8 +102,8 @@ MIXAMO_NAMES = {
 FIGHTER_NAMES = {
     FighterType.samuel: "Samuel",
     FighterType.clara: "Clara",
-    FighterType.sophie: "Sophie",
-    FighterType.michelle: "Michelle",
+    FighterType.kim: "Kim",
+    FighterType.deeJay: "Dee Jay",
     FighterType.jad: "Jad",
     # FighterType.olivia: "Olivia",
     FighterType.ruby: "Ruby",
@@ -122,8 +122,8 @@ FIGHTER_NAMES = {
 MIXAMO_HAS_MULTIPLE_TEXTURE_VERSION = {
     FighterType.samuel: False,
     FighterType.clara: False,
-    FighterType.sophie: True,
-    FighterType.michelle: False,
+    FighterType.kim: True,
+    FighterType.deeJay: False,
     FighterType.jad: True,
     # FighterType.olivia: True,
     FighterType.ruby: True,
@@ -245,7 +245,7 @@ def getTextureOldName(fighterType, filePath):
     return textureName
 
 def getTextureNewName(fighterType, filePath):
-    """Returns something like "sophieTexture2_Diffuse.png\""""
+    """Returns something like "kimTexture2_Diffuse.png\""""
     oldTextureKeyToReplace = getTextureKey(fighterType)
     currentTextureName = os.path.basename(filePath)
     textureName = currentTextureName.replace(oldTextureKeyToReplace, f"{fighterType.value}Texture")
