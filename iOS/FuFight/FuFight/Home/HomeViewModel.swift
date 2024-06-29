@@ -9,7 +9,7 @@ import Combine
 import SwiftUI
 
 final class HomeViewModel: BaseAccountViewModel {
-    @Published var player: FetchedPlayer?
+    var player: FetchedPlayer?
     @Published var fighter: Fighter!
 
     @Published var isAccountVerified = false
@@ -63,6 +63,6 @@ final class HomeViewModel: BaseAccountViewModel {
         guard let room = Room.current else { return }
         self.player = room.player
         RoomManager.goOnlineIfNeeded()
-        self.fighter = Fighter(type: room.player.fighterType, isEnemy: false)
+        fighter = Fighter(type: room.player.fighterType, isEnemy: false)
     }
 }

@@ -17,7 +17,7 @@ class Fighter {
     ///The parent node which contain all of the nodes
     private(set) var daeHolderNode = SCNNode()
     ///Bone node that contains the animation players
-    private(set) var animationsNode: SCNNode!
+    private(set) var animationsNode: SCNNode?
 
     //MARK: Get-only properties
     private(set) lazy var textNode: SCNNode = {
@@ -76,8 +76,7 @@ class Fighter {
     }
 
     //MARK: - Public Methods
-    func switchFighter() {
-        let nextFighterType: FighterType = fighterType == .clara ? .samuel : .clara
+    func switchFighter(to nextFighterType: FighterType) {
         fighterType = nextFighterType
     }
 
@@ -115,14 +114,14 @@ class Fighter {
     ///Plays an animation if animationType is new
     func playAnimation(_ animationType: AnimationType) {
         //Get and stop the default animation
-        guard let defaultAnimationPlayer = animationsNode.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
+        guard let defaultAnimationPlayer = animationsNode?.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
         let blendDuration: CGFloat = 0.3
         if animationType != defaultAnimation {
             //Stopping withBlendOutDuration prevents node from going back to T-position before playing the next animation
             defaultAnimationPlayer.stop(withBlendOutDuration: blendDuration)
         }
         //Play next animation
-        guard let player = animationsNode.animationPlayer(forKey: animationType.rawValue) else {
+        guard let player = animationsNode?.animationPlayer(forKey: animationType.rawValue) else {
             LOGDE("Animation played not loaded \(animationType)", from: Fighter.self)
             return
         }
@@ -145,15 +144,15 @@ class Fighter {
     }
 
     func resumeAnimations() {
-        animationsNode.isPaused = false
+        animationsNode?.isPaused = false
     }
 
     func pauseAnimations() {
-        animationsNode.isPaused = true
+        animationsNode?.isPaused = true
     }
 
     func stopAnimations() {
-        animationsNode.removeAllAnimations()
+        animationsNode?.removeAllAnimations()
     }
 }
 
@@ -165,7 +164,7 @@ private extension Fighter {
         for child in daeHolderNode.childNodes {
             if let partName = child.name,
                let part = SkeletonType(rawValue: partName) {
-                child.geometry?.firstMaterial = part.material
+                child.geometry?.firstMaterial = fighterType.getMaterial(for: part)
             }
         }
         //Assign the daeHolderNode's bones as the node to animate
@@ -181,14 +180,14 @@ private extension Fighter {
         for child in scene.rootNode.childNodes {
             if !child.animationKeys.isEmpty,
                let animationPlayer = SCNAnimationPlayer.loadAnimation(animationType, fighterType: fighterType, from: child) {
-                animationsNode.addAnimationPlayer(animationPlayer, forKey: animationType.rawValue)
+                animationsNode?.addAnimationPlayer(animationPlayer, forKey: animationType.rawValue)
                 break
             } else {
                 //Not needed for my case, but added just in case
                 for item in child.childNodes {
                     if !item.animationKeys.isEmpty,
                        let animationPlayer = SCNAnimationPlayer.loadAnimation(animationType, fighterType: fighterType, from: item) {
-                        animationsNode.addAnimationPlayer(animationPlayer, forKey: animationType.rawValue)
+                        animationsNode?.addAnimationPlayer(animationPlayer, forKey: animationType.rawValue)
                         break
                     }
                 }
