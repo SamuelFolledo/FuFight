@@ -10,17 +10,19 @@ import SwiftUI
 import SceneKit
 
 final class RoomViewModel: BaseAccountViewModel {
-    var player: FetchedPlayer!
-    var fighter: Fighter!
-    var animationType: AnimationType = .idle
+    @Published var selectedFighterType: FighterType? = nil
+    @Published var animationType: AnimationType = .idle
     @Published var path = NavigationPath()
-    @Published var fighterScene: SCNScene!
+
+    var player: FetchedPlayer!
+    var fighterScene: SCNScene?
+
     let playerType: PlayerType = .user
 
     //MARK: - Override Methods
     override func onAppear() {
         super.onAppear()
-        refreshPlayer()
+        setupSelectedPlayer()
     }
 
     //MARK: - Public Methods
@@ -40,21 +42,25 @@ final class RoomViewModel: BaseAccountViewModel {
         updatedPlayer.fighterType = nextFighterType
         updatePlayer(with: updatedPlayer)
     }
+
+    func setupSelectedPlayer() {
+        guard let player = RoomManager.getPlayer() else { return }
+        LOG("ROOM SETTINGUP \(player.fighterType) vs \(selectedFighterType?.rawValue ?? "none")")
+        self.player = player
+        if let index = allFighters.compactMap({ $0.fighterType }).firstIndex(of: player.fighterType) {
+            fighterScene = createFighterScene(fighterType: player.fighterType, animation: animationType)
+            selectedFighterType = player.fighterType
+        }
+    }
 }
 
 private extension RoomViewModel {
     func refreshPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
         self.player = player
-        if let fighter = fighter {
-            if player.fighterType != fighter.fighterType {
-                LOGD("Switching fighter type from \(player.fighterType) to \(fighter.fighterType)")
-                fighter.switchFighter(to: player.fighterType)
-                fighterScene = createFighterScene(fighterType: fighter.fighterType, animation: animationType)
-            }
-        } else {
-            self.fighter = Fighter(type: player.fighterType, isEnemy: false)
-            fighterScene = createFighterScene(fighterType: player.fighterType, animation: animationType)
+        guard let selectedFighterType else { return }
+        DispatchQueue.main.async {
+            self.fighterScene = createFighterScene(fighterType: selectedFighterType, animation: self.animationType)
         }
     }
 
@@ -65,8 +71,8 @@ private extension RoomViewModel {
         Task {
             do {
                 try await RoomManager.saveCurrent(currentRoom)
-                refreshPlayer()
                 try await RoomNetworkManager.updateOwner(updatedPlayer)
+                refreshPlayer()
                 updateLoadingMessage(to: nil)
             } catch {
                 updateLoadingMessage(to: nil)
@@ -82,13 +88,14 @@ private extension RoomViewModel {
 
     func updateAnimation(_ animation: AnimationType) {
         //Play animation
+        guard let selectedFighterType else { return }
         animationType = animation
-        fighterScene = createFighterScene(fighterType: fighter.fighterType, animation: animationType)
+        fighterScene = createFighterScene(fighterType: selectedFighterType, animation: animationType)
         //Go back to default animation after showing the animation
-        runAfterDelay(delay: animation.animationDuration(for: fighter.fighterType) - 0.2) { [weak self] in
+        runAfterDelay(delay: animation.animationDuration(for: selectedFighterType) - 0.2) { [weak self] in
             guard let self else { return }
-            animationType = fighter.defaultAnimation
-            fighterScene = createFighterScene(fighterType: fighter.fighterType, animation: animationType)
+            animationType = .idle
+            fighterScene = createFighterScene(fighterType: selectedFighterType, animation: animationType)
         }
     }
 }

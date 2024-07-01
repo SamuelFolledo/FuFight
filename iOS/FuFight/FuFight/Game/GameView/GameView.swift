@@ -118,6 +118,6 @@ struct GameView: View {
 
 #Preview {
     NavigationView {
-        GameView(vm: GameViewModel(player: fakePlayer, enemy: fakeEnemyPlayer, gameMode: .offlineGame))
+        GameView(vm: GameViewModel(enemy: fakeEnemyPlayer, gameMode: .offlineGame))
     }
 }

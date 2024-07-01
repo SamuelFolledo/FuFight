@@ -10,12 +10,12 @@ import SceneKit
 
 /// A Preview of fighter
 struct DaePreview: UIViewRepresentable {
-    var scene: SCNScene
+    var scene: SCNScene?
 
     typealias UIViewType = SCNView
     private let cameraNode = SCNNode()
 
-    init(scene: SCNScene) {
+    init(scene: SCNScene?) {
         self.scene = scene
     }
 
@@ -55,6 +55,6 @@ extension DaePreview {
         cameraOrbit.addChildNode(cameraNode)
 //        cameraOrbit.eulerAngles.y = Float(-2 * M_PI) * widthRatio
 //        cameraOrbit.eulerAngles.x = Float(-M_PI) * heightRatio
-        scene.rootNode.addChildNode(cameraOrbit)
+        scene?.rootNode.addChildNode(cameraOrbit)
     }
 }
