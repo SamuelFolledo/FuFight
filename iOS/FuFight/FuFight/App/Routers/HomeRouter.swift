@@ -79,9 +79,7 @@ class HomeRouter: ObservableObject {
             //show loading and let loading handle transition to online game
             navigationPath.append(.loading(vm: makeLoadingViewModel(account: vm.account)))
         case .offlineGame, .practice:
-            let player = Player(fetchedPlayer: vm.player!, isEnemy: false, isGameOwner: true, initiallyHasSpeedBoost: true)
-            navigationPath.append(.game(vm: makeGameViewModel(player: player,
-                                                              enemy: fakeEnemyPlayer,
+            navigationPath.append(.game(vm: makeGameViewModel(enemy: fakeEnemyPlayer,
                                                               gameMode: route)))
         }
     }
@@ -144,12 +142,12 @@ class HomeRouter: ObservableObject {
         }
         let player = Player(fetchedPlayer: game.player, isEnemy: false, isGameOwner: !vm.isChallenger, initiallyHasSpeedBoost: game.playerInitiallyHasSpeedBoost)
         let enemyPlayer = Player(fetchedPlayer: game.enemy, isEnemy: true, isGameOwner: vm.isChallenger, initiallyHasSpeedBoost: !game.playerInitiallyHasSpeedBoost)
-        navigationPath.append(.game(vm: makeGameViewModel(player: player, enemy: enemyPlayer, gameMode: .onlineGame)))
+        navigationPath.append(.game(vm: makeGameViewModel(enemy: enemyPlayer, gameMode: .onlineGame)))
     }
 
     //MARK: - GameView Methods
-    func makeGameViewModel(player: Player, enemy: Player, gameMode: GameRoute) -> GameViewModel {
-        let vm = GameViewModel(player: player, enemy: enemy, gameMode: gameMode)
+    func makeGameViewModel(enemy: Player, gameMode: GameRoute) -> GameViewModel {
+        let vm = GameViewModel(enemy: enemy, gameMode: gameMode)
         vm.didExitGame
             .sink(receiveValue: didExitGame)
             .store(in: &subscriptions)

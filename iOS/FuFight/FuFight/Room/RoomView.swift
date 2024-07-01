@@ -45,6 +45,11 @@ struct RoomView: View {
         .onDisappear {
             vm.onDisappear()
         }
+        .onChange(of: vm.selectedFighterType ?? .samuel, { oldValue, newValue in
+            if newValue != oldValue {
+                vm.switchFighterTo(newValue)
+            }
+        })
         .allowsHitTesting(vm.loadingMessage == nil)
     }
 
@@ -56,13 +61,10 @@ struct RoomView: View {
 
             HStack {
                 Spacer()
-                
-                if vm.fighter != nil {
-                    Text("\(vm.fighter.fighterType.name)")
+
+                    Text("\(vm.selectedFighterType?.name ?? "")")
                         .font(mediumTitleFont)
                         .foregroundStyle(.white)
-
-                }
                 Spacer()
             }
         }
@@ -86,13 +88,9 @@ struct RoomView: View {
     }
 
     @ViewBuilder var fightersView: some View {
-        if vm.fighter != nil {
-            FightersCollectionView(selectedFighter: vm.fighter.fighterType) { fighterType in
-                vm.switchFighterTo(fighterType)
-            }
+        FightersCollectionView(selectedFighterType: $vm.selectedFighterType)
             .frame(height: fighterCellSize)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset)
-        }
     }
 
     @ViewBuilder var fighterView: some View {

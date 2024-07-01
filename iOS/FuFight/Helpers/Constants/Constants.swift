@@ -139,6 +139,8 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
 let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
 let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
+let allFighters = FighterType.allCases.compactMap { Fighter(type: $0, isEnemy: false) }
+
 //MARK: - Constant Methods
 ///Run action after a delayed time in seconds
 func runAfterDelay(delay: TimeInterval, action: @escaping () -> Void) {
@@ -164,11 +166,7 @@ func createFighterScene(fighterType: FighterType, animation: AnimationType) -> S
     scene.rootNode.enumerateChildNodes { (child, stop) in
         if let partName = child.name,
            let part = SkeletonType(rawValue: partName) {
-            let partMaterial = fighterType.getMaterial(for: part)
-            if let geometry = child.geometry,
-               geometry.firstMaterial != partMaterial {
-                geometry.firstMaterial = partMaterial
-            }
+            child.geometry?.firstMaterial = fighterType.getMaterial(for: part)
         }
     }
     return scene

@@ -63,6 +63,9 @@ final class HomeViewModel: BaseAccountViewModel {
         guard let room = Room.current else { return }
         self.player = room.player
         RoomManager.goOnlineIfNeeded()
-        fighter = Fighter(type: room.player.fighterType, isEnemy: false)
+        if let fighterType = player?.fighterType,
+           room.player.fighterType != fighterType {
+            fighter = Fighter(type: fighterType, isEnemy: false)
+        }
     }
 }

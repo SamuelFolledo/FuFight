@@ -9,7 +9,18 @@ import Foundation
 import SceneKit
 
 enum FighterType: String, CaseIterable, Identifiable {
-    case samuel, clara
+    case samuel
+    case clara
+    case kim
+    case deeJay
+    case jad
+    case ruby
+    case cain
+    case andrew
+    case corey
+    case alexis
+    case marco
+    case neverRight
 
     var id: String { rawValue }
 
@@ -19,6 +30,26 @@ enum FighterType: String, CaseIterable, Identifiable {
             "Samuel"
         case .clara:
             "Clara"
+        case .kim:
+            "Kim"
+        case .deeJay:
+            "Dee Jay"
+        case .jad:
+            "Jad"
+        case .ruby:
+            "Ruby"
+        case .cain:
+            "Cain"
+        case .andrew:
+            "Andrew"
+        case .corey:
+            "Corey"
+        case .alexis:
+            "Alexis"
+        case .marco:
+            "Marco"
+        case .neverRight:
+            "Never Right"
         }
     }
 
@@ -32,28 +63,42 @@ enum FighterType: String, CaseIterable, Identifiable {
             "Armature"
         case .clara:
             "Armature-001"
+        case .andrew:
+            "mixamorig1_Hips"
+        case .alexis:
+            "mixamorig6_Hips"
+        case .jad:
+            "mixamorig7_Hips"
+        case .corey:
+            "mixamorig10_Hips"
+        case .ruby, .kim, .deeJay, .cain, .marco, .neverRight:
+            "mixamorig_Hips"
         }
+    }
+
+    var scale: Float {
+        0.02
     }
 
     var daeUrl: URL? {
         return Bundle.main.url(forResource: defaultDaePath, withExtension: "dae")
     }
 
+    var path: String {
+        "3DAssets.scnassets/Characters/\(name)"
+    }
+
+    private var animationsPath: String {
+        "\(path)/assets/"
+    }
+
     var defaultDaePath: String {
-        "3DAssets.scnassets/Characters/\(name)/assets/\(name.lowercased())"
+        "\(animationsPath)/\(rawValue)"
     }
 
-    var scale: Float {
-        switch self {
-        case .samuel:
-            0.02
-        case .clara:
-            0.02
-        }
-    }
-
+    //MARK: - Public Methods
     func animationPath(_ animationType: AnimationType) -> String {
-        "3DAssets.scnassets/Characters/\(name)/\(animationType.animationPath)"
+        "\(path)/\(animationType.animationPath)"
     }
 
     func animationUrl(_ animationType: AnimationType) -> URL? {
@@ -63,53 +108,42 @@ enum FighterType: String, CaseIterable, Identifiable {
     func getMaterial(for skeletonType: SkeletonType) -> SCNMaterial {
         let material = SCNMaterial()
         material.name = skeletonType.name
-        switch skeletonType {
-        case .samuelGlassesLens:
-            material.diffuse.contents = isBlackGlasses ? UIColor.black : imageMaterial(for: skeletonType)
-            material.transparent.contents = transparentMaterial(for: skeletonType)
-        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .claraBody:
-            material.diffuse.contents = imageMaterial(for: skeletonType)
-            material.transparent.contents = transparentMaterial(for: skeletonType)
-        }
+        material.diffuse.contents = diffusedMaterial(for: skeletonType)
+        material.specular.contents = specularMaterial(for: skeletonType)
+        material.transparent.contents = transparentMaterial(for: skeletonType)
         return material
     }
 }
 
 private extension FighterType {
-    func diffusedImagePath(for skeletonType: SkeletonType) -> String {
-        let path = "3DAssets.scnassets/Characters/\(name)/assets/"
-        switch skeletonType {
-        case .samuelFacialHair:
-            return path + "samuelFacialHair"
-        case .samuelBody:
-            return path + "samuelBody"
-        case .samuelGlassesLens:
-            return path + "samuelGlasses"
-        case .samuelGlassesFrame:
-            return path + "samuelGlasses"
-        case .samuelHair:
-            return path + "samuelHair"
-        case .samuelHead:
-            return path + "samuelFace"
-        case .claraBody:
-            return path + "ClaraFullTexture"
-        }
-    }
-
-    func imageMaterial(for skeletonType: SkeletonType) -> UIImage? {
-        if let url = Bundle.main.url(forResource: diffusedImagePath(for: skeletonType), withExtension: "png"),
+    func diffusedMaterial(for skeletonType: SkeletonType) -> Any? {
+        if let url = Bundle.main.url(forResource: "\(animationsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }
         return nil
     }
 
-    func transparentMaterial(for skeletonType: SkeletonType) -> UIColor {
+    func specularMaterial(for skeletonType: SkeletonType) -> Any? {
+        if let imageName = skeletonType.specularImageName,
+           let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
+           let data = try? Data(contentsOf: url) {
+            return UIImage(data: data)
+        }
+        return UIColor.black
+    }
+
+    func transparentMaterial(for skeletonType: SkeletonType) -> Any? {
         switch skeletonType {
         case .samuelGlassesLens:
-            isBlackGlasses ? UIColor.black : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
-        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .claraBody:
-                .black
+            return isBlackGlasses ? UIColor.white : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
+        default:
+            if let imageName = skeletonType.transparentImageName,
+               let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
+               let data = try? Data(contentsOf: url) {
+                return UIImage(data: data)
+            }
+            return UIColor.black
         }
     }
 }

@@ -114,7 +114,10 @@ class Fighter {
     ///Plays an animation if animationType is new
     func playAnimation(_ animationType: AnimationType) {
         //Get and stop the default animation
-        guard let defaultAnimationPlayer = animationsNode?.animationPlayer(forKey: defaultAnimation.rawValue) else { return }
+        guard let defaultAnimationPlayer = animationsNode?.animationPlayer(forKey: defaultAnimation.rawValue) else {
+            LOGE("No default animation player found for \(defaultAnimation)")
+            return
+        }
         let blendDuration: CGFloat = 0.3
         if animationType != defaultAnimation {
             //Stopping withBlendOutDuration prevents node from going back to T-position before playing the next animation
@@ -156,7 +159,18 @@ class Fighter {
     }
 }
 
-private extension Fighter {
+extension Fighter: Hashable {
+    //MARK: - Hashable Required Methods
+    static func == (lhs: Fighter, rhs: Fighter) -> Bool {
+        return lhs.fighterType == lhs.fighterType
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        return hasher.combine(fighterType)
+    }
+}
+
+extension Fighter {
     ///Create node from default animation
     func createNode() {
         daeHolderNode = SCNNode(daePath: fighterType.defaultDaePath)
@@ -168,14 +182,17 @@ private extension Fighter {
             }
         }
         //Assign the daeHolderNode's bones as the node to animate
-        animationsNode = daeHolderNode.childNode(withName: fighterType.bonesName, recursively: true)!
+        animationsNode = daeHolderNode.childNode(withName: fighterType.bonesName, recursively: true)
     }
 
     ///Adds animation player to the animationsNode with the animationType.rawValue as the key
     func addAnimationPlayer(_ animationType: AnimationType) {
         // Load the dae file for that animation
         let path = fighterType.animationPath(animationType)
-        let scene = SCNScene(named: path)!
+        guard let scene = SCNScene(named: path) else {
+            LOGE("Missing path for animation \(animationType.rawValue) at \(path)")
+            return
+        }
         //Grab the animation from the child or grandchild and add the animation player to the animationsNode
         for child in scene.rootNode.childNodes {
             if !child.animationKeys.isEmpty,

@@ -32,10 +32,10 @@ class GameViewModel: BaseViewModel {
     private var enemyMovesListener: ListenerRegistration?
     private var subscriptions = Set<AnyCancellable>()
 
-    init(player: Player, enemy: Player, gameMode: GameRoute) {
+    init(enemy: Player, gameMode: GameRoute) {
         self.state = .gameOver
         self.gameMode = gameMode
-        self.player = player
+        self.player = Room.current != nil ? Player(fetchedPlayer: Room.current!.player, isEnemy: false, isGameOwner: true, initiallyHasSpeedBoost: true) : fakePlayer
         self.enemy = enemy
         super.init()
     }

@@ -97,15 +97,23 @@ struct ContentView: View {
     }
 
     var roomView: some View {
-        NavigationStack {
-            RoomView(vm: RoomViewModel(account: account))
+        let roomVm = RoomViewModel(account: account)
+        return NavigationStack {
+            RoomView(vm: roomVm)
         }
         .tag(Tab.edit)
+        .onAppear {
+            if tab == .edit {
+                //Required to trigger onAppear when switching between tabs
+                roomVm.onAppear()
+            }
+        }
     }
 
     var homeView: some View {
-        NavigationStack(path: $homeRouter.navigationPath) {
-            HomeView(vm: homeRouter.makeHomeViewModel(account: account))
+        let homeVm = homeRouter.makeHomeViewModel(account: account)
+        return NavigationStack(path: $homeRouter.navigationPath) {
+            HomeView(vm: homeVm)
                 .navigationDestination(for: HomeRoute.self) { screen in
                     switch screen {
                     case .loading(vm: let vm):
@@ -128,13 +136,26 @@ struct ContentView: View {
                 self.showTab = newValue.isEmpty
             }
         }
+        .onAppear {
+            if tab == .home {
+                //Required to trigger onAppear when switching between tabs
+                homeVm.onAppear()
+            }
+        }
     }
 
     var storeView: some View {
-        NavigationStack {
-            StoreView(vm: StoreViewModel(account: account))
+        let storeVm = StoreViewModel(account: account)
+        return NavigationStack {
+            StoreView(vm: storeVm)
         }
         .tag(Tab.store)
+        .onAppear {
+            if tab == .store {
+                //Required to trigger onAppear when switching between tabs
+                storeVm.onAppear()
+            }
+        }
     }
 
     //MARK: - Methods
