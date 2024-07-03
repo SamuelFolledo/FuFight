@@ -23,7 +23,6 @@ struct GameSceneView: UIViewRepresentable {
         setUpCamera()
         setUpLight()
         setUpFighters()
-
         let sceneView = SCNView()
         //TODO: 1 Set allowsCameraControl to false for production
         // allows the user to manipulate the camera
@@ -38,10 +37,8 @@ struct GameSceneView: UIViewRepresentable {
 
 private extension GameSceneView {
     func setUpFighters() {
-        [fighter, enemyFighter].forEach {
-            scene.rootNode.addChildNode($0.daeHolderNode)
-            $0.positionNode(asHorizontal: isPracticeMode)
-        }
+        scene.rootNode.addChildNode(fighter.daeHolderNode)
+        scene.rootNode.addChildNode(enemyFighter.daeHolderNode)
     }
 
     func setUpCamera() {

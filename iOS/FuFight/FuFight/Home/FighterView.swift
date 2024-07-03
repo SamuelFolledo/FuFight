@@ -53,7 +53,6 @@ extension FighterView {
 
     func setUpFighter() {
         scene.rootNode.addChildNode(fighter.daeHolderNode)
-        fighter.loadAnimations(animations: allAnimations)
         fighter.daeHolderNode.position = SCNVector3Make(0, -2, -1)
         fighter.daeHolderNode.scale = .init(x: fighter.fighterType.scale, y: fighter.fighterType.scale, z: fighter.fighterType.scale)
         fighter.playAnimation(fighter.defaultAnimation)
