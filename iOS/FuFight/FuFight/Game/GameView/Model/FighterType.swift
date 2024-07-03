@@ -117,10 +117,17 @@ enum FighterType: String, CaseIterable, Identifiable {
 
 private extension FighterType {
     func diffusedMaterial(for skeletonType: SkeletonType) -> Any? {
-        if let url = Bundle.main.url(forResource: "\(animationsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
-           let data = try? Data(contentsOf: url) {
-            return UIImage(data: data)
+        switch skeletonType {
+        case .samuelGlassesLens:
+            //Make samuel's glasses black
+            return isBlackGlasses ? UIColor.black : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
+        default:
+            if let url = Bundle.main.url(forResource: "\(animationsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
+               let data = try? Data(contentsOf: url) {
+                return UIImage(data: data)
+            }
         }
+        LOGDE("No diffused material found for \(skeletonType)")
         return nil
     }
 
@@ -134,16 +141,11 @@ private extension FighterType {
     }
 
     func transparentMaterial(for skeletonType: SkeletonType) -> Any? {
-        switch skeletonType {
-        case .samuelGlassesLens:
-            return isBlackGlasses ? UIColor.white : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
-        default:
-            if let imageName = skeletonType.transparentImageName,
-               let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
-               let data = try? Data(contentsOf: url) {
-                return UIImage(data: data)
-            }
-            return UIColor.black
+        if let imageName = skeletonType.transparentImageName,
+           let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
+           let data = try? Data(contentsOf: url) {
+            return UIImage(data: data)
         }
+        return UIColor.black
     }
 }
