@@ -101,7 +101,7 @@ struct Fighter {
         textNode.runAction(textNodeAction)
     }
 
-    mutating func loadAnimations(animations: [AnimationType]) {
+    mutating func loadAnimations(animations: Set<AnimationType>) {
         for animationType in animations {
             addAnimationPlayer(animationType)
         }

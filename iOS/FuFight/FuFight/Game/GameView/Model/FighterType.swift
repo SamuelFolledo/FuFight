@@ -19,7 +19,7 @@ enum FighterType: String, CaseIterable, Identifiable {
     case andrew
     case corey
     case alexis
-    case marco
+//    case marco
     case neverRight
 
     var id: String { rawValue }
@@ -46,8 +46,8 @@ enum FighterType: String, CaseIterable, Identifiable {
             "Corey"
         case .alexis:
             "Alexis"
-        case .marco:
-            "Marco"
+//        case .marco:
+//            "Marco"
         case .neverRight:
             "Never Right"
         }
@@ -71,13 +71,18 @@ enum FighterType: String, CaseIterable, Identifiable {
             "mixamorig7_Hips"
         case .corey:
             "mixamorig10_Hips"
-        case .ruby, .kim, .deeJay, .cain, .marco, .neverRight:
+        case .ruby, .kim, .deeJay, .cain, .neverRight:
             "mixamorig_Hips"
         }
     }
 
     var scale: Float {
-        0.02
+        switch self {
+        case .neverRight:
+            0.016
+        default:
+            0.02
+        }
     }
 
     var daeUrl: URL? {
@@ -88,21 +93,20 @@ enum FighterType: String, CaseIterable, Identifiable {
         "3DAssets.scnassets/Characters/\(name)"
     }
 
-    private var animationsPath: String {
+    private var assetsPath: String {
         "\(path)/assets/"
+    }
+    private var animationsPath: String {
+        "\(path)/animations/"
     }
 
     var defaultDaePath: String {
-        "\(animationsPath)/\(rawValue)"
+        "\(assetsPath)\(rawValue)"
     }
 
     //MARK: - Public Methods
     func animationPath(_ animationType: AnimationType) -> String {
         "\(path)/\(animationType.animationPath)"
-    }
-
-    func animationUrl(_ animationType: AnimationType) -> URL? {
-        return Bundle.main.url(forResource: animationPath(animationType), withExtension: "dae")
     }
 
     func getMaterial(for skeletonType: SkeletonType) -> SCNMaterial {
@@ -122,7 +126,7 @@ private extension FighterType {
             //Make samuel's glasses black
             return isBlackGlasses ? UIColor.black : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
         default:
-            if let url = Bundle.main.url(forResource: "\(animationsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
+            if let url = Bundle.main.url(forResource: "\(assetsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
                let data = try? Data(contentsOf: url) {
                 return UIImage(data: data)
             }
@@ -133,7 +137,7 @@ private extension FighterType {
 
     func specularMaterial(for skeletonType: SkeletonType) -> Any? {
         if let imageName = skeletonType.specularImageName,
-           let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
+           let url = Bundle.main.url(forResource: "\(assetsPath)\(imageName)", withExtension: "png"),
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }
@@ -142,7 +146,7 @@ private extension FighterType {
 
     func transparentMaterial(for skeletonType: SkeletonType) -> Any? {
         if let imageName = skeletonType.transparentImageName,
-           let url = Bundle.main.url(forResource: "\(animationsPath)\(imageName)", withExtension: "png"),
+           let url = Bundle.main.url(forResource: "\(assetsPath)\(imageName)", withExtension: "png"),
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }

@@ -51,7 +51,7 @@ class FighterType(Enum):
     andrew = "andrew"
     corey = "corey"
     alexis = "alexis"
-    marco = "marco"
+    marco = "marco" #stopped using because his hair is not getting rendered properly on the back of his head
     jennifer = "jennifer" #unused for now
     neverRight = "neverRight"
     eve = "eve" #the ".Gonzales" in zip file name's "Eve By J.Gonzales.zip" us causing the character's folder to be named as "Eve By J"

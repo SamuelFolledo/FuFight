@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Moves {
-    let animationTypes: [AnimationType]
+    let animationTypes: Set<AnimationType>
     var attacks: [Attack]
     var defenses: [Defense]
 
@@ -23,7 +23,7 @@ struct Moves {
     init(attacks: [Attack], defenses: [Defense]) {
         self.attacks = attacks
         self.defenses = defenses
-        self.animationTypes = attacks.compactMap { $0.animationType } + defenses.compactMap { $0.animationType } + otherAnimations
+        self.animationTypes = Set(attacks.compactMap { $0.animationType } + defenses.compactMap { $0.animationType } + otherAnimations)
     }
 
     //MARK: - Public Methods
