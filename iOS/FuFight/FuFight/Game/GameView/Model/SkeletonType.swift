@@ -76,12 +76,12 @@ enum SkeletonType: String {
     case alexisZipper = "Ch37_Zipper"
     case alexisHair = "Ch37_Hair"
 
-    case marcoSneakers = "Ch42_Sneakers"
-    case marcoBody = "Ch42_Body1"
-    case marcoShirt = "Ch42_Shirt"
-    case marcoShorts = "Ch42_Shorts"
-    case marcoEyelashes = "Ch42__Eyelashes"
-    case marcoHair = "Ch42_Hair1"
+//    case marcoSneakers = "Ch42_Sneakers"
+//    case marcoBody = "Ch42_Body1"
+//    case marcoShirt = "Ch42_Shirt"
+//    case marcoShorts = "Ch42_Shorts"
+//    case marcoEyelashes = "Ch42__Eyelashes"
+//    case marcoHair = "Ch42_Hair1"
     
     case neverRight = "Prisoner"
 
@@ -197,18 +197,18 @@ enum SkeletonType: String {
             rawValue
         case .alexisHair:
             rawValue
-        case .marcoSneakers:
-            rawValue
-        case .marcoBody:
-            rawValue
-        case .marcoShirt:
-            rawValue
-        case .marcoShorts:
-            rawValue
-        case .marcoEyelashes:
-            rawValue
-        case .marcoHair:
-            rawValue
+//        case .marcoSneakers:
+//            rawValue
+//        case .marcoBody:
+//            rawValue
+//        case .marcoShirt:
+//            rawValue
+//        case .marcoShorts:
+//            rawValue
+//        case .marcoEyelashes:
+//            rawValue
+//        case .marcoHair:
+//            rawValue
         case .neverRight:
             rawValue
         }
@@ -262,10 +262,10 @@ enum SkeletonType: String {
             "alexisTexture1_Diffuse"
         case .alexisEyelashes, .alexisHair:
             "alexisTexture2_Diffuse"
-        case .marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts:
-            "marcoTexture1_Diffuse"
-        case .marcoEyelashes, .marcoHair:
-            "marcoTexture2_Diffuse"
+//        case .marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts:
+//            "marcoTexture1_Diffuse"
+//        case .marcoEyelashes, .marcoHair:
+//            "marcoTexture2_Diffuse"
         case .neverRight:
             "neverRightTexture_diffuse"
         }
@@ -303,10 +303,10 @@ enum SkeletonType: String {
             "alexisTexture1_Specular"
         case .alexisEyelashes, .alexisHair:
             nil
-        case .marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts:
-            "marcoTexture1_Specular"
-        case .marcoEyelashes, .marcoHair:
-            nil
+//        case .marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts:
+//            "marcoTexture1_Specular"
+//        case .marcoEyelashes, .marcoHair:
+//            nil
         }
     }
 
@@ -315,9 +315,9 @@ enum SkeletonType: String {
         case .samuelGlassesLens:
             //Handled specially with isBlackGlasses
             nil
-        case .kimEyelashes, .kimHair, .jadEyelashes, .jadHair, .jadBeard, .rubyEyelashes, .rubyHair, .cainEyelashes, .andrewEyelashes, .andrewHair, .coreyEyelashes, .coreyHair, .alexisEyelashes, .alexisHair, .marcoEyelashes, .marcoHair:
+        case .kimEyelashes, .kimHair, .jadEyelashes, .jadHair, .jadBeard, .rubyEyelashes, .rubyHair, .cainEyelashes, .andrewEyelashes, .andrewHair, .coreyEyelashes, .coreyHair, .alexisEyelashes, .alexisHair/*, .marcoEyelashes, .marcoHair*/:
             diffuseImageName
-        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .clara, .coreyBody, .coreySneakers, .coreyPants, .coreyHoody, .kimCloth, .kimBody, .kimSneakers, .kimSocks, .deeJay, .jadBody, .jadSneakers, .jadPants, .jadHoodie, .rubyShoe, .rubyBody, .rubyPants, .rubyShirt, .cainMask, .cainBody, .cainCap, .cainPants, .cainShirt, .cainShoes, .andrewBody, .andrewBoots, .andrewHelmet, .andrewVest, .andrewShirt, .andrewPants, .alexisPants, .alexisSneakers, .alexisShirt, .alexisBody, .alexisZipper, .marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts, .neverRight:
+        case .samuelFacialHair, .samuelBody, .samuelGlassesFrame, .samuelHair, .samuelHead, .clara, .coreyBody, .coreySneakers, .coreyPants, .coreyHoody, .kimCloth, .kimBody, .kimSneakers, .kimSocks, .deeJay, .jadBody, .jadSneakers, .jadPants, .jadHoodie, .rubyShoe, .rubyBody, .rubyPants, .rubyShirt, .cainMask, .cainBody, .cainCap, .cainPants, .cainShirt, .cainShoes, .andrewBody, .andrewBoots, .andrewHelmet, .andrewVest, .andrewShirt, .andrewPants, .alexisPants, .alexisSneakers, .alexisShirt, .alexisBody, .alexisZipper, /*.marcoSneakers, .marcoBody, .marcoShirt, .marcoShorts,*/ .neverRight:
                 nil
         }
     }
