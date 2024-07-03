@@ -127,6 +127,11 @@ class Player: PlayerProtocol {
         moves.updateDefensesForNextRound()
     }
 
+    func startNewGame() {
+        speed = 0
+        rounds = [Round(round: 1)]
+    }
+
     func prepareForNewRound() {
         speed = 0
         let newRound = Round(round: rounds.count + 1)

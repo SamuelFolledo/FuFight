@@ -42,9 +42,6 @@ class GameViewModel: BaseViewModel {
 
     override func onAppear() {
         super.onAppear()
-        runAfterDelay(delay: 1.5) {
-            self.listenToEnemyGameDocument()
-        }
     }
 
     override func onDisappear() {
@@ -148,9 +145,14 @@ class GameViewModel: BaseViewModel {
 //MARK: - Private Methods
 private extension GameViewModel {
     func startNewGame() {
-        createNewRound()
         player.fighter.playAnimation(.idle)
         enemy.fighter.playAnimation(.idle)
+        createNewRound()
+        player.startNewGame()
+        enemy.startNewGame()
+        runAfterDelay(delay: 1.5) {
+            self.listenToEnemyGameDocument()
+        }
     }
 
     func createNewRound() {
