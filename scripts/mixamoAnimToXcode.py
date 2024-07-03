@@ -109,6 +109,13 @@ def handleZippedDae(path, newAnimationName):
         prepareDaeAnimation(path, newAnimationName)
         print("\n\n")
 
+def handleAnimationsFolder(path):
+    """Unzipped and convert all zipped dae files including its subdirectories"""
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            filePath = os.path.join(root, file)
+            handleZippedDae(filePath, newAnimationName)
+
 #----------------------------------------------------------------------------------------------------------------
 #################################################### Main #######################################################
 #----------------------------------------------------------------------------------------------------------------
@@ -130,14 +137,18 @@ if __name__ == "__main__":
     pathsToConvert, newAnimationName = validateAndGetInput()
     for pathToConvert in pathsToConvert:
         if isFolder(pathToConvert):
-            # If folder, then get all zip files to unzip
-            if getNameFromPath(pathToConvert) == "animations":
-                #If folder's name == animations, then check zip files including subdirectories
+            if getNameFromPath(pathToConvert) == "Characters":
+                #Get all of the paths that contains "animations" folder and run the same thing as "animations" folders
+                animationsPaths = []
                 for root, dirs, files in os.walk(pathToConvert):
-                    for file in files:
-                        filePath = os.path.join(root, file)
-                        handleZippedDae(filePath, newAnimationName)
+                    for dir in dirs:
+                        if dir == "animations":
+                            animationsPath = os.path.join(root, dir)
+                            handleAnimationsFolder(animationsPath)
+            elif getNameFromPath(pathToConvert) == "animations":
+                handleAnimationsFolder(pathToConvert)
             else:
+                #Handle zipped files in current directory only
                 for filename in os.listdir(pathToConvert):
                     filePath = os.path.join(pathToConvert, filename)
                     handleZippedDae(filePath, newAnimationName)
