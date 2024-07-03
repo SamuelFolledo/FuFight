@@ -8,7 +8,7 @@
 import SceneKit
 
 ///3D model of the fighter
-class Fighter {
+struct Fighter {
     //MARK: Properties
     var fighterType: FighterType
     let isEnemy: Bool
@@ -71,16 +71,12 @@ class Fighter {
         createNode()
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     //MARK: - Public Methods
-    func switchFighter(to nextFighterType: FighterType) {
+    mutating func switchFighter(to nextFighterType: FighterType) {
         fighterType = nextFighterType
     }
 
-    func positionNode(asHorizontal: Bool = false) {
+    mutating func positionNode(asHorizontal: Bool = false) {
         daeHolderNode.scale = SCNVector3Make(fighterType.scale, fighterType.scale, fighterType.scale)
         var xPosition: Float = isEnemy ? 1.5 : 0    //further
         let yPosition: Float = 0.5                  //vertical position
@@ -100,12 +96,12 @@ class Fighter {
         daeHolderNode.addChildNode(textNode)
     }
 
-    func showResult(_ attackResult: AttackResult) {
+    mutating func showResult(_ attackResult: AttackResult) {
         damageText.string = attackResult.damageText
         textNode.runAction(textNodeAction)
     }
 
-    func loadAnimations(animations: [AnimationType]) {
+    mutating func loadAnimations(animations: [AnimationType]) {
         for animationType in animations {
             addAnimationPlayer(animationType)
         }
@@ -125,15 +121,14 @@ class Fighter {
         }
         //Play next animation
         guard let player = animationsNode?.animationPlayer(forKey: animationType.rawValue) else {
-            LOGDE("Animation played not loaded \(animationType)", from: Fighter.self)
+            LOGDE("Animation played not loaded \(animationType)")
             return
         }
         player.play()
         //Handle end of animation
         if animationType.isKillAnimationType {
             //Pause fighter's animations after playing the kill animation. Reduce duration by 0.2 to not let the fighter stand back up
-            runAfterDelay(delay: player.animation.duration - blendDuration) { [weak self] in
-                guard let self else { return }
+            runAfterDelay(delay: player.animation.duration - blendDuration) {
                 pauseAnimations()
             }
         } else {
@@ -172,7 +167,7 @@ extension Fighter: Hashable {
 
 extension Fighter {
     ///Create node from default animation
-    func createNode() {
+    mutating func createNode() {
         daeHolderNode = SCNNode(daePath: fighterType.defaultDaePath)
         //Add materials and images programmatically
         for child in daeHolderNode.childNodes {

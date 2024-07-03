@@ -145,11 +145,14 @@ class GameViewModel: BaseViewModel {
 //MARK: - Private Methods
 private extension GameViewModel {
     func startNewGame() {
+        player.rounds.removeAll()
+        enemy.rounds.removeAll()
+        let isPracticeMode = gameMode == .practice
+        player.fighter.positionNode(asHorizontal: isPracticeMode)
+        enemy.fighter.positionNode(asHorizontal: isPracticeMode)
         player.fighter.playAnimation(.idle)
         enemy.fighter.playAnimation(.idle)
         createNewRound()
-        player.startNewGame()
-        enemy.startNewGame()
         runAfterDelay(delay: 1.5) {
             self.listenToEnemyGameDocument()
         }
