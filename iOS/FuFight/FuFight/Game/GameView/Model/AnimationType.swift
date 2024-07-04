@@ -51,7 +51,7 @@ enum AnimationType: String, CaseIterable {
 
     //MARK: Non attack or defensive moves
     case stop
-    case idle
+    case idleFight
     case idleStand
 
     //MARK: - Properties
@@ -67,7 +67,7 @@ enum AnimationType: String, CaseIterable {
             "dodge\(nameSuffix)"
         case .stop:
             ""
-        case .idle, .idleStand:
+        case .idleFight, .idleStand:
             "idle\(nameSuffix)"
         }
     }
@@ -108,8 +108,10 @@ enum AnimationType: String, CaseIterable {
             ""
         case .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard:
             "-m"
-        case .stop, .idle:
+        case .stop:
             ""
+        case .idleFight:
+            "Fight"
         case .idleStand:
             "Stand"
         }
@@ -134,7 +136,7 @@ enum AnimationType: String, CaseIterable {
             "/kill"
         case .stop:
             ""
-        case .idle, .idleStand:
+        case .idleFight, .idleStand:
             "/idle"
         }
     }
@@ -148,7 +150,7 @@ enum AnimationType: String, CaseIterable {
     ///Determines if animation type aims the head or body, nil means no body or head specific
     var isHigh: Bool? {
         switch self {
-        case .stop, .idle, .idleStand:
+        case .stop, .idleFight, .idleStand:
             nil
         case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             true
@@ -172,7 +174,7 @@ enum AnimationType: String, CaseIterable {
     ///how many times the animation will be repeated
     var repeatCount: Float {
         switch self {
-        case .idle, .idleStand:
+        case .idleFight, .idleStand:
             .greatestFiniteMagnitude
         case .stop:
             0
@@ -183,7 +185,7 @@ enum AnimationType: String, CaseIterable {
 
     var iconName: String? {
         switch self {
-        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
+        case .stop, .idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             nil
         case .punchHeadLeftLight:
             "punchLeftLight"
@@ -216,7 +218,7 @@ enum AnimationType: String, CaseIterable {
         switch self {
         case .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             true
-        case .stop, .idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
+        case .stop, .idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .punchHeadLeftLight, .punchHeadLeftMedium, .punchHeadLeftHard, .punchHeadRightLight, .punchHeadRightMedium, .punchHeadRightHard, .kickHeadRightLight, .kickHeadRightMedium, .kickHeadRightHard, .kickHeadLeftLight, .kickHeadLeftMedium, .kickHeadLeftHard:
             false
         }
     }
@@ -242,7 +244,7 @@ enum AnimationType: String, CaseIterable {
             false
         case .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard:
             true
-        case .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+        case .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idleFight, .idleStand:
             false
         }
     }
@@ -255,7 +257,7 @@ enum AnimationType: String, CaseIterable {
             .medium
         case .punchHeadRightHard, .punchHeadLeftHard, .kickHeadLeftHard, .kickHeadRightHard, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightHard, .killHeadLeftHard:
             .hard
-        case .dodgeHeadRight, .dodgeHeadLeft, .stop, .idle, .idleStand:
+        case .dodgeHeadRight, .dodgeHeadLeft, .stop, .idleFight, .idleStand:
             nil
         }
     }
@@ -294,7 +296,7 @@ enum AnimationType: String, CaseIterable {
     ///Used to figure out the slight delay before playing the defender's animation
     func delayForDefendingAnimation(_ defenderAnimationType: AnimationType, defender: FighterType, attacker: FighterType) -> CGFloat {
         switch defenderAnimationType {
-        case .stop, .idle, .idleStand:
+        case .stop, .idleFight, .idleStand:
             break
         case .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard:
             //Defense moves
@@ -322,7 +324,7 @@ enum AnimationType: String, CaseIterable {
             fighter == .samuel ? false : true
         case .kickHeadRightHard, .kickHeadLeftHard:
             fighter == .samuel ? false : true
-        case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+        case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idleFight, .idleStand:
             false
         }
     }
@@ -338,7 +340,7 @@ extension AnimationType {
             fighter == .samuel ? 4.46667 : 38.833332
         case .stop:
             0
-        case .idle:
+        case .idleFight:
             fighter == .samuel ? 2.2 : 2.966667
         case .punchHeadLeftLight, .punchHeadRightLight:
             fighter == .samuel ? 1.13333 : 1.53333
@@ -386,7 +388,7 @@ extension AnimationType {
         //Note: these values are estimate and manually inputted after testing animations. The smaller the number, the more sooner the animation will get played
         switch self {
         //MARK: Idle moves
-        case .idleStand, .idle, .stop:
+        case .idleStand, .idleFight, .stop:
             0
         //MARK: Defense moves
         case .dodgeHeadRight, .dodgeHeadLeft:

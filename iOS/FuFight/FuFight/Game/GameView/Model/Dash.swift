@@ -105,9 +105,9 @@ enum Dash: String, CaseIterable, DefenseTypeProtocol {
         case .backward:
             .idleStand
         case .left:
-            .idle
+            .idleFight
         case .right:
-            .idle
+            .idleFight
         }
     }
 

@@ -129,7 +129,7 @@ struct HomeView: View {
 
     @ViewBuilder var fighterView: some View {
         if let player = Room.current?.player {
-            DaePreview(scene: createFighterScene(fighterType: player.fighterType, animation: .idle))
+            DaePreview(scene: createFighterScene(fighterType: player.fighterType, animation: .idleStand))
                 .ignoresSafeArea()
         }
     }

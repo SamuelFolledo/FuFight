@@ -79,7 +79,7 @@ enum FighterType: String, CaseIterable, Identifiable {
     var scale: Float {
         switch self {
         case .neverRight:
-            0.016
+            0.018
         default:
             0.02
         }
