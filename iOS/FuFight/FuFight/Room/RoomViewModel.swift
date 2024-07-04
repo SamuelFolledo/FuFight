@@ -11,7 +11,7 @@ import SceneKit
 
 final class RoomViewModel: BaseAccountViewModel {
     @Published var selectedFighterType: FighterType? = nil
-    @Published var animationType: AnimationType = .idle
+    @Published var animationType: AnimationType = .idleStand
     @Published var path = NavigationPath()
 
     var player: FetchedPlayer!
@@ -45,9 +45,8 @@ final class RoomViewModel: BaseAccountViewModel {
 
     func setupSelectedPlayer() {
         guard let player = RoomManager.getPlayer() else { return }
-        LOG("ROOM SETTINGUP \(player.fighterType) vs \(selectedFighterType?.rawValue ?? "none")")
         self.player = player
-        if let index = allFighters.compactMap({ $0.fighterType }).firstIndex(of: player.fighterType) {
+        if selectedFighterType != player.fighterType {
             fighterScene = createFighterScene(fighterType: player.fighterType, animation: animationType)
             selectedFighterType = player.fighterType
         }
@@ -71,8 +70,8 @@ private extension RoomViewModel {
         Task {
             do {
                 try await RoomManager.saveCurrent(currentRoom)
-                try await RoomNetworkManager.updateOwner(updatedPlayer)
                 refreshPlayer()
+                try await RoomNetworkManager.updateOwner(updatedPlayer)
                 updateLoadingMessage(to: nil)
             } catch {
                 updateLoadingMessage(to: nil)
@@ -94,7 +93,7 @@ private extension RoomViewModel {
         //Go back to default animation after showing the animation
         runAfterDelay(delay: animation.animationDuration(for: selectedFighterType) - 0.2) { [weak self] in
             guard let self else { return }
-            animationType = .idle
+            animationType = .idleStand
             fighterScene = createFighterScene(fighterType: selectedFighterType, animation: animationType)
         }
     }

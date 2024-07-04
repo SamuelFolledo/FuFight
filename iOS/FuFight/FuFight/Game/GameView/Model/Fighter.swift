@@ -67,7 +67,7 @@ struct Fighter {
     init(type: FighterType, isEnemy: Bool) {
         self.fighterType = type
         self.isEnemy = isEnemy
-        defaultAnimation = .idle
+        defaultAnimation = .idleFight
         createNode()
     }
 

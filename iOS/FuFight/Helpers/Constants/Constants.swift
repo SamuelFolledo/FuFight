@@ -132,12 +132,12 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              username: "Enemy",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
-                             fighter: Fighter(type: .clara, isEnemy: true),
+                             fighter: Fighter(type: .samuel, isEnemy: true),
                              state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
 let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
-let otherAnimations: [AnimationType] = [.idle, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
+let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
 let allFighters = FighterType.allCases.compactMap { Fighter(type: $0, isEnemy: false) }
 

@@ -102,11 +102,11 @@ private extension GameSceneView {
                         case .forward:
                             fighter.playAnimation(.idleStand)
                         case .left:
-                            fighter.playAnimation(.idle)
+                            fighter.playAnimation(.idleFight)
                         case .backward:
                             fighter.playAnimation(.idleStand)
                         case .right:
-                            fighter.playAnimation(.idle)
+                            fighter.playAnimation(.idleFight)
                         }
                     },
                 playerType: .enemy)

@@ -53,7 +53,7 @@ extension Kick {
             "kickRightMedium"
         case .kickHeadRightHard:
             "kickRightHard"
-        case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idle, .idleStand:
+        case .dodgeHeadRight, .dodgeHeadLeft, .hitHeadRightLight, .hitHeadRightMedium, .hitHeadRightHard, .hitHeadLeftLight, .hitHeadLeftMedium, .hitHeadLeftHard, .hitHeadStraightLight, .hitHeadStraightMedium, .hitHeadStraightHard, .killHeadRightLight, .killHeadRightMedium, .killHeadRightHard, .killHeadLeftLight, .killHeadLeftMedium, .killHeadLeftHard, .stop, .idleFight, .idleStand:
             ""
         }
     }

@@ -150,8 +150,8 @@ private extension GameViewModel {
         let isPracticeMode = gameMode == .practice
         player.fighter.positionNode(asHorizontal: isPracticeMode)
         enemy.fighter.positionNode(asHorizontal: isPracticeMode)
-        player.fighter.playAnimation(.idle)
-        enemy.fighter.playAnimation(.idle)
+        player.fighter.playAnimation(.idleFight)
+        enemy.fighter.playAnimation(.idleFight)
         createNewRound()
         runAfterDelay(delay: 1.5) {
             self.listenToEnemyGameDocument()
