@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 enum Tab: String, CaseIterable, Identifiable {
-    case edit
+    case collections
     case home
     case store
 
@@ -17,8 +17,8 @@ enum Tab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .edit:
-            "Edit"
+        case .collections:
+            "Collections"
         case .home:
             "Play"
         case .store:
@@ -28,7 +28,7 @@ enum Tab: String, CaseIterable, Identifiable {
 
     var systemImage: String {
         switch self {
-        case .edit:
+        case .collections:
             "applepencil.gen1"
         case .home:
             "house"
@@ -45,8 +45,8 @@ struct ContentView: View {
     @StateObject var homeRouter: HomeRouter = HomeRouter()
     @StateObject var account: Account = Account.current ?? Account()
     @State var showTab: Bool = true
-    @State var tab: Tab = .home
-    private let tabs: [Tab] = [.edit, .home, .store]
+    @State var tab: Tab = .collections
+    private let tabs: [Tab] = [.collections, .home, .store]
     var subscriptions = Set<AnyCancellable>()
 
     @Namespace var namespace
@@ -96,16 +96,36 @@ struct ContentView: View {
         }
     }
 
+//    var characterDetailView: some View {
+//        let roomVm = CharacterDetailViewModel(account: account)
+//        return NavigationStack {
+//            CharacterDetailView(vm: roomVm)
+//                .onAppear {
+//                    if tab == .edit {
+//                        LOG("Roomview is showing")
+//                    }
+//                }
+//        }
+//        .tag(Tab.edit)
+//        .onAppear {
+//            if tab == .edit {
+//                //Required to trigger onAppear when switching between tabs
+//                LOG("Roomview is showing")
+//                roomVm.onAppear()
+//            }
+//        }
+//    }
+
     var roomView: some View {
-        let roomVm = RoomViewModel(account: account)
+        let vm = RoomViewModel(account: account)
         return NavigationStack {
-            RoomView(vm: roomVm)
+            RoomView(vm: vm)
         }
-        .tag(Tab.edit)
+        .tag(Tab.collections)
         .onAppear {
-            if tab == .edit {
+            if tab == .collections {
                 //Required to trigger onAppear when switching between tabs
-                roomVm.onAppear()
+                vm.onAppear()
             }
         }
     }
@@ -227,7 +247,7 @@ private extension ContentView {
     func tabBarView(_ currentTab: Tab) -> some View {
         Group {
             switch currentTab {
-            case .edit:
+            case .collections:
                 roomView
             case .home:
                 homeView
