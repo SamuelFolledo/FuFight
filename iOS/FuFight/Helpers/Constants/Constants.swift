@@ -48,6 +48,8 @@ let defaultFontSize: CGFloat = 16
 let tabFont = Font.headline
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
 let textFont = Font.system(size: defaultFontSize, weight: .regular)
+let characterFont = Font.system(size: 14, weight: .semibold)
+let characterDetailFont = Font.system(size: 12, weight: .medium)
 let mediumTextFont = textFont.weight(.medium)
 let boldedTextFont = textFont.weight(.bold)
 let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
@@ -132,14 +134,14 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              username: "Enemy",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
-                             fighter: Fighter(type: .samuel, isEnemy: true),
+                             fighter: Fighter(type: FighterType.allCases.randomElement()!, isEnemy: true),
                              state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
 let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
 let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
-let allFighters = FighterType.allCases.compactMap { Fighter(type: $0, isEnemy: false) }
+let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0) }
 
 //MARK: - Constant Methods
 ///Run action after a delayed time in seconds
