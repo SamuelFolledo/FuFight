@@ -9,31 +9,41 @@ import SwiftUI
 import Combine
 
 enum Tab: String, CaseIterable, Identifiable {
+    case store
     case collections
     case home
-    case store
+    case school
+    case events
 
     var id: Self { self }
 
     var title: String {
         switch self {
+        case .store:
+            "Store"
         case .collections:
             "Collections"
         case .home:
             "Play"
-        case .store:
-            "Store"
+        case .school:
+            "School"
+        case .events:
+            "Events"
         }
     }
 
     var systemImage: String {
         switch self {
+        case .store:
+            "storefront"
         case .collections:
             "applepencil.gen1"
         case .home:
             "house"
-        case .store:
-            "storefront"
+        case .school:
+            "graduationcap"
+        case .events:
+            "party.popper"
         }
     }
 }
@@ -45,8 +55,8 @@ struct ContentView: View {
     @StateObject var homeRouter: HomeRouter = HomeRouter()
     @StateObject var account: Account = Account.current ?? Account()
     @State var showTab: Bool = true
-    @State var tab: Tab = .collections
-    private let tabs: [Tab] = [.collections, .home, .store]
+    @State var tab: Tab = .home
+    private let tabs: [Tab] = Tab.allCases
     var subscriptions = Set<AnyCancellable>()
 
     @Namespace var namespace
@@ -72,7 +82,7 @@ struct ContentView: View {
                             //MARK: - TabBar
                             HStack(alignment: .bottom, spacing: 1) {
                                 ForEach(tabs, id: \.self) { currentTab in
-                                    tabBarItem(currentTab)
+                                    tabBarItem(currentTab, reader: reader)
                                 }
                             }
                             .transition(.move(edge: .bottom))
@@ -115,6 +125,20 @@ struct ContentView: View {
 //            }
 //        }
 //    }
+
+    var storeView: some View {
+        let storeVm = StoreViewModel(account: account)
+        return NavigationStack {
+            StoreView(vm: storeVm)
+        }
+        .tag(Tab.store)
+        .onAppear {
+            if tab == .store {
+                //Required to trigger onAppear when switching between tabs
+                storeVm.onAppear()
+            }
+        }
+    }
 
     var roomView: some View {
         let vm = RoomViewModel(account: account)
@@ -164,16 +188,30 @@ struct ContentView: View {
         }
     }
 
-    var storeView: some View {
-        let storeVm = StoreViewModel(account: account)
+    var schoolView: some View {
+        let vm = SchoolViewModel(account: account)
         return NavigationStack {
-            StoreView(vm: storeVm)
+            SchoolView(vm: vm)
         }
-        .tag(Tab.store)
+        .tag(Tab.school)
         .onAppear {
-            if tab == .store {
+            if tab == .school {
                 //Required to trigger onAppear when switching between tabs
-                storeVm.onAppear()
+                vm.onAppear()
+            }
+        }
+    }
+
+    var eventsView: some View {
+        let vm = EventsViewModel(account: account)
+        return NavigationStack {
+            EventsView(vm: vm)
+        }
+        .tag(Tab.events)
+        .onAppear {
+            if tab == .events {
+                //Required to trigger onAppear when switching between tabs
+                vm.onAppear()
             }
         }
     }
@@ -197,15 +235,18 @@ private extension ContentView {
         }
     }
 
-    func tabBarItem(_ currentTab: Tab) -> some View {
+    func tabBarItem(_ currentTab: Tab, reader: GeometryProxy) -> some View {
         let selectedColor = Color.yellow
         let unselectedColor = Color.white
+        let offset: CGFloat = 8
+        let unselectedTabItemWidth = reader.size.width / CGFloat(Tab.allCases.count) - offset
+        let selectedTabItemWidth = unselectedTabItemWidth + CGFloat(Tab.allCases.count) * offset
         return VStack(spacing: 0) {
             //Selected TabBar item's extra padding
             Group {
                 tab == currentTab ? selectedColor : unselectedColor
             }
-            .frame(height: tab == currentTab ? 8 : 0)
+            .frame(height: tab == currentTab ? 2 : 0)
 
             //TabBar item
             Button(action: { withAnimation(.easeInOut) {
@@ -213,11 +254,16 @@ private extension ContentView {
             }}) {
                 VStack {
                     Spacer()
-                        .frame(height: 10)
+                        .frame(height: 12)
+
                     Image(systemName: currentTab.systemImage)
-                        .frame(width: 25, height: 25)
-                    Text(currentTab.title)
-                        .font(tabFont)
+                        .frame(width: 35, height: 35)
+
+                    if tab == currentTab {
+                        Text(currentTab.title)
+                            .font(tabFont)
+                    }
+
                     Spacer()
                         .frame(height: UserDefaults.bottomSafeAreaInset / 2)
                 }
@@ -242,17 +288,22 @@ private extension ContentView {
                     .foregroundColor(unselectedColor)
             )
         }
+        .frame(width: tab == currentTab ? selectedTabItemWidth : unselectedTabItemWidth)
     }
 
     func tabBarView(_ currentTab: Tab) -> some View {
         Group {
             switch currentTab {
+            case .store:
+                storeView
             case .collections:
                 roomView
             case .home:
                 homeView
-            case .store:
-                storeView
+            case .school:
+                schoolView
+            case .events:
+                eventsView
             }
         }
     }

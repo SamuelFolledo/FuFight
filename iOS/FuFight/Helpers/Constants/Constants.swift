@@ -43,9 +43,8 @@ let fighterCellSize: CGFloat = 80
 var animationToTest: AnimationType = .punchHeadRightHard
 
 //Fonts
-let tabFontSize: Font = .caption
 let defaultFontSize: CGFloat = 16
-let tabFont = Font.headline
+let tabFont = Font.system(size: 12, weight: .semibold)
 let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
 let textFont = Font.system(size: defaultFontSize, weight: .regular)
 let characterFont = Font.system(size: 14, weight: .semibold)
