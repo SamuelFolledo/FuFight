@@ -12,7 +12,7 @@ struct HomeView: View {
 
     var body: some View {
         ZStack {
-            fighterView
+//            fighterView
 
             VStack {
                 navigationView
