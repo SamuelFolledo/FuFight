@@ -29,7 +29,7 @@ struct HomeView: View {
             LoadingView(message: vm.loadingMessage)
         }
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -900)
         }
         .safeAreaInset(edge: .bottom) {
             HStack {

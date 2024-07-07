@@ -35,7 +35,7 @@ struct GameLoadingView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -900)
         }
         .safeAreaInset(edge: .bottom) {
             cancelButton

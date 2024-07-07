@@ -52,7 +52,7 @@ struct UpdatePasswordView: View {
             hideKeyboard()
         }
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -900)
         }
         .navigationBarHidden(true)
     }

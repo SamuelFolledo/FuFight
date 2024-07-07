@@ -35,7 +35,7 @@ struct SchoolView: View {
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -1300)
         }
         .onAppear {
             vm.onAppear()

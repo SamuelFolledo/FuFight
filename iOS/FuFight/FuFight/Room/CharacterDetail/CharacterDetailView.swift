@@ -34,7 +34,7 @@ struct CharacterDetailView: View {
             LoadingView(message: vm.loadingMessage)
         }
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -500)
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
