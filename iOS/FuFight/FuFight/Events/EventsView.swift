@@ -35,7 +35,7 @@ struct EventsView: View {
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -1700)
         }
         .onAppear {
             vm.onAppear()

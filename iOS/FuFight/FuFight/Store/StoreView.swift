@@ -33,7 +33,7 @@ struct StoreView: View {
                 LoadingView(message: vm.loadingMessage)
             }
             .background {
-                AnimatingBackgroundView(animate: true)
+                AnimatingBackgroundView(animate: true, leadingPadding: -100)
             }
             .safeAreaInset(edge: .bottom) {
                 VStack {

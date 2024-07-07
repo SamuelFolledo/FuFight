@@ -10,11 +10,14 @@ import SwiftUI
 struct AnimatingBackgroundView: View {
 
     @State var animate: Bool = false
+    var leadingPadding: CGFloat = 0
+
     let animation: Animation = Animation.linear(duration: 60.0).repeatForever(autoreverses: false)
 
     var body: some View {
         GeometryReader { geo in
             backgroundImage
+                .padding(.leading, leadingPadding)
                 .overlay {
                     HStack(spacing: -1) {
                         backgroundOverImage

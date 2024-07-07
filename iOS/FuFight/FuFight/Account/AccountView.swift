@@ -58,7 +58,7 @@ struct AccountView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .background {
-            AnimatingBackgroundView(animate: true)
+            AnimatingBackgroundView(animate: true, leadingPadding: -900)
         }
         .onTapGesture {
             hideKeyboard()
