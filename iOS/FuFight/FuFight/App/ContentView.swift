@@ -122,20 +122,24 @@ struct ContentView: View {
         }
     }
 
-    func homeBottomView() -> some View {
-        HStack {
-            Image(Room.current?.player.fighterType.headShotImageName ?? "")
-                .defaultImageModifier()
-
-            Spacer()
+    @ViewBuilder func homeBottomView() -> some View {
+        if tab != .collections {
+            HStack {
+                Image(Room.current?.player.fighterType.headShotImageName ?? "")
+                    .defaultImageModifier()
+                
+                Spacer()
+            }
+            .background {
+                Color.clear
+            }
+            //        .frame(height: tab.bottomViewHeight)
+            .frame(height: homeBottomViewHeight)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, smallerHorizontalPadding)
+            .allowsHitTesting(false)
+            .transition(.move(edge: .bottom))
         }
-        .background {
-            Color.clear
-        }
-        .frame(height: tab.bottomViewHeight)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, smallerHorizontalPadding)
-        .allowsHitTesting(false)
     }
 
 //    var characterDetailView: some View {
