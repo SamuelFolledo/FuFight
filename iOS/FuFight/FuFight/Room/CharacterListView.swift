@@ -41,6 +41,9 @@ struct CharacterObjectCell: View {
                 VStack {
                     Image(character.fighterType.headShotImageName)
                         .defaultImageModifier()
+
+//                    Spacer() //Uncomment to add more vertical space on each cell
+//                        .frame(height: 200)
                 }
                 .overlay {
                     VStack {
@@ -93,11 +96,10 @@ struct CharacterObjectCell: View {
 
     var coinButton: some View {
         Button(action: {
-            TODO("Buy with coin \(character.fighterType.name)")
+            TODO("Buy fighter \(character.fighterType.name) with COIN \(character.fighterType.name)")
         }, label: {
             HStack(spacing: 2) {
-                Image("coin")
-                    .defaultImageModifier()
+                coinImage
                     .frame(width: 15, height: 15, alignment: .center)
 
                 Text("6999")
@@ -111,11 +113,10 @@ struct CharacterObjectCell: View {
 
     var diamondButton: some View {
         Button(action: {
-            TODO("Buy with cash \(character.fighterType.name)")
+            TODO("Buy fighter \(character.fighterType.name) with DIAMOND \(character.fighterType.name)")
         }, label: {
             HStack(spacing: 2) {
-                Image("diamond")
-                    .defaultImageModifier()
+                diamondImage
                     .frame(width: 15, height: 15, alignment: .center)
 
                 Text("750")
