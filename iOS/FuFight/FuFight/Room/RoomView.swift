@@ -9,7 +9,9 @@ import SwiftUI
 
 struct RoomView: View {
     @StateObject var vm: RoomViewModel
-    
+
+    private let bottomOffsetPadding: CGFloat = 24
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             ScrollViewReader { value in
@@ -21,16 +23,21 @@ struct RoomView: View {
 
                         VStack {
                             CharacterListView(selectedFighterType: $vm.selectedFighterType)
+                                .padding(.horizontal, smallerHorizontalPadding)
                         }
+                        .padding(.bottom, homeBottomViewHeight)
                     }
                     .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                     .padding(.top, UserDefaults.topSafeAreaInset + 6)
-                    .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
+                    .padding(.bottom, UserDefaults.bottomSafeAreaInset - charactersBottomButtonsHeight + bottomOffsetPadding)
                 }
             }
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
+        }
+        .overlay {
+            bottomButtonsView
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
@@ -64,6 +71,21 @@ struct RoomView: View {
             }
         }
         .padding(.horizontal, smallerHorizontalPadding)
+    }
+
+    var bottomButtonsView: some View {
+        VStack {
+            Spacer()
+
+            Color.white
+                .padding(.horizontal, smallerHorizontalPadding)
+                .frame(height: charactersBottomButtonsHeight)
+                .frame(maxWidth: .infinity)
+
+            Spacer()
+                .frame(height: UserDefaults.bottomSafeAreaInset + charactersBottomButtonsHeight + bottomOffsetPadding)
+        }
+        .allowsHitTesting(false)
     }
 }
 

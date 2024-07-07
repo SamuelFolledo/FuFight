@@ -39,6 +39,10 @@ let defaultMaxTime: Int = 5
 let defaultMaxHp: CGFloat = 100
 let defaultEnemyHp: CGFloat = 100
 let fighterCellSize: CGFloat = 80
+let characterItemSpacing: CGFloat = 2
+let characterItemBorderWidth: CGFloat = 5
+let homeBottomViewHeight: CGFloat = 120
+let charactersBottomButtonsHeight: CGFloat = 40
 
 var animationToTest: AnimationType = .punchHeadRightHard
 

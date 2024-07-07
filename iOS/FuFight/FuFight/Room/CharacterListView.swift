@@ -9,11 +9,10 @@ import SwiftUI
 
 struct CharacterListView: View {
     @Binding var selectedFighterType: FighterType?
-    let itemSpacing: CGFloat = 2
-    let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: 2), count: 3)
+    let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: characterItemSpacing), count: 3)
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: itemSpacing) {
+        LazyVGrid(columns: columns, spacing: characterItemSpacing) {
             ForEach(characters, id: \.self) { character in
                 CharacterObjectCell(character: character, isSelected: character.id == selectedFighterType?.id) {
                     LOGD("CHARACTER SELECTED \(character.fighterType.name)")
@@ -21,7 +20,6 @@ struct CharacterListView: View {
                 }
             }
         }
-        .padding()
     }
 }
 
@@ -29,8 +27,6 @@ struct CharacterObjectCell: View {
     var character: CharacterObject
     var isSelected: Bool
     var action: () -> Void
-
-    private let borderWidth: CGFloat = 5
 
     init(character: CharacterObject, isSelected: Bool, action: @escaping () -> Void) {
         UITableViewCell.appearance().backgroundColor = .clear
@@ -87,8 +83,8 @@ struct CharacterObjectCell: View {
                     .padding(.bottom, 4)
             }
             .background(Color.black)
-            .padding(borderWidth)
-            .border(.yellow, width: isSelected ? borderWidth : 0)
+            .padding(characterItemBorderWidth)
+            .border(.yellow, width: isSelected ? characterItemBorderWidth : 0)
             .minimumScaleFactor(0.3)
             .lineLimit(1)
         })
