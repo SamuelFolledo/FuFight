@@ -32,10 +32,9 @@ struct StoreView: View {
             .overlay {
                 LoadingView(message: vm.loadingMessage)
             }
-            .background(
-                backgroundImage
-                    .padding(.leading, 30)
-            )
+            .background {
+                AnimatingBackgroundView(animate: true)
+            }
             .safeAreaInset(edge: .bottom) {
                 VStack {
 //                    playButton

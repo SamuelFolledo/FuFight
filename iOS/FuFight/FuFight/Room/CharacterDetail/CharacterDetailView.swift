@@ -27,16 +27,15 @@ struct CharacterDetailView: View {
 
                 fightersView
             }
-            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 40)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
         }
-        .background(
-            backgroundImage
-                .padding(.leading, 30)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
         .onAppear {

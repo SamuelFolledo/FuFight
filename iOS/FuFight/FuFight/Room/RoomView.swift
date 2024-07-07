@@ -39,10 +39,9 @@ struct RoomView: View {
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
-        .background(
-            backgroundImage
-                .padding(.leading, 30)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .onAppear {
             vm.onAppear()
         }

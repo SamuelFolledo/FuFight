@@ -24,7 +24,7 @@ struct EventsView: View {
                         }
                     }
                     .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                    .padding(.top, UserDefaults.topSafeAreaInset + 6)
+                    .padding(.top, homeNavBarHeight + 6)
                     .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
                 }
             }
@@ -34,10 +34,9 @@ struct EventsView: View {
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
-        .background(
-            backgroundImage
-                .padding(.leading, 30)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .onAppear {
             vm.onAppear()
         }
