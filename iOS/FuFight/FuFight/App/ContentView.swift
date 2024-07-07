@@ -46,6 +46,15 @@ enum Tab: String, CaseIterable, Identifiable {
             "party.popper"
         }
     }
+
+    var bottomViewHeight: CGFloat {
+        switch self {
+        case .store, .home, .school, .events:
+            homeBottomViewHeight
+        case .collections:
+            0
+        }
+    }
 }
 
 ///Root view that handles which view to show
@@ -79,14 +88,21 @@ struct ContentView: View {
                         Spacer()
 
                         if showTab {
-                            //MARK: - TabBar
-                            HStack(alignment: .bottom, spacing: 1) {
-                                ForEach(tabs, id: \.self) { currentTab in
-                                    tabBarItem(currentTab, reader: reader)
+                            VStack(spacing: 4) {
+                                Spacer()
+
+                                //TODO: Add FighterType and buttons overlay
+                                homeBottomView()
+
+                                //MARK: - TabBar
+                                HStack(alignment: .bottom, spacing: 1) {
+                                    ForEach(tabs, id: \.self) { currentTab in
+                                        tabBarItem(currentTab, reader: reader)
+                                    }
                                 }
+                                .transition(.move(edge: .bottom))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
-                            .transition(.move(edge: .bottom))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                     }
                 }
@@ -104,6 +120,22 @@ struct ContentView: View {
                 createAuthenticationView(step: .logIn)
             }
         }
+    }
+
+    func homeBottomView() -> some View {
+        HStack {
+            Image(Room.current?.player.fighterType.headShotImageName ?? "")
+                .defaultImageModifier()
+
+            Spacer()
+        }
+        .background {
+            Color.clear
+        }
+        .frame(height: tab.bottomViewHeight)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, smallerHorizontalPadding)
+        .allowsHitTesting(false)
     }
 
 //    var characterDetailView: some View {
