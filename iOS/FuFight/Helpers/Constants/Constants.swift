@@ -43,6 +43,8 @@ let characterItemSpacing: CGFloat = 2
 let characterItemBorderWidth: CGFloat = 5
 let homeBottomViewHeight: CGFloat = 120
 let charactersBottomButtonsHeight: CGFloat = 40
+let homeNavBarHeight: CGFloat = 100
+let navBarIconSize: CGFloat = 25
 
 var animationToTest: AnimationType = .punchHeadRightHard
 
@@ -60,6 +62,7 @@ let boldedButtonFont = buttonFont.weight(.bold)
 let mediumTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
 let largeTitleFont = Font.system(size: defaultFontSize * 4, weight: .bold)
 let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
+let navBarFont = Font.system(size: 13, weight: .semibold)
 
 //Colors
 let systemUiColor = UIColor.label
@@ -88,6 +91,7 @@ let currencyBackgroundImage: some View = Image("currencyBackground").defaultImag
 let navBarBackgroundImage: some View = Image("navBarBackground").defaultImageModifier()
 let cityBackgroundImage: some View = Image("cityBackground").defaultImageModifier()
 let timerBackgroundImage: some View = Image("timerBackground").defaultImageModifier()
+let navBarContainerImage: some View = Image("navBarContainer").containerImageModifier()
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()

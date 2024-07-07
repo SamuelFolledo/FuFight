@@ -1,15 +1,17 @@
 {
   "images" : [
     {
+      "filename" : "navBarBackground.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "navBarBackground@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "navBarView.png",
+      "filename" : "navBarBackground@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

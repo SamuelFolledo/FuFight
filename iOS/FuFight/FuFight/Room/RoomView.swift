@@ -17,8 +17,6 @@ struct RoomView: View {
             ScrollViewReader { value in
                 ZStack {
                     VStack {
-                        navigationView
-
                         Spacer()
 
                         VStack {
@@ -28,7 +26,7 @@ struct RoomView: View {
                         .padding(.bottom, homeBottomViewHeight)
                     }
                     .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                    .padding(.top, UserDefaults.topSafeAreaInset + 6)
+                    .padding(.top, homeNavBarHeight + 6)
                     .padding(.bottom, UserDefaults.bottomSafeAreaInset - charactersBottomButtonsHeight + bottomOffsetPadding)
                 }
             }
@@ -52,25 +50,6 @@ struct RoomView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-    }
-
-    var navigationView: some View {
-        ZStack {
-            HStack {
-                Spacer()
-            }
-
-            HStack {
-                Spacer()
-
-                Text("\(vm.selectedFighterType?.name ?? "")")
-                    .font(mediumTitleFont)
-                    .foregroundStyle(.white)
-
-                Spacer()
-            }
-        }
-        .padding(.horizontal, smallerHorizontalPadding)
     }
 
     var bottomButtonsView: some View {

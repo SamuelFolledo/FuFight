@@ -22,7 +22,7 @@ struct HomeView: View {
                 }
                 .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             }
-            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {

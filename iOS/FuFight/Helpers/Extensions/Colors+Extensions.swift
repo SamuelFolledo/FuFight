@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+import UIKit
+
+extension UIColor {
+    static let mainColor: UIColor = UIColor(red: 16, green: 29, blue: 77, alpha: 1)
+}
+
 
 ///UIKit system Color extension
 ///Source: https://stackoverflow.com/a/64414674
 extension Color {
+    static let mainColor = Color(UIColor.mainColor)
+
     // MARK: - Text Colors
     static let lightText = Color(UIColor.lightText)
     static let darkText = Color(UIColor.darkText)
