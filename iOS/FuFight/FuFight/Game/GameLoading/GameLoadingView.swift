@@ -20,7 +20,7 @@ struct GameLoadingView: View {
                    message: vm.alertMessage,
                    isPresented: $vm.isAlertPresented)
             .padding(.horizontal, horizontalPadding)
-            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .frame(maxWidth: .infinity)
@@ -34,10 +34,9 @@ struct GameLoadingView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-        .background(
-            backgroundImage
-                .padding(.trailing, 400)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .safeAreaInset(edge: .bottom) {
             cancelButton
         }

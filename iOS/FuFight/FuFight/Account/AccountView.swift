@@ -44,7 +44,7 @@ struct AccountView: View {
                    title: Str.recentReauthenticationIsRequiredToMakeChanges,
                    primaryButton: AlertButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
-            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
@@ -57,10 +57,9 @@ struct AccountView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-        .background(
-            backgroundImage
-                .padding(.trailing, 600)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .onTapGesture {
             hideKeyboard()
         }

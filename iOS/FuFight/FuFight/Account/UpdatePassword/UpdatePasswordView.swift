@@ -28,7 +28,7 @@ struct UpdatePasswordView: View {
                 .padding(.horizontal, horizontalPadding)
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-            .padding(.top, UserDefaults.topSafeAreaInset + 6)
+            .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
@@ -51,10 +51,9 @@ struct UpdatePasswordView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .background(
-            backgroundImage
-                .padding(.trailing, 800)
-        )
+        .background {
+            AnimatingBackgroundView(animate: true)
+        }
         .navigationBarHidden(true)
     }
 

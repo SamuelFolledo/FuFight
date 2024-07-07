@@ -84,6 +84,7 @@ let blackColor = Color.black
 //Backgrounds
 let backgroundUiImage = UIImage(named: "homeBackground")!
 let backgroundImage: some View = Image(uiImage: backgroundUiImage).backgroundImageModifier()
+let backgroundOverImage: some View = Image("homeBackgroundOverlay").backgroundImageModifier()
 let gameBackgroundUiImage = UIImage(named: "gameBackground")!
 let gameBackgroundImage: some View = Image(uiImage: gameBackgroundUiImage).backgroundImageModifier()
 let accountBackgroundImage: some View = Image("accountImageBackground").defaultImageModifier()
