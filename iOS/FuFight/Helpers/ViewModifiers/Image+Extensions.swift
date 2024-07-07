@@ -18,6 +18,11 @@ extension Image {
             .aspectRatio(contentMode: .fill)
     }
 
+    func navBarBackgroundImageModifier() -> some View {
+        self.resizable()
+            .aspectRatio(contentMode: .fill)
+    }
+
     func backgroundImageModifier() -> some View {
         self.resizable()
             .aspectRatio(contentMode: .fill)

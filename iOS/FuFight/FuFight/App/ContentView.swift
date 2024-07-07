@@ -85,6 +85,8 @@ struct ContentView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never)) //adds swipe gesture and sliding effect when switching between tabs
                 .overlay {
                     VStack {
+                        navBarView()
+
                         Spacer()
 
                         if showTab {
@@ -122,12 +124,47 @@ struct ContentView: View {
         }
     }
 
+    @ViewBuilder func navBarView() -> some View {
+        if tab != .collections {
+            VStack {
+                Color.black
+                    .frame(height: UserDefaults.topSafeAreaInset)
+                    .frame(maxWidth: .infinity)
+                    .mask(LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .bottom, endPoint: .top))
+
+                HStack {
+                    Color.clear
+
+                    HStack {
+                        Color.yellow
+
+
+                        Color.blue
+                    }
+                }
+                .padding(.bottom, 4)
+            }
+            .frame(height: 100)
+            .frame(maxWidth: .infinity)
+            .allowsHitTesting(false)
+            .transition(.move(edge: .top))
+            .background {
+                VStack(spacing: 0) {
+
+                    Image("navBarBackground")
+                        .navBarBackgroundImageModifier()
+
+                }
+            }
+        }
+    }
+
     @ViewBuilder func homeBottomView() -> some View {
         if tab != .collections {
             HStack {
                 Image(Room.current?.player.fighterType.headShotImageName ?? "")
                     .defaultImageModifier()
-                
+
                 Spacer()
             }
             .background {
