@@ -126,7 +126,9 @@ struct ContentView: View {
                 .mask(LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .bottom, endPoint: .top))
 
             HStack {
-                Color.white
+                UsernameView()
+
+                Spacer()
 
                 HStack(spacing: 12) {
                     Button(action: {

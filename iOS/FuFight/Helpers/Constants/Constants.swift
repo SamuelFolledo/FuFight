@@ -15,7 +15,7 @@ import SceneKit
 //MARK: Firebase Auth constants
 let auth = Auth.auth()
 
-let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com:443/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FNbJGeGskGZb1BT7m9NYm5l87mps1.jpg?alt=media&token=29b66d7a-bd94-42b6-9a77-c1dcfd2accb8")!
+let fakePhotoUrl = URL(string: "https://firebasestorage.googleapis.com/v0/b/fufight-51d75.appspot.com/o/Accounts%2FPhotos%2FqFLqUnDkyVZTAT1cH6WIThWjzMq1.jpg?alt=media&token=dcd076a4-afca-47fc-95fb-870bc285a23f")!
 let fakeAccount = Account()
 
 
@@ -43,7 +43,7 @@ let characterItemSpacing: CGFloat = 2
 let characterItemBorderWidth: CGFloat = 5
 let homeBottomViewHeight: CGFloat = 120
 let charactersBottomButtonsHeight: CGFloat = 40
-let homeNavBarHeight: CGFloat = 100
+let homeNavBarHeight: CGFloat = 120
 let navBarIconSize: CGFloat = 25
 
 var animationToTest: AnimationType = .punchHeadRightHard
@@ -63,6 +63,7 @@ let mediumTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
 let largeTitleFont = Font.system(size: defaultFontSize * 4, weight: .bold)
 let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
 let navBarFont = Font.system(size: 13, weight: .semibold)
+let usernameFont = Font.system(size: 18, weight: .semibold)
 
 //Colors
 let systemUiColor = UIColor.label
@@ -93,6 +94,7 @@ let navBarBackgroundImage: some View = Image("navBarBackground").defaultImageMod
 let cityBackgroundImage: some View = Image("cityBackground").defaultImageModifier()
 let timerBackgroundImage: some View = Image("timerBackground").defaultImageModifier()
 let navBarContainerImage: some View = Image("navBarContainer").containerImageModifier()
+let yellowRingImage: some View = Image("yellowRing").containerImageModifier()
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()
