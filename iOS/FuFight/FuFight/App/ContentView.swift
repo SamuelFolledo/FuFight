@@ -46,15 +46,6 @@ enum Tab: String, CaseIterable, Identifiable {
             "party.popper"
         }
     }
-
-    var bottomViewHeight: CGFloat {
-        switch self {
-        case .store, .home, .school, .events:
-            homeBottomViewHeight
-        case .collections:
-            0
-        }
-    }
 }
 
 ///Root view that handles which view to show
@@ -64,6 +55,7 @@ struct ContentView: View {
     @StateObject var homeRouter: HomeRouter = HomeRouter()
     @StateObject var account: Account = Account.current ?? Account()
     @State var showTab: Bool = true
+    @State var showNav: Bool = true
     @State var tab: Tab = .home
     private let tabs: [Tab] = Tab.allCases
     var subscriptions = Set<AnyCancellable>()
@@ -85,7 +77,9 @@ struct ContentView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never)) //adds swipe gesture and sliding effect when switching between tabs
                 .overlay {
                     VStack {
-                        navBarView()
+                        if showNav {
+                            navBarView()
+                        }
 
                         Spacer()
 
@@ -191,7 +185,10 @@ struct ContentView: View {
     }
 
     @ViewBuilder func homeBottomView() -> some View {
-        if tab != .collections {
+        switch tab {
+        case .store, .collections:
+            EmptyView()
+        case .home, .school, .events:
             HStack {
                 Image(Room.current?.player.fighterType.headShotImageName ?? "")
                     .defaultImageModifier()
@@ -281,6 +278,8 @@ struct ContentView: View {
         .onChange(of: homeRouter.navigationPath) { _, newValue in
             withAnimation(.easeInOut(duration: 0.2)) {
                 self.showTab = newValue.isEmpty
+                let isShowingGame = newValue.compactMap { $0.id }.contains("game")
+                self.showNav = !isShowingGame
             }
         }
         .onAppear {
