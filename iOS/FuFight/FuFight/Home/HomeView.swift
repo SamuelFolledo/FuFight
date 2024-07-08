@@ -15,8 +15,6 @@ struct HomeView: View {
 //            fighterView
 
             VStack {
-                navigationView
-
                 VStack {
                     Spacer()
                 }
@@ -54,35 +52,6 @@ struct HomeView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-    }
-
-    var navigationView: some View {
-        ZStack {
-            HStack {
-                accountImage
-
-                Spacer()
-            }
-            
-            HStack {
-                Spacer()
-
-                Text("Welcome \(vm.account.displayName)")
-                    .font(mediumTitleFont)
-                    .foregroundStyle(.white)
-
-                Spacer()
-            }
-        }
-        .padding(.horizontal, smallerHorizontalPadding)
-    }
-
-    var accountImage: some View {
-        Button {
-            vm.transitionToAccount.send(vm)
-        } label: {
-            AccountImage(url: vm.account.photoUrl, radius: 30)
-        }
     }
 
     var playButton: some View {

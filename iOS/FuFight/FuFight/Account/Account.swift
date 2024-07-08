@@ -40,6 +40,7 @@ class Account: ObservableObject, Codable {
     ///Use this initializer for previews only
     init() {
         LOGD("Fake account initialized", from: Account.self)
+        id = "fakeId"
         photoUrl = fakePhotoUrl
         email = "samuelfolledo@gmail.com"
         username = "Fake Samuel"
