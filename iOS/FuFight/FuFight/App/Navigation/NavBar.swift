@@ -14,7 +14,7 @@ struct NavBar: View {
             statusBarView
 
             HStack {
-                UsernameView()
+                UsernameView(photoUrl: Room.current?.player.photoUrl)
 
                 Spacer()
 

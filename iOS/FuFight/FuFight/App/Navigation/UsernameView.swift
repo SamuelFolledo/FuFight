@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct UsernameView: View {
+    let photoUrl: URL?
+    private let imageHeight: CGFloat = 38
+
     var body: some View {
         HStack(spacing: 0) {
             userImage
@@ -27,7 +30,13 @@ struct UsernameView: View {
         } label: {
             accountBackgroundImage
                 .overlay {
-                    AccountImage(url: Room.current?.player.photoUrl, radius: 38)
+                    if let photoUrl {
+                        AccountImage(url: photoUrl, radius: imageHeight)
+                    } else {
+                        Image(uiImage: defaultProfilePhoto)
+                            .defaultImageModifier()
+                            .frame(height: imageHeight)
+                    }
                 }
                 .overlay(alignment: .bottomTrailing) {
                     RoundedExperienceBarView()
@@ -44,7 +53,7 @@ struct UsernameView: View {
 }
 
 #Preview {
-    UsernameView()
+    UsernameView(photoUrl: fakePhotoUrl)
         .frame(height: 100)
         .background { Color.black }
 }
