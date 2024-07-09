@@ -288,7 +288,7 @@ private extension ContentView {
             Button(action: { withAnimation(.easeInOut) {
                 tab = currentTab
             }}) {
-                VStack {
+                VStack(spacing: 2) {
                     Spacer()
                         .frame(height: 12)
 
