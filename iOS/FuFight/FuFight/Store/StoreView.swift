@@ -11,42 +11,30 @@ struct StoreView: View {
     @StateObject var vm: StoreViewModel
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView {
-                ZStack {
-                    VStack {
-                        navigationView
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack {
+                Spacer()
 
-                        VStack {
-
-                            Spacer()
-                        }
-                        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                        .padding()
-                    }
-                    .padding(.top, UserDefaults.topSafeAreaInset)
-                    .padding(.bottom, UserDefaults.bottomSafeAreaInset)
-                }
-            }
-            .edgesIgnoringSafeArea([.bottom, .leading, .trailing])
-            .overlay {
-                LoadingView(message: vm.loadingMessage)
-            }
-            .background {
-                AnimatingBackgroundView(animate: true, leadingPadding: -100)
-            }
-            .safeAreaInset(edge: .bottom) {
                 VStack {
-//                    playButton
-//
-//                    offlinePlayButton
-//
-//                    practiceButton
+
                 }
-                .padding(.bottom)
+
+                Spacer()
             }
-            .navigationBarHidden(true)
-            .frame(maxWidth: .infinity)
+            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+            .background {
+                Color.black
+            }
+        }
+        .overlay {
+            LoadingView(message: vm.loadingMessage)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, homeNavBarHeight + 6)
+        .padding(.bottom, homeTabBarHeight)
+        .navigationBarHidden(true)
+        .background {
+            AnimatingBackgroundView(animate: true, leadingPadding: -1300)
         }
         .onAppear {
             vm.onAppear()
@@ -56,50 +44,6 @@ struct StoreView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
     }
-
-    var navigationView: some View {
-        HStack {
-            Spacer()
-
-            Text("Store")
-                .font(mediumTitleFont)
-                .foregroundStyle(.white)
-
-            Spacer()
-        }
-        .padding(.horizontal, smallerHorizontalPadding)
-    }
-
-    var accountImage: some View {
-        NavigationLink(destination: AccountView(vm: AccountViewModel(account: vm.account))) {
-            AccountImage(url: vm.account.photoUrl, radius: 30)
-        }
-    }
-
-    //    var playButton: some View {
-    //        Button {
-    //            vm.transitionToLoading.send(vm)
-    //        } label: {
-    //            Image("playButton")
-    //                .frame(width: 200)
-    //        }
-    //    }
-
-    //    var offlinePlayButton: some View {
-    //        Button {
-    //            vm.transitionToOffline.send(vm)
-    //        } label: {
-    //            Text("Offline Play")
-    //                .padding(6)
-    //                .frame(maxWidth: .infinity)
-    //                .foregroundStyle(Color(uiColor: .systemBackground))
-    //                .font(.title)
-    //                .background(Color(uiColor: .label))
-    //                .clipShape(RoundedRectangle(cornerRadius: 16))
-    //        }
-    //        .padding(.horizontal)
-    //        .padding(.bottom, 4)
-    //    }
 }
 
 #Preview {
