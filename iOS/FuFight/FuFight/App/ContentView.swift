@@ -88,7 +88,7 @@ struct ContentView: View {
                                 Spacer()
 
                                 //TODO: Add FighterType and buttons overlay
-                                homeBottomView()
+                                homeBottomView(reader)
 
                                 //MARK: - TabBar
                                 HStack(alignment: .bottom, spacing: 1) {
@@ -118,14 +118,15 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder func homeBottomView() -> some View {
+    @ViewBuilder func homeBottomView(_ reader: GeometryProxy) -> some View {
         switch tab {
         case .store, .collections:
             EmptyView()
         case .home, .school, .events:
             HStack {
-                Image(Room.current?.player.fighterType.headShotImageName ?? "")
+                Image(Room.current?.player.fighterType.headShotImageName ?? FighterType.samuel.headShotImageName)
                     .defaultImageModifier()
+                    .frame(width: reader.size.width / 4)
 
                 Spacer()
             }

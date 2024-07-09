@@ -12,28 +12,27 @@ struct SchoolView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            ScrollViewReader { value in
-                ZStack {
-                    VStack {
-                        navigationView
+            VStack {
+                Spacer()
 
-                        Spacer()
+                VStack {
 
-                        VStack {
-                            
-                        }
-                    }
-                    .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                    .padding(.top, homeNavBarHeight + 6)
-                    .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
                 }
+
+                Spacer()
+            }
+            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+            .background {
+                Color.black
             }
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
         }
-        .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
+        .padding(.top, homeNavBarHeight + 6)
+        .padding(.bottom, homeTabBarHeight)
+        .navigationBarHidden(true)
         .background {
             AnimatingBackgroundView(animate: true, leadingPadding: -1300)
         }
@@ -44,25 +43,19 @@ struct SchoolView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
-    }
-
-    var navigationView: some View {
-        ZStack {
-            HStack {
-                Spacer()
-            }
-
-            HStack {
-                Spacer()
-
-                Text("School coming soon")
-                    .font(mediumTitleFont)
-                    .foregroundStyle(.white)
-
-                Spacer()
-            }
+        .overlay {
+            Color.black
+                .opacity(0.6)
+                .padding(.top, homeNavBarHeight + 6)
+                .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
+                .overlay {
+                    Text("School games coming soon")
+                        .font(mediumTitleFont)
+                        .foregroundStyle(.white)
+                        .frame(alignment: .center)
+                        .padding(.horizontal)
+                }
         }
-        .padding(.horizontal, smallerHorizontalPadding)
     }
 }
 
