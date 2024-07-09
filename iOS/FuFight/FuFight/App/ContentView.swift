@@ -78,7 +78,7 @@ struct ContentView: View {
                 .overlay {
                     VStack {
                         if showNav {
-                            navBarView()
+                            NavBar()
                         }
 
                         Spacer()
@@ -114,74 +114,6 @@ struct ContentView: View {
             case .loggedOut:
                 //Log in
                 createAuthenticationView(step: .logIn)
-            }
-        }
-    }
-
-    @ViewBuilder func navBarView() -> some View {
-        VStack {
-            Color.black
-                .frame(height: UserDefaults.topSafeAreaInset)
-                .frame(maxWidth: .infinity)
-                .mask(LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .bottom, endPoint: .top))
-
-            HStack {
-                UsernameView()
-
-                Spacer()
-
-                HStack(spacing: 12) {
-                    Button(action: {
-                        TODO("Buying more coins")
-                    }, label: {
-                        HStack(spacing: 2) {
-                            coinImage
-                                .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
-
-                            Text("812999")
-                                .font(navBarFont)
-                                .foregroundStyle(Color.white)
-
-                            Spacer()
-                        }
-                    })
-                    .background {
-                        navBarContainerImage
-                    }
-
-                    Button(action: {
-                        TODO("Buy diamonds")
-                    }, label: {
-                        HStack(spacing: 2) {
-                            diamondImage
-                                .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
-
-                            Text("209")
-                                .font(navBarFont)
-                                .foregroundStyle(Color.white)
-                                .frame(alignment: .center)
-
-                            Spacer()
-                        }
-                    })
-                    .background {
-                        navBarContainerImage
-                    }
-                }
-            }
-            .lineLimit(1)
-            .minimumScaleFactor(0.7)
-            .padding(.bottom, 4)
-            .padding(.horizontal, 8)
-        }
-        .frame(height: homeNavBarHeight)
-        .frame(maxWidth: .infinity)
-        .transition(.move(edge: .top))
-        .background {
-            VStack(spacing: 0) {
-                Image("navBarBackground")
-                    .navBarBackgroundImageModifier()
-
             }
         }
     }

@@ -15,11 +15,14 @@ struct HomeView: View {
 //            fighterView
 
             VStack {
-                VStack {
+                HStack {
                     Spacer()
+
+                    FriendPickerView()
+                        .frame(width: 200, height: 300)
                 }
-                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             }
+            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }

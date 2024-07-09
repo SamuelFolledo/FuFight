@@ -47,6 +47,15 @@ class HomeRouter: ObservableObject {
         UITabBar.appearance().backgroundImage = UIImage()
         //Change TabItem (text + icon) color
         UITabBar.appearance().unselectedItemTintColor = UIColor.gray
+
+        // Sets the background color of the Picker
+        UISegmentedControl.appearance().backgroundColor = .black.withAlphaComponent(0.15)
+        // Disappears the divider
+        UISegmentedControl.appearance().setDividerImage(UIImage(), forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
+        // Changes the color for the selected item
+        UISegmentedControl.appearance().selectedSegmentTintColor = .yellow
+        // Changes the text color for the selected item
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
     }
 
     //MARK: - Home Methods
