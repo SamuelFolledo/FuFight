@@ -42,20 +42,22 @@ class HomeRouter: ObservableObject {
     var subscriptions = Set<AnyCancellable>()
 
     init() {
+        // Sets the background color of the Picker
+        UISegmentedControl.appearance().backgroundColor = .black.withAlphaComponent(0.8)
+        // Disappears the divider
+        UISegmentedControl.appearance().setDividerImage(UIImage(), forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
+        // Changes the color for the selected item
+        UISegmentedControl.appearance().selectedSegmentTintColor = .systemYellow
+        // Changes the text color for the selected item
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white, .font: friendListFont], for: .selected)
+        // Changes the text color for the unselected item
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.lightGray, .font: friendListFont], for: .normal)
+
         //Change TabView background color
         UITabBar.appearance().backgroundColor = UIColor.clear
         UITabBar.appearance().backgroundImage = UIImage()
         //Change TabItem (text + icon) color
         UITabBar.appearance().unselectedItemTintColor = UIColor.gray
-
-        // Sets the background color of the Picker
-        UISegmentedControl.appearance().backgroundColor = .black.withAlphaComponent(0.15)
-        // Disappears the divider
-        UISegmentedControl.appearance().setDividerImage(UIImage(), forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
-        // Changes the color for the selected item
-        UISegmentedControl.appearance().selectedSegmentTintColor = .yellow
-        // Changes the text color for the selected item
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
     }
 
     //MARK: - Home Methods

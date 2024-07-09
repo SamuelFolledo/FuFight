@@ -11,20 +11,23 @@ struct HomeView: View {
     @StateObject var vm: HomeViewModel
 
     var body: some View {
-        ZStack {
-//            fighterView
+        GeometryReader { reader in
+            ZStack {
+                //            fighterView
 
-            VStack {
-                HStack {
-                    Spacer()
+                VStack {
+                    HStack {
+                        Spacer()
 
-                    FriendPickerView()
-                        .frame(width: 200, height: 300)
+                        FriendPickerView()
+                            .frame(width: reader.size.width / 2, height: abs(reader.size.height - homeNavBarHeight) / 3)
+                            .padding(.trailing, smallerHorizontalPadding)
+                    }
                 }
+                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                .padding(.top, homeNavBarHeight + 6)
+                .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
             }
-            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-            .padding(.top, homeNavBarHeight + 6)
-            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)

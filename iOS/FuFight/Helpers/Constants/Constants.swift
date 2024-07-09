@@ -32,8 +32,8 @@ let accountPhotoStorage = storage.child(kACCOUNTS).child(kPHOTOS)
 
 //Constant values
 let accountPhotoCompressionQuality: Double = 0.3
-let smallerHorizontalPadding: CGFloat = 18
-let horizontalPadding: CGFloat = 36
+let smallerHorizontalPadding: CGFloat = 12
+let horizontalPadding: CGFloat = 24
 let accountImagePickerHeight: CGFloat = 160
 let defaultMaxTime: Int = 5
 let defaultMaxHp: CGFloat = 100
@@ -64,6 +64,7 @@ let largeTitleFont = Font.system(size: defaultFontSize * 4, weight: .bold)
 let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
 let navBarFont = Font.system(size: 13, weight: .semibold)
 let usernameFont = Font.system(size: 18, weight: .semibold)
+let friendListFont = UIFont.systemFont(ofSize: defaultFontSize, weight: .semibold)
 
 //Colors
 let systemUiColor = UIColor.label

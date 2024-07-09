@@ -13,7 +13,7 @@ struct FriendPickerView: View {
     private let recentFriends: [Friend] = fakeFriends
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Picker("", selection: $selectedTab) {
                 Text("Following").tag(0)
                 Text("Recent").tag(1)
@@ -38,63 +38,62 @@ struct FriendListView: View {
     private let imageHeight: CGFloat = 30
 
     var body: some View {
-        ScrollView() {
-            ScrollViewReader { value in
-                LazyVStack {
-                    ForEach(friends, id: \.username) { friend in
-                        Button {
-                            TODO("Implement following list for \(friend.username)")
-                        } label: {
-                            HStack {
-                                accountBackgroundImage
-                                    .overlay {
-                                        if let photoUrl = friend.photoUrl {
-                                            AccountImage(url: photoUrl, radius: imageHeight)
-                                        } else {
-                                            Image(uiImage: defaultProfilePhoto)
-                                                .defaultImageModifier()
-                                        }
-                                    }
-                                    .overlay(alignment: .bottomTrailing) {
-                                        RoundedExperienceBarView()
-                                    }
-
-                                VStack(alignment: .leading) {
-                                    Text(friend.username)
-                                        .font(characterDetailFont)
-                                        .foregroundStyle(Color.white)
-
-                                    switch friend.status {
-                                    case .offline:
-                                        Text(friend.description)
-                                            .font(characterDetailFont)
-                                            .foregroundStyle(Color.systemGray)
-                                    case .online:
-                                        Text(friend.description)
-                                            .font(characterDetailFont)
-                                            .foregroundStyle(friend.statusDetail.isEmpty ? Color.green : Color.orange)
+        ScrollView(showsIndicators: false) {
+            LazyVStack {
+                ForEach(friends, id: \.username) { friend in
+                    Button {
+                        TODO("Implement following list for \(friend.username)")
+                    } label: {
+                        HStack {
+                            accountBackgroundImage
+                                .overlay {
+                                    if let photoUrl = friend.photoUrl {
+                                        AccountImage(url: photoUrl, radius: imageHeight)
+                                    } else {
+                                        Image(uiImage: defaultProfilePhoto)
+                                            .defaultImageModifier()
                                     }
                                 }
+                                .overlay(alignment: .bottomTrailing) {
+                                    RoundedExperienceBarView()
+                                }
 
-                                Spacer()
+                            VStack(alignment: .leading) {
+                                Text(friend.username)
+                                    .font(characterDetailFont)
+                                    .foregroundStyle(Color.white)
 
-                                Button {
-                                    TODO("Implement challenging \(friend.username)")
-                                } label: {
-                                    Image(systemName: "hand.wave")
-                                        .padding(4)
+                                switch friend.status {
+                                case .offline:
+                                    Text(friend.description)
+                                        .font(characterDetailFont)
+                                        .foregroundStyle(Color.systemGray)
+                                case .online:
+                                    Text(friend.description)
+                                        .font(characterDetailFont)
+                                        .foregroundStyle(friend.statusDetail.isEmpty ? Color.green : Color.orange)
                                 }
                             }
+                            .minimumScaleFactor(0.4)
 
+                            Spacer()
+
+                            Button {
+                                TODO("Implement challenging \(friend.username)")
+                            } label: {
+                                Image(systemName: "hand.wave")
+                                    .padding(4)
+                            }
                         }
-                        .frame(height: 2.0.squareRoot() * imageHeight)
-                        .padding(.leading, 8)
+
                     }
+                    .frame(height: 2.0.squareRoot() * imageHeight)
+                    .padding(.leading, 8)
                 }
             }
             .background {
                 Color.black
-                    .opacity(0.8)
+                    .opacity(0.7)
             }
         }
     }
