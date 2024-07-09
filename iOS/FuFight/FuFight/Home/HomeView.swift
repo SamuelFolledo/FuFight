@@ -11,11 +11,14 @@ struct HomeView: View {
     @StateObject var vm: HomeViewModel
 
     var body: some View {
-        GeometryReader { reader in
-            ZStack {
+        ZStack {
+            GeometryReader { reader in
+
                 //            fighterView
 
-                VStack {
+                VStack(spacing: 0) {
+                    Spacer()
+
                     HStack {
                         Spacer()
 
@@ -23,31 +26,28 @@ struct HomeView: View {
                             .frame(width: reader.size.width / 2, height: abs(reader.size.height - homeNavBarHeight) / 3)
                             .padding(.trailing, smallerHorizontalPadding)
                     }
+
+                    Spacer()
+
+                    VStack {
+                        practiceButton
+
+                        offlinePlayButton
+
+                        playButton
+                    }
+                    .padding(.bottom, 60)
                 }
-                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-                .padding(.top, homeNavBarHeight + 6)
-                .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
             }
         }
+        .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+        .padding(.top, homeNavBarHeight + 6)
+        .padding(.bottom, homeTabBarHeight)
         .overlay {
             LoadingView(message: vm.loadingMessage)
         }
         .background {
             AnimatingBackgroundView(animate: true, leadingPadding: -900)
-        }
-        .safeAreaInset(edge: .bottom) {
-            HStack {
-                Spacer()
-
-                VStack {
-                    practiceButton
-
-                    offlinePlayButton
-
-                    playButton
-                }
-            }
-            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 90)
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
