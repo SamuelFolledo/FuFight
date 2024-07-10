@@ -11,23 +11,18 @@ struct AnimatingBackgroundView: View {
 
     @State var animate: Bool = false
     var leadingPadding: CGFloat = 0
+    var color: Color? = nil
 
     let animation: Animation = Animation.linear(duration: 60.0).repeatForever(autoreverses: false)
 
     var body: some View {
-        GeometryReader { geo in
-            backgroundImage
-                .padding(.leading, leadingPadding)
-                .overlay {
-                    HStack(spacing: -1) {
-                        backgroundOverImage
-
-                        backgroundOverImage
-                            .frame(width: geo.size.width, alignment: .leading)
-                    }
-                    .frame(width: geo.size.width, height: geo.size.height,
-                           alignment: animate ? .trailing : .leading)
-                }
+        GeometryReader { reader in
+            if let color {
+                createBackgroundImage(reader)
+                    .colorMultiply(color)
+            } else {
+                createBackgroundImage(reader)
+            }
         }
         .ignoresSafeArea()
         .onAppear {
@@ -35,5 +30,20 @@ struct AnimatingBackgroundView: View {
                 animate.toggle()
             }
         }
+    }
+
+    @ViewBuilder func createBackgroundImage(_ reader: GeometryProxy) -> some View {
+        backgroundImage
+            .padding(.leading, leadingPadding)
+            .overlay {
+                HStack(spacing: -1) {
+                    backgroundOverImage
+
+                    backgroundOverImage
+                        .frame(width: reader.size.width, alignment: .leading)
+                }
+                .frame(width: reader.size.width, height: reader.size.height,
+                       alignment: animate ? .trailing : .leading)
+            }
     }
 }

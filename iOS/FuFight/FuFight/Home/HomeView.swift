@@ -19,13 +19,9 @@ struct HomeView: View {
                 VStack(spacing: 0) {
                     Spacer()
 
-                    HStack {
-                        Spacer()
-
-                        FriendPickerView()
-                            .frame(width: reader.size.width / 2, height: abs(reader.size.height - homeNavBarHeight) / 3)
-                            .padding(.trailing, smallerHorizontalPadding)
-                    }
+                    FriendPickerView()
+                        .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
+                        .padding(.trailing, smallerHorizontalPadding)
 
                     Spacer()
 
@@ -38,6 +34,7 @@ struct HomeView: View {
                     }
                     .padding(.bottom, 60)
                 }
+                .frame(maxWidth: .infinity)
             }
         }
         .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
@@ -47,7 +44,16 @@ struct HomeView: View {
             LoadingView(message: vm.loadingMessage)
         }
         .background {
-            AnimatingBackgroundView(animate: true, leadingPadding: -900)
+            GeometryReader { reader in
+                VerticalTabView(proxy: reader) {
+                    ForEach(vm.availableModes, id: \.id) { mode in
+                        AnimatingBackgroundView(animate: true, leadingPadding: -900, color: mode.color)
+                            .onAppear {
+                                LOGD("Current mode is \(mode)")
+                            }
+                    }
+                }
+            }
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)

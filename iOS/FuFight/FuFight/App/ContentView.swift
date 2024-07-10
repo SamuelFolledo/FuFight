@@ -124,11 +124,11 @@ struct ContentView: View {
             EmptyView()
         case .home, .school, .events:
             HStack {
+                Spacer()
+                
                 Image(Room.current?.player.fighterType.headShotImageName ?? FighterType.samuel.headShotImageName)
                     .defaultImageModifier()
                     .frame(width: reader.size.width / 4)
-
-                Spacer()
             }
             .background {
                 Color.clear

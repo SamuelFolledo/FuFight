@@ -12,6 +12,7 @@ final class HomeViewModel: BaseAccountViewModel {
     var player: FetchedPlayer?
     @Published var fighter: Fighter!
 
+    @Published var availableModes: [FightMode] = [.offline, .casual, .rank]
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
     let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
