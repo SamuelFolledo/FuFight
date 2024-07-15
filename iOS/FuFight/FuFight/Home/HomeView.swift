@@ -18,7 +18,7 @@ struct HomeView: View {
 
                 VStack(spacing: 0) {
                     HStack(alignment: .top) {
-                        sideButtonsView(.leading)
+                        sideButtonsView(position: .leading, reader: reader)
 
                         Spacer()
 
@@ -29,17 +29,12 @@ struct HomeView: View {
 
                             Spacer()
 
-                            if !vm.isOffline {
-                                FriendPickerView()
-                                    .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
-                                    .padding(.trailing, smallerHorizontalPadding)
-                            }
                             Spacer()
                         }
 
                         Spacer()
 
-                        sideButtonsView(.trailing)
+                        sideButtonsView(position: .trailing, reader: reader)
                     }
 
                     Spacer()
@@ -88,18 +83,20 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder func sideButtonsView(_ position: HomeButtonType.Position) -> some View {
+    @ViewBuilder func sideButtonsView(position: HomeButtonType.Position, reader: GeometryProxy) -> some View {
         if !vm.isOffline {
             VStack {
                 ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
-                    Button(action: {
-                        LOG("Tapped button \(buttonType.rawValue)")
-                    }, label: {
-                        Image(buttonType.iconName)
-                            .defaultImageModifier()
-                            .frame(width: 40, height: 50)
-                            .padding(4)
-                    })
+                    switch buttonType {
+                        case .leading1, .leading2, .leading3, .trailing1, .trailing2:
+                            PopoverButton(type: buttonType, popOverContent: {
+                                EmptyView()
+                            })
+                        case .friendPicker:
+                            PopoverButton(type: buttonType, showPopover: $vm.showFriendPicker, popOverContent: {
+                                friendPickerView(reader)
+                            })
+                        }
                 }
             }
             .padding(position.edgeSet, smallerHorizontalPadding - 4)
@@ -107,6 +104,14 @@ struct HomeView: View {
         } else {
             EmptyView()
         }
+    }
+
+    @ViewBuilder func friendPickerView(_ reader: GeometryProxy) -> some View {
+        FriendPickerView()
+            .frame(height: abs(reader.size.height - homeNavBarHeight) / 2.5)
+            .presentationBackground(
+                Color.black.opacity(0.7)
+            )
     }
 
     @ViewBuilder var playButtons: some View {

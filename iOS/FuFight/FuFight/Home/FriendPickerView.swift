@@ -15,8 +15,10 @@ struct FriendPickerView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $selectedTab) {
-                Text("Following").tag(0)
-                Text("Recent").tag(1)
+                Text("Following")
+                    .tag(0)
+                Text("Recent")
+                    .tag(1)
             }
             .pickerStyle(SegmentedPickerStyle())
 
@@ -90,10 +92,6 @@ struct FriendListView: View {
                     .frame(height: 2.0.squareRoot() * imageHeight)
                     .padding(.leading, 8)
                 }
-            }
-            .background {
-                Color.black
-                    .opacity(0.7)
             }
         }
     }

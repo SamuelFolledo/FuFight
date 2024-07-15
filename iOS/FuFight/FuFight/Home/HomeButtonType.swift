@@ -7,28 +7,71 @@
 
 import SwiftUI
 
+struct PopoverButton<PopOverContent: View>: View {
+    let type: HomeButtonType
+    @Binding private var showPopover: Bool
+    let popOverContent: PopOverContent
+
+    init(type: HomeButtonType, showPopover: Binding<Bool> = .constant(false), @ViewBuilder popOverContent: () -> PopOverContent) {
+        self.type = type
+        self._showPopover = showPopover
+        self.popOverContent = popOverContent()
+    }
+
+    var body: some View {
+        Button(action: {
+            showPopover.toggle()
+        }, label: {
+            type.image
+        })
+        .popover(isPresented: $showPopover) {
+            popOverContent
+                .presentationCompactAdaptation(.popover)
+        }
+    }
+}
+
 enum HomeButtonType: String, CaseIterable {
     case leading1
     case leading2
     case leading3
     case trailing1
     case trailing2
-    case trailing3
+    case friendPicker
 
-    var iconName: String {
+    var imageName: String {
         switch self {
         case .leading1, .leading2, .leading3:
             "coin"
-        case .trailing1, .trailing2, .trailing3:
+        case .trailing1, .trailing2:
             "diamond"
+        case .friendPicker:
+            "person.2.fill"
         }
+    }
+
+    var image: some View {
+        Group {
+            switch self {
+            case .leading1, .leading2, .leading3, .trailing1, .trailing2:
+                Image(imageName)
+                    .defaultImageModifier()
+                    .frame(width: 40, height: 50)
+            case .friendPicker:
+                Image(systemName: imageName)
+                    .defaultImageModifier()
+                    .frame(width: 40, height: 40)
+            }
+        }
+        .foregroundStyle(Color.white)
+        .padding(4)
     }
 
     var position: Position {
         switch self {
         case .leading1, .leading2, .leading3:
                 .leading
-        case .trailing1, .trailing2, .trailing3:
+        case .trailing1, .trailing2, .friendPicker:
                 .trailing
         }
     }

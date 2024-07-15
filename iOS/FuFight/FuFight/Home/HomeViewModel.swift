@@ -15,6 +15,7 @@ final class HomeViewModel: BaseAccountViewModel {
     @Published var path = NavigationPath()
     @Published var selectedGameType: GameType = .casual
     @Published var isOffline: Bool = false
+    @Published var showFriendPicker: Bool = false
 
     let gameTypes: [GameType] = GameType.allCases
     let availableButtonTypes: [HomeButtonType] = HomeButtonType.allCases
@@ -40,6 +41,18 @@ final class HomeViewModel: BaseAccountViewModel {
     func gameTypeUpdatedHandler() {
         withAnimation {
             isOffline = !selectedGameType.requiresWifi
+            showFriendPicker = false
+        }
+    }
+
+    func homeButtonTapped(_ buttonType: HomeButtonType) {
+        switch buttonType {
+        case .leading1, .leading2, .leading3:
+            LOG("Tapped leading button \(buttonType.rawValue)")
+        case .trailing1, .trailing2:
+            LOG("Tapped trailing button \(buttonType.rawValue)")
+        case .friendPicker:
+            break
         }
     }
 }
