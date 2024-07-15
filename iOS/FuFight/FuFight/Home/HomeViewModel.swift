@@ -14,7 +14,7 @@ final class HomeViewModel: BaseAccountViewModel {
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
     @Published var selectedGameType: GameType = .casual
-    @Published var showButtons: Bool = true
+    @Published var isOffline: Bool = false
 
     let gameTypes: [GameType] = GameType.allCases
     let availableButtonTypes: [HomeButtonType] = HomeButtonType.allCases
@@ -37,6 +37,14 @@ final class HomeViewModel: BaseAccountViewModel {
     }
 
     //MARK: - Public Methods
+    func gameTypeUpdatedHandler() {
+        withAnimation {
+            isOffline = !selectedGameType.requiresWifi
+        }
+    }
+}
+
+private extension HomeViewModel {
     ///Make sure account is valid at least once
     @MainActor func verifyAccount() {
         if !isAccountVerified {
