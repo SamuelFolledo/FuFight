@@ -96,6 +96,9 @@ struct HomeView: View {
                             PopoverButton(type: buttonType, showPopover: $vm.showFriendPicker, popOverContent: {
                                 friendPickerView(reader)
                             })
+                            .overlay(alignment: .bottomLeading) {
+                                onlineFriendsCountLabel
+                            }
                         }
                 }
             }
@@ -104,6 +107,20 @@ struct HomeView: View {
         } else {
             EmptyView()
         }
+    }
+
+    var onlineFriendsCountLabel: some View {
+        Color.green
+            .overlay {
+                Text("\(fakeFriends.compactMap { $0.status == .online }.count)")
+                    .font(characterDetailFont)
+                    .foregroundStyle(Color.white)
+                    .padding(1.5)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
+            }
+            .clipShape(Circle())
+            .frame(width: 16, height: 16)
     }
 
     @ViewBuilder func friendPickerView(_ reader: GeometryProxy) -> some View {
