@@ -11,6 +11,7 @@ struct FriendPickerView: View {
     @State private var selectedTab: Int = 0
     private let followingFriends: [Friend] = fakeFriends
     private let recentFriends: [Friend] = fakeFriends
+    private let clubFriends: [Friend] = fakeFriends
 
     var body: some View {
         VStack(spacing: 0) {
@@ -19,6 +20,8 @@ struct FriendPickerView: View {
                     .tag(0)
                 Text("Recent")
                     .tag(1)
+                Text("Club")
+                    .tag(2)
             }
             .pickerStyle(SegmentedPickerStyle())
 
@@ -26,6 +29,8 @@ struct FriendPickerView: View {
             case 0:
                 FriendListView(friends: followingFriends)
             case 1:
+                FriendListView(friends: recentFriends)
+            case 2:
                 FriendListView(friends: recentFriends)
             default:
                 EmptyView()
