@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UsernameView: View {
     let photoUrl: URL?
+    let onImageTap: (() -> Void)?
     private let imageHeight: CGFloat = 38
 
     var body: some View {
@@ -27,6 +28,7 @@ struct UsernameView: View {
     var userImage: some View {
         Button {
             TODO("Go to user's profile")
+            onImageTap?()
         } label: {
             accountBackgroundImage
                 .overlay {
@@ -53,7 +55,7 @@ struct UsernameView: View {
 }
 
 #Preview {
-    UsernameView(photoUrl: fakePhotoUrl)
+    UsernameView(photoUrl: fakePhotoUrl, onImageTap: nil)
         .frame(height: 100)
         .background { Color.black }
 }

@@ -77,9 +77,7 @@ struct ContentView: View {
                 .tabViewStyle(.page(indexDisplayMode: .never)) //adds swipe gesture and sliding effect when switching between tabs
                 .overlay {
                     VStack {
-                        if showNav {
-                            NavBar()
-                        }
+                        navBarView()
 
                         Spacer()
 
@@ -114,6 +112,16 @@ struct ContentView: View {
             case .loggedOut:
                 //Log in
                 createAuthenticationView(step: .logIn)
+            }
+        }
+    }
+
+    @ViewBuilder func navBarView() -> some View {
+        if showNav {
+            NavBar {
+                //TODO: Change this to one of the HomeButtonType
+                homeRouter.transitionToAccount(vm: homeRouter.makeHomeViewModel(account: account))
+                showNav = false
             }
         }
     }
@@ -214,7 +222,8 @@ struct ContentView: View {
             withAnimation(.easeInOut(duration: 0.2)) {
                 self.showTab = newValue.isEmpty
                 let isShowingGame = newValue.compactMap { $0.id }.contains("game")
-                self.showNav = !isShowingGame
+                let isShowingAccount = newValue.compactMap { $0.id }.contains("account")
+                self.showNav = !isShowingGame && !isShowingAccount
             }
         }
         .onAppear {

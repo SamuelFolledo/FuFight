@@ -13,8 +13,6 @@ struct AccountView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                navigationView
-
                 VStack(spacing: 12) {
                     profilePicture
 
@@ -64,13 +62,26 @@ struct AccountView: View {
             hideKeyboard()
         }
         .navigationBarHidden(true)
+        .safeAreaInset(edge: .bottom) {
+            navigationView
+        }
     }
 
+    var backButton: some View {
+        Button(action: {
+            vm.didBack.send(vm)
+        }) {
+            Text("Back")
+                .padding(.vertical, 4)
+        }
+        .appButton(.destructive, hasPadding: true)
+    }
     var editSaveButton: some View {
         Button(action: vm.editSaveButtonTapped) {
             Text(vm.isViewingMode ? Str.editTitle : Str.saveTitle)
+                .padding(.vertical, 4)
         }
-        .appButton(.tertiary, hasPadding: false)
+        .appButton(.tertiary, hasPadding: true)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -101,38 +112,36 @@ struct AccountView: View {
             vm.changePasswordButtonTapped()
         } label: {
             Text(Str.changePasswordTitle)
-                .frame(maxWidth: .infinity)
+                .frame(height: 50)
         }
-        .appButton(.primary)
+        .appButton(.secondary)
     }
     var deleteAccountButton: some View {
         Button(action: vm.deleteButtonTapped) {
             Text(Str.deleteTitle)
-                .frame(maxWidth: .infinity)
+                .frame(height: 50)
         }
         .appButton(.destructive)
     }
     var logOutButton: some View {
         Button(action: vm.logOut) {
             Text(Str.logOutTitle)
-                .frame(maxWidth: .infinity)
+                .frame(height: 50)
         }
         .appButton(.destructive, isBordered: true)
     }
     var navigationView: some View {
         HStack(alignment: .center) {
-            Button(action: {
-                vm.didBack.send(vm)
-            }, label: {
-                backButtonImage
-                    .padding(.leading, smallerHorizontalPadding)
-                    .frame(width: 104, height: 30)
-            })
+            backButton
+                .padding(.leading, 28)
 
             Spacer()
 
             editSaveButton
+                .padding(.trailing, 28)
         }
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset)
+        .padding(.horizontal, smallerHorizontalPadding)
     }
 }
 

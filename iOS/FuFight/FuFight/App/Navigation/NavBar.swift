@@ -9,12 +9,16 @@ import SwiftUI
 
 struct NavBar: View {
 
+    var usernameViewTap: (() -> Void)?
+
     var body: some View {
         VStack {
             statusBarView
 
             HStack {
-                UsernameView(photoUrl: Room.current?.player.photoUrl)
+                UsernameView(photoUrl: Room.current?.player.photoUrl) {
+                    usernameViewTap?()
+                }
 
                 Spacer()
 
