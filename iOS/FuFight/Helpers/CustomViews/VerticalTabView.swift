@@ -10,26 +10,31 @@ import SwiftUI
 struct VerticalTabView<Content: View>: View {
     let proxy: GeometryProxy
     let content: Content
+    @Binding var selected: GameType
 
-    init(proxy: GeometryProxy, @ViewBuilder content: () -> Content) {
+    init(selectedGameType: Binding<GameType>, proxy: GeometryProxy, @ViewBuilder content: () -> Content) {
         self.proxy = proxy
+        self._selected = selectedGameType
         self.content = content()
     }
 
     var body: some View {
         if #available(iOS 15.0, *) {
             // Geometry Reader code: https://blog.prototypr.io/how-to-vertical-paging-in-swiftui-f0e4afa739ba
-            TabView {
-                content
-                    .rotationEffect(.degrees(-90)) // Rotate content
-                    .frame(width: proxy.size.width, height: proxy.size.height)
+            withAnimation(.easeInOut) {
+                TabView(selection: $selected) {
+                    //            TabView {
+                    content
+                        .rotationEffect(.degrees(-90)) // Rotate content
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                }
+                .frame(width: proxy.size.height, height: proxy.size.width)
+                .rotationEffect(.degrees(90), anchor: .topLeading) // Rotate TabView
+                .offset(x: proxy.size.width) // Offset back into screens bounds
+                .tabViewStyle(
+                    PageTabViewStyle(indexDisplayMode: .never)
+                )
             }
-            .frame(width: proxy.size.height, height: proxy.size.width)
-            .rotationEffect(.degrees(90), anchor: .topLeading) // Rotate TabView
-            .offset(x: proxy.size.width) // Offset back into screens bounds
-            .tabViewStyle(
-                PageTabViewStyle(indexDisplayMode: .never)
-            )
         } else {
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVStack(spacing: 0) {
@@ -45,7 +50,7 @@ struct VerticalTabView<Content: View>: View {
 #Preview {
     ZStack {
         GeometryReader { proxy in
-            VerticalTabView(proxy: proxy) {
+            VerticalTabView(selectedGameType: .constant(GameType.casual), proxy: proxy) {
                 ForEach(0..<3, id: \.self) { item in
                     Rectangle().fill(Color.pink)
                         .frame(

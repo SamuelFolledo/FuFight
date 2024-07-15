@@ -28,7 +28,7 @@ enum HomeRoute: Hashable, Identifiable {
     }
 
     static func == (lhs: HomeRoute, rhs: HomeRoute) -> Bool {
-        return lhs.id == lhs.id
+        return lhs.id == rhs.id
     }
 
     public func hash(into hasher: inout Hasher) {

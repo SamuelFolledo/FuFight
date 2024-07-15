@@ -11,17 +11,31 @@ struct HomeView: View {
     @StateObject var vm: HomeViewModel
 
     var body: some View {
-        ZStack {
-            GeometryReader { reader in
+        GeometryReader { reader in
+            ZStack {
 
                 //            fighterView
 
                 VStack(spacing: 0) {
-                    Spacer()
+                    HStack(alignment: .top) {
+                        buttonsView(.leading)
 
-                    FriendPickerView()
-                        .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
-                        .padding(.trailing, smallerHorizontalPadding)
+                        Spacer()
+
+                        VStack {
+                            Spacer()
+
+                            FriendPickerView()
+                                .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
+                                .padding(.trailing, smallerHorizontalPadding)
+
+                            Spacer()
+                        }
+
+                        Spacer()
+
+                        buttonsView(.trailing)
+                    }
 
                     Spacer()
 
@@ -45,12 +59,17 @@ struct HomeView: View {
         }
         .background {
             GeometryReader { reader in
-                VerticalTabView(proxy: reader) {
-                    ForEach(vm.availableModes, id: \.id) { mode in
-                        AnimatingBackgroundView(animate: true, leadingPadding: -900, color: mode.color)
-                            .onAppear {
-                                LOGD("Current mode is \(mode)")
-                            }
+                VerticalTabView(selectedGameType: $vm.selectedGameType, proxy: reader) {
+                    ForEach(vm.gameTypes, id: \.id) { type in
+                        AnimatingBackgroundView(animate: vm.selectedGameType == type,
+                                                leadingPadding: -900,
+                                                color: type.color)
+                        .tag(type)
+                    }
+                }
+                .onChange(of: vm.selectedGameType) { oldValue, newValue in
+                    withAnimation {
+                        vm.showButtons = newValue.requiresWifi
                     }
                 }
             }
@@ -111,6 +130,27 @@ struct HomeView: View {
         if let player = Room.current?.player {
             DaePreview(scene: createFighterScene(fighterType: player.fighterType, animation: .idleStand))
                 .ignoresSafeArea()
+        }
+    }
+
+    @ViewBuilder func buttonsView(_ position: HomeButtonType.Position) -> some View {
+        if vm.showButtons {
+            VStack {
+                ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
+                    Button(action: {
+                        LOG("Tapped button \(buttonType.rawValue)")
+                    }, label: {
+                        Image(buttonType.iconName)
+                            .defaultImageModifier()
+                            .frame(width: 40, height: 50)
+                            .padding(4)
+                    })
+                }
+            }
+            .padding(position.edgeSet, smallerHorizontalPadding - 4)
+            .transition(.move(edge: position.edge))
+        } else {
+            EmptyView()
         }
     }
 }

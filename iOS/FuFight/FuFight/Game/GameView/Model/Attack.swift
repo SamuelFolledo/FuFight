@@ -85,7 +85,7 @@ struct Attack: MoveProtocol, AttackProtocol, AttackTypeProtocol {
 
     //MARK: - Hashable Required Methods
     static func == (lhs: Attack, rhs: Attack) -> Bool {
-        return lhs.id == lhs.id
+        return lhs.id == rhs.id
     }
 
     public func hash(into hasher: inout Hasher) {
