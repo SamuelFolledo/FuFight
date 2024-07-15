@@ -8,10 +8,21 @@
 import SwiftUI
 
 //MARK: - GameType
-enum GameType: String, CaseIterable, Hashable, Identifiable {
+enum GameType: String, CaseIterable {
     case offline
     case casual
     case rank
+
+    var title: String {
+        switch self {
+        case .offline:
+            "Offline"
+        case .casual:
+            "Casual"
+        case .rank:
+            "Rank"
+        }
+    }
 
     var color: Color? {
         switch self {
@@ -32,7 +43,9 @@ enum GameType: String, CaseIterable, Hashable, Identifiable {
             true
         }
     }
+}
 
+extension GameType: Hashable, Identifiable {
     var id: String { rawValue }
 
     static func == (lhs: GameType, rhs: GameType) -> Bool {

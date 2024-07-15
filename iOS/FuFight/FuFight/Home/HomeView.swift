@@ -18,35 +18,33 @@ struct HomeView: View {
 
                 VStack(spacing: 0) {
                     HStack(alignment: .top) {
-                        buttonsView(.leading)
+                        sideButtonsView(.leading)
 
                         Spacer()
 
                         VStack {
+                            Text("\(vm.selectedGameType.title)")
+                                .font(mediumTitleFont)
+                                .foregroundStyle(.white)
+
                             Spacer()
 
-                            FriendPickerView()
-                                .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
-                                .padding(.trailing, smallerHorizontalPadding)
-
+                            if !vm.isOffline {
+                                FriendPickerView()
+                                    .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
+                                    .padding(.trailing, smallerHorizontalPadding)
+                            }
                             Spacer()
                         }
 
                         Spacer()
 
-                        buttonsView(.trailing)
+                        sideButtonsView(.trailing)
                     }
 
                     Spacer()
 
-                    VStack {
-                        practiceButton
-
-                        offlinePlayButton
-
-                        playButton
-                    }
-                    .padding(.bottom, 60)
+                    playButtons
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -68,9 +66,7 @@ struct HomeView: View {
                     }
                 }
                 .onChange(of: vm.selectedGameType) { oldValue, newValue in
-                    withAnimation {
-                        vm.showButtons = newValue.requiresWifi
-                    }
+                    vm.gameTypeUpdatedHandler()
                 }
             }
         }
@@ -83,6 +79,47 @@ struct HomeView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+    }
+
+    @ViewBuilder var fighterView: some View {
+        if let player = Room.current?.player {
+            DaePreview(scene: createFighterScene(fighterType: player.fighterType, animation: .idleStand))
+                .ignoresSafeArea()
+        }
+    }
+
+    @ViewBuilder func sideButtonsView(_ position: HomeButtonType.Position) -> some View {
+        if !vm.isOffline {
+            VStack {
+                ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
+                    Button(action: {
+                        LOG("Tapped button \(buttonType.rawValue)")
+                    }, label: {
+                        Image(buttonType.iconName)
+                            .defaultImageModifier()
+                            .frame(width: 40, height: 50)
+                            .padding(4)
+                    })
+                }
+            }
+            .padding(position.edgeSet, smallerHorizontalPadding - 4)
+            .transition(.move(edge: position.edge))
+        } else {
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder var playButtons: some View {
+        VStack {
+            if vm.isOffline {
+                practiceButton
+
+                offlinePlayButton
+            } else {
+                playButton
+            }
+        }
+        .padding(.bottom, 60)
     }
 
     var playButton: some View {
@@ -124,34 +161,6 @@ struct HomeView: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 4)
-    }
-
-    @ViewBuilder var fighterView: some View {
-        if let player = Room.current?.player {
-            DaePreview(scene: createFighterScene(fighterType: player.fighterType, animation: .idleStand))
-                .ignoresSafeArea()
-        }
-    }
-
-    @ViewBuilder func buttonsView(_ position: HomeButtonType.Position) -> some View {
-        if vm.showButtons {
-            VStack {
-                ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
-                    Button(action: {
-                        LOG("Tapped button \(buttonType.rawValue)")
-                    }, label: {
-                        Image(buttonType.iconName)
-                            .defaultImageModifier()
-                            .frame(width: 40, height: 50)
-                            .padding(4)
-                    })
-                }
-            }
-            .padding(position.edgeSet, smallerHorizontalPadding - 4)
-            .transition(.move(edge: position.edge))
-        } else {
-            EmptyView()
-        }
     }
 }
 
