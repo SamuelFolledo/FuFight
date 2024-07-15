@@ -11,10 +11,14 @@ import SwiftUI
 final class HomeViewModel: BaseAccountViewModel {
     var player: FetchedPlayer?
     @Published var fighter: Fighter!
-
-    @Published var availableModes: [FightMode] = [.offline, .casual, .rank]
     @Published var isAccountVerified = false
     @Published var path = NavigationPath()
+    @Published var selectedGameType: GameType = .casual
+    @Published var showButtons: Bool = true
+
+    let gameTypes: [GameType] = GameType.allCases
+    let availableButtonTypes: [HomeButtonType] = HomeButtonType.allCases
+
     let transitionToLoading = PassthroughSubject<HomeViewModel, Never>()
     let transitionToOffline = PassthroughSubject<HomeViewModel, Never>()
     let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()

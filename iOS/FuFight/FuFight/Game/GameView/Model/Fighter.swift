@@ -157,7 +157,7 @@ struct Fighter {
 extension Fighter: Hashable {
     //MARK: - Hashable Required Methods
     static func == (lhs: Fighter, rhs: Fighter) -> Bool {
-        return lhs.fighterType == lhs.fighterType
+        return lhs.fighterType == rhs.fighterType
     }
 
     public func hash(into hasher: inout Hasher) {

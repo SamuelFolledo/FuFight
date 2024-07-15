@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnimatingBackgroundView: View {
 
-    @State var animate: Bool = false
+    @State var animate: Bool = true
     var leadingPadding: CGFloat = 0
     var color: Color? = nil
 
