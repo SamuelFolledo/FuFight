@@ -50,27 +50,41 @@ struct AppButtonModifier: ViewModifier {
         content
             .font(buttonFont)
             .padding(.vertical, hasPadding ? 8 : 0)
-            .padding(.horizontal)
+            .padding(.horizontal, hasPadding ? 8 : 0)
             .background(background)
-            .foregroundColor(
-                Color(uiColor: foregroundColor))
-            .cornerRadius(24)
-            .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(
-                        Color(uiColor: isEnabled ? viewType.color : disabledColor),
-                        lineWidth: 2)
-            )
+            .foregroundColor(Color(uiColor: foregroundColor))
+        //TODO: Figure out if needed. Previous implementation before images
+//            .cornerRadius(24)
+//            .overlay(
+//                RoundedRectangle(cornerRadius: 24)
+//                    .stroke(
+//                        Color(uiColor: isEnabled ? viewType.color : disabledColor),
+//                        lineWidth: 2)
+//            )
             .opacity(isEnabled ? 1 : 0.8)
     }
 
     var background: some View {
         Group {
-            if isEnabled {
-                Color(uiColor: isBordered ? .white : viewType.color)
-            } else {
-                Color(uiColor: isBordered ? .clear : disabledColor)
+            switch viewType {
+            case .primary:
+                yellowButtonImage
+            case .secondary:
+                blueButtonImage
+            case .tertiary:
+                yellowButtonImage
+            case .system:
+                greenButtonImage
+            case .destructive:
+                redButtonImage
             }
+
+            //TODO: Figure out if needed. Previous implementation before images
+//            if isEnabled {
+//                Color(uiColor: isBordered ? .white : viewType.color)
+//            } else {
+//                Color(uiColor: isBordered ? .clear : disabledColor)
+//            }
         }
     }
     var foregroundColor: UIColor {

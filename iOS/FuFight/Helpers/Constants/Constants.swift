@@ -110,6 +110,10 @@ let plusButtonImage: some View = Image("plusButton").defaultImageModifier()
 let restartButtonImage: some View = Image("restartButton").buttonImageModifier()
 let resumeButtonImage: some View = Image("resumeButton").buttonImageModifier()
 let yesButtonButtonImage: some View = Image("yesButton").buttonImageModifier()
+let blueButtonImage: some View = Image("blueButton").buttonImageModifier()
+let greenButtonImage: some View = Image("greenButton").buttonImageModifier()
+let redButtonImage: some View = Image("redButton").buttonImageModifier()
+let yellowButtonImage: some View = Image("yellowButton").buttonImageModifier()
 
 //Icons
 let coinImage: some View = Image("coin").defaultImageModifier()
