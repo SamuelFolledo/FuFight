@@ -108,7 +108,7 @@ struct HomeView: View {
 
     @ViewBuilder func friendPickerView(_ reader: GeometryProxy) -> some View {
         FriendPickerView()
-            .frame(width: reader.size.width / 1.8, height: abs(reader.size.height - homeNavBarHeight) / 2.5)
+            .frame(height: abs(reader.size.height - homeNavBarHeight) / 2.5)
             .presentationBackground(
                 Color.black.opacity(0.7)
             )

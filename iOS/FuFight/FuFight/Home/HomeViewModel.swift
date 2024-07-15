@@ -41,6 +41,7 @@ final class HomeViewModel: BaseAccountViewModel {
     func gameTypeUpdatedHandler() {
         withAnimation {
             isOffline = !selectedGameType.requiresWifi
+            showFriendPicker = false
         }
     }
 
