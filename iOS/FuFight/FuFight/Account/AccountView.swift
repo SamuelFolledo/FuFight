@@ -22,11 +22,15 @@ struct AccountView: View {
 
                     Spacer()
 
-                    changePasswordButton
+                    VStack(spacing: 40) {
+                        changePasswordButton
 
-                    deleteAccountButton
+                        deleteAccountButton
 
-                    logOutButton
+                        logOutButton
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    .padding(.top)
                 }
                 .padding(.horizontal, horizontalPadding)
             }
@@ -68,20 +72,12 @@ struct AccountView: View {
     }
 
     var backButton: some View {
-        Button(action: {
+        GameButton(title: "Back", type: .delete) {
             vm.didBack.send(vm)
-        }) {
-            Text("Back")
-                .padding(.vertical, 4)
         }
-        .appButton(.destructive, hasPadding: true)
     }
     var editSaveButton: some View {
-        Button(action: vm.editSaveButtonTapped) {
-            Text(vm.isViewingMode ? Str.editTitle : Str.saveTitle)
-                .padding(.vertical, 4)
-        }
-        .appButton(.tertiary, hasPadding: true)
+        GameButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, action: vm.editSaveButtonTapped)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -108,37 +104,27 @@ struct AccountView: View {
             isDisabled: .constant(true))
     }
     var changePasswordButton: some View {
-        Button {
+        GameButton(title: Str.changePasswordTitle) {
             vm.changePasswordButtonTapped()
-        } label: {
-            Text(Str.changePasswordTitle)
-                .frame(height: 50)
         }
-        .appButton(.secondary)
     }
     var deleteAccountButton: some View {
-        Button(action: vm.deleteButtonTapped) {
-            Text(Str.deleteTitle)
-                .frame(height: 50)
+        GameButton(title: Str.deleteTitle, type: .delete) {
+            vm.deleteButtonTapped()
         }
-        .appButton(.destructive)
     }
     var logOutButton: some View {
-        Button(action: vm.logOut) {
-            Text(Str.logOutTitle)
-                .frame(height: 50)
+        GameButton(title: Str.logOutTitle, type: .delete) {
+            vm.logOut()
         }
-        .appButton(.destructive, isBordered: true)
     }
     var navigationView: some View {
         HStack(alignment: .center) {
             backButton
-                .padding(.leading, 28)
 
             Spacer()
 
             editSaveButton
-                .padding(.trailing, 28)
         }
         .padding(.bottom, UserDefaults.bottomSafeAreaInset)
         .padding(.horizontal, smallerHorizontalPadding)
