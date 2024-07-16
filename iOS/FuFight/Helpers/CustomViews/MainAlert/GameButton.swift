@@ -72,23 +72,26 @@ struct GameButton: View {
     let title: String
     let textColor: UIColor
     let bgColor: UIColor
+    let maxWidth: CGFloat
     var action: (() -> Void)? = nil
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, action: (() -> Void)? = nil) {
+    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
         self.bgColor = .systemBackground
         self.action = action
         self.type = type
+        self.maxWidth = maxWidth
     }
 
-    init(type: GameButtonType, action: (() -> Void)? = nil) {
+    init(type: GameButtonType, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.type = type
         self.title = type.title
         self.textColor = type.textColor
         self.bgColor = type.bgColor
         self.action = action
+        self.maxWidth = maxWidth
     }
 
     // MARK: - View
@@ -100,8 +103,8 @@ struct GameButton: View {
             Text(title)
                 .font(mediumTextFont)
                 .foregroundColor(Color(uiColor: textColor))
-                .frame(maxWidth: .infinity, maxHeight: 45)
-                .padding(.horizontal, 20)
+                .frame(maxWidth: maxWidth)
+                .padding(.horizontal, 25)
         }
         .background(
             type.background

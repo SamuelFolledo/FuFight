@@ -72,12 +72,12 @@ struct AccountView: View {
     }
 
     var backButton: some View {
-        GameButton(title: "Back", type: .delete) {
+        GameButton(title: "Back", type: .delete, maxWidth: navBarButtonMaxWidth) {
             vm.didBack.send(vm)
         }
     }
     var editSaveButton: some View {
-        GameButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, action: vm.editSaveButtonTapped)
+        GameButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, maxWidth: navBarButtonMaxWidth, action: vm.editSaveButtonTapped)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -126,6 +126,7 @@ struct AccountView: View {
 
             editSaveButton
         }
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.bottom, UserDefaults.bottomSafeAreaInset)
         .padding(.horizontal, smallerHorizontalPadding)
     }

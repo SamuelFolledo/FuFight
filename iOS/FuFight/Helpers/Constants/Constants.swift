@@ -47,6 +47,7 @@ let homeBottomViewHeight: CGFloat = 120
 let charactersBottomButtonsHeight: CGFloat = 40
 let homeNavBarHeight: CGFloat = 120
 let navBarIconSize: CGFloat = 25
+let navBarButtonMaxWidth: CGFloat = 50
 
 var animationToTest: AnimationType = .punchHeadRightHard
 
