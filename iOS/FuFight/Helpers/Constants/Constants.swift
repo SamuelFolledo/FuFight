@@ -97,7 +97,9 @@ let navBarBackgroundImage: some View = Image("navBarBackground").navBarBackgroun
 let cityBackgroundImage: some View = Image("cityBackground").defaultImageModifier()
 let timerBackgroundImage: some View = Image("timerBackground").defaultImageModifier()
 let navBarContainerImage: some View = Image("navBarContainer").containerImageModifier()
-let yellowRingImage: some View = Image("yellowRing").containerImageModifier()
+let alertBodyBackgroundImage: some View = Image("alertBodyBackground").containerImageModifier()
+let alertTitleBackgroundImage_Shadowed: some View = Image("alertTitleBackground-shadowed").containerImageModifier()
+let alertTitleBackgroundImage: some View = Image("alertTitleBackground").containerImageModifier()
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()
@@ -118,6 +120,7 @@ let yellowButtonImage: some View = Image("yellowButton").buttonImageModifier()
 //Icons
 let coinImage: some View = Image("coin").defaultImageModifier()
 let diamondImage: some View = Image("diamond").defaultImageModifier()
+let yellowRingImage: some View = Image("yellowRing").containerImageModifier()
 
 //System Images
 let defaultProfilePhoto: UIImage = UIImage(systemName: "person.crop.circle")!
