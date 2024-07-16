@@ -75,7 +75,7 @@ struct GameButton: View {
     var action: (() -> Void)? = nil
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .systemBackground, type: GameButtonType = .custom, action: (() -> Void)? = nil) {
+    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
         self.bgColor = .systemBackground
