@@ -39,11 +39,11 @@ struct AuthenticationView: View {
                 LoadingView(message: vm.loadingMessage)
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-            .alert(withText: $vm.topFieldText,
-                   fieldType: .emailOrUsername,
-                   title: Str.putEmailOrUsernameToResetPassword,
-                   primaryButton: AlertButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
-                   isPresented: $vm.showForgotPassword)
+//            .alert(withText: $vm.topFieldText,
+//                   fieldType: .emailOrUsername,
+//                   title: Str.putEmailOrUsernameToResetPassword,
+//                   primaryButton: AlertButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
+//                   isPresented: $vm.showForgotPassword)
             .background(
                 backgroundImage
                     .padding(.trailing, 400)
@@ -117,11 +117,13 @@ struct AuthenticationView: View {
     }
 
     var authButtons: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: 80) {
             topButton
 
             bottomButton
         }
+        .fixedSize(horizontal: true, vertical: false)
+        .padding(.top)
     }
 
     var topField: some View {
@@ -153,24 +155,14 @@ struct AuthenticationView: View {
     }
 
     var topButton: some View {
-        Button(action: vm.topButtonTapped) {
-            Text(vm.step.topButtonTitle)
-                .frame(maxWidth: .infinity)
-                .font(boldedButtonFont)
-        }
-        .appButton(.system)
+        GameButton(title: vm.step.topButtonTitle, textColor: .white, action: vm.topButtonTapped)
         .disabled(!vm.topButtonIsEnabled)
     }
 
     @ViewBuilder var bottomButton: some View {
         switch vm.step {
         case .logIn, .signUp:
-            Button(action: vm.bottomButtonTapped) {
-                Text(vm.step.bottomButtonTitle)
-                    .frame(maxWidth: .infinity)
-                    .font(boldedButtonFont)
-            }
-            .appButton(.tertiary)
+            GameButton(title: vm.step.bottomButtonTitle, textColor: .white, type: .secondaryCustom, action: vm.bottomButtonTapped)
         case .phone, .phoneVerification, .onboard:
             EmptyView()
         }

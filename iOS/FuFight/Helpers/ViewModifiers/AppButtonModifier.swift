@@ -72,9 +72,9 @@ struct AppButtonModifier: ViewModifier {
             case .secondary:
                 blueButtonImage
             case .tertiary:
-                yellowButtonImage
-            case .system:
                 greenButtonImage
+            case .system:
+                blueButtonImage
             case .destructive:
                 redButtonImage
             }

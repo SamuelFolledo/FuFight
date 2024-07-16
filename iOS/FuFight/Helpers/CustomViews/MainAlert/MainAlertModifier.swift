@@ -16,9 +16,9 @@ struct MainAlertModifier {
     // MARK: Private
     private let title: String
     private let message: String
-    private let dismissButton: AlertButton?
-    private let primaryButton: AlertButton?
-    private let secondaryButton: AlertButton?
+    private let dismissButton: GameButton?
+    private let primaryButton: GameButton?
+    private let secondaryButton: GameButton?
     ///Show a TextField if this is not nil
     var fieldType: FieldType? = nil
     @Binding var text: String
@@ -32,9 +32,9 @@ extension MainAlertModifier: ViewModifier {
             .fullScreenCover(isPresented: $isPresented) {
                 Group {
                     if let fieldType {
-                        MainAlert(withText: $text, fieldType: fieldType, title: title, primaryButton: primaryButton, secondaryButton: secondaryButton)
+                        GameAlert(withText: $text, fieldType: fieldType, title: title, primaryButton: primaryButton, secondaryButton: secondaryButton)
                     } else {
-                        MainAlert(title: title, message: message, dismissButton: dismissButton, primaryButton: primaryButton, secondaryButton: secondaryButton)
+                        GameAlert(title: title, message: message, dismissButton: dismissButton, primaryButton: primaryButton, secondaryButton: secondaryButton)
                     }
                 }
                     .presentationBackground(.clear)
@@ -44,7 +44,7 @@ extension MainAlertModifier: ViewModifier {
 
 extension MainAlertModifier {
 
-    init(title: String = "", message: String = "", dismissButton: AlertButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", dismissButton: GameButton, isPresented: Binding<Bool>) {
         self.title         = title
         self.message       = message
         self.dismissButton = dismissButton
@@ -54,7 +54,7 @@ extension MainAlertModifier {
         _text = .constant("")
     }
 
-    init(title: String = "", message: String = "", primaryButton: AlertButton, secondaryButton: AlertButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", primaryButton: GameButton, secondaryButton: GameButton, isPresented: Binding<Bool>) {
         self.title           = title
         self.message         = message
         self.primaryButton   = primaryButton
@@ -65,7 +65,7 @@ extension MainAlertModifier {
     }
 
     ///Initializer for primary button only alert
-    init(title: String = "", message: String = "", primaryButton: AlertButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", primaryButton: GameButton, isPresented: Binding<Bool>) {
         self.title         = title
         self.message       = message
         self.dismissButton = nil
@@ -76,7 +76,7 @@ extension MainAlertModifier {
     }
 
     ///Initializer for alerts with a TextField
-    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AlertButton?, secondaryButton: AlertButton?, isPresented: Binding<Bool>) {
+    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: GameButton?, secondaryButton: GameButton?, isPresented: Binding<Bool>) {
         self.fieldType = fieldType
         self.primaryButton = primaryButton
         self.secondaryButton = secondaryButton

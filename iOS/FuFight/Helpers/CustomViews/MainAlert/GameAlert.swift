@@ -27,7 +27,7 @@ struct GameAlert: View {
     @State private var opacity: CGFloat           = 0
     @State private var backgroundOpacity: CGFloat = 0
     @State private var scale: CGFloat             = 0.001
-    private let alertWidth: CGFloat = 320
+    private let alertWidth: CGFloat = 360
     private let verticalPadding: CGFloat = 4
     private let horizontalPadding: CGFloat = 12
     private var isManyText: Bool {
@@ -290,7 +290,7 @@ struct GameAlert_Previews: PreviewProvider {
 
         let dismissButton2   = GameButton(type: .ok)
         let primaryButton2   = GameButton(type: .delete)
-        let secondaryButton2 = GameButton(type: .ok)
+        let secondaryButton2 = GameButton(type: .secondaryOk)
 
         let title = "Error connecting game to the server"
         let message = """
@@ -305,8 +305,8 @@ struct GameAlert_Previews: PreviewProvider {
 
         return VStack {
             if showType {
-                GameAlert(title: title, message: message, dismissButton: dismissButton2, primaryButton: nil,            secondaryButton: nil)
-                GameAlert(title: title, message: message2, dismissButton: nil,           primaryButton: primaryButton2, secondaryButton: secondaryButton2)
+                GameAlert(title: title, message: message, dismissButton: secondaryButton2, primaryButton: nil,            secondaryButton: nil)
+                GameAlert(title: title, message: message2, dismissButton: nil,           primaryButton: secondaryButton2, secondaryButton: primaryButton2)
             } else {
                 GameAlert(title: title, message: message, dismissButton: nil,           primaryButton: nil,           secondaryButton: nil)
                 GameAlert(title: title, message: message2, dismissButton: dismissButton, primaryButton: nil,          secondaryButton: nil)

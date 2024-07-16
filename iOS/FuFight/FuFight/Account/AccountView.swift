@@ -34,13 +34,13 @@ struct AccountView: View {
                    message: vm.alertMessage,
                    isPresented: $vm.isAlertPresented)
             .alert(title: Str.deleteAccountQuestion,
-                   primaryButton: AlertButton(type: .delete, action: vm.deleteAccount), 
-                   secondaryButton: AlertButton(type: .secondaryCancel), 
+                   primaryButton: GameButton(type: .delete, action: vm.deleteAccount), 
+                   secondaryButton: GameButton(type: .secondaryCancel), 
                    isPresented: $vm.isDeleteAccountAlertPresented)
             .alert(withText: $vm.password,
                    fieldType: .password(.current),
                    title: Str.recentReauthenticationIsRequiredToMakeChanges,
-                   primaryButton: AlertButton(title: Str.logInTitle, action: vm.reauthenticate),
+                   primaryButton: GameButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
             .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)

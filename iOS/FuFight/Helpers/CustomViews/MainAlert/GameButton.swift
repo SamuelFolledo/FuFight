@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum GameButtonType {
-    case cancel, secondaryCancel, ok, secondaryOk, custom, delete, dismiss
+    case cancel, secondaryCancel, ok, secondaryOk, custom, secondaryCustom, delete, dismiss
 
     var title: String {
         switch self {
@@ -18,7 +18,7 @@ enum GameButtonType {
             "Delete"
         case .ok, .secondaryOk:
             "Ok"
-        case .custom:
+        case .custom, .secondaryCustom:
             ""
         case .dismiss:
             "Dismiss"
@@ -34,13 +34,15 @@ enum GameButtonType {
         case .ok:
             yellowButtonImage
         case .secondaryOk:
-            greenButtonImage
+            blueButtonImage
         case .custom:
             yellowButtonImage
+        case .secondaryCustom:
+            blueButtonImage
         case .delete:
             redButtonImage
         case .dismiss:
-            yellowButtonImage
+            blueButtonImage
         }
     }
 
@@ -52,7 +54,7 @@ enum GameButtonType {
             destructiveUiColor
         case .ok, .secondaryOk:
             backgroundUiColor
-        case .custom:
+        case .custom, .secondaryCustom:
             backgroundUiColor
         case .dismiss:
             backgroundUiColor
@@ -73,12 +75,12 @@ struct GameButton: View {
     var action: (() -> Void)? = nil
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .systemBackground, bgColor: UIColor = .systemBackground, action: (() -> Void)? = nil) {
+    init(title: String, textColor: UIColor = .systemBackground, type: GameButtonType = .custom, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
-        self.bgColor = bgColor
+        self.bgColor = .systemBackground
         self.action = action
-        self.type = .custom
+        self.type = type
     }
 
     init(type: GameButtonType, action: (() -> Void)? = nil) {
@@ -99,6 +101,7 @@ struct GameButton: View {
                 .font(mediumTextFont)
                 .foregroundColor(Color(uiColor: textColor))
                 .frame(maxWidth: .infinity, maxHeight: 45)
+                .padding(.horizontal, 20)
         }
         .background(
             type.background
