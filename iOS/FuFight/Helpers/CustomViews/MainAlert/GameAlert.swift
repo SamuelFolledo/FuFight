@@ -30,6 +30,7 @@ struct GameAlert: View {
     private let alertWidth: CGFloat = 360
     private let verticalPadding: CGFloat = 4
     private let horizontalPadding: CGFloat = 12
+    private let buttonMultiplier: CGFloat = 0.3
     private var isManyText: Bool {
         message.count > 120
     }
@@ -157,22 +158,18 @@ struct GameAlert: View {
 
     func buttonsView(_ reader: GeometryProxy) -> some View {
         HStack(spacing: 16) {
-            let buttonMultiplier: CGFloat = 0.3
             if dismissButton != nil {
-                dismissButtonView
-                    .frame(width: reader.size.width * buttonMultiplier)
+                dismissButtonView(reader)
             } else if primaryButton != nil, secondaryButton != nil {
-                secondaryButtonView
-                    .frame(width: reader.size.width * buttonMultiplier)
+                secondaryButtonView(reader)
 
-                primaryButtonView
-                    .frame(width: reader.size.width * buttonMultiplier)
+                primaryButtonView(reader)
             } else if primaryButton != nil {
-                primaryButtonView
-                    .frame(width: reader.size.width * buttonMultiplier)
+                primaryButtonView(reader)
             }
         }
         .padding(.horizontal, horizontalPadding)
+        .padding(.bottom)
     }
 
     func primaryButtonAction() {
@@ -186,19 +183,17 @@ struct GameAlert: View {
         }
     }
 
-    @ViewBuilder
-    private var primaryButtonView: some View {
+    @ViewBuilder private func primaryButtonView(_ reader: GeometryProxy) -> some View {
         if let primaryButton {
             if primaryButton.type == .custom {
-                GameButton(title: primaryButton.title, action: primaryButtonAction)
+                GameButton(title: primaryButton.title, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             } else {
-                GameButton(type: primaryButton.type, action: primaryButtonAction)
+                GameButton(type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             }
         }
     }
 
-    @ViewBuilder
-    private var secondaryButtonView: some View {
+    @ViewBuilder private func secondaryButtonView(_ reader: GeometryProxy) -> some View {
         if let button = secondaryButton {
             let buttonAction = {
                 animate(isShown: false) {
@@ -210,15 +205,14 @@ struct GameAlert: View {
                 }
             }
             if button.type == .custom {
-                GameButton(title: button.title, action: buttonAction)
+                GameButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
-                GameButton(type: button.type, action: buttonAction)
+                GameButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             }
         }
     }
 
-    @ViewBuilder
-    private var dismissButtonView: some View {
+    @ViewBuilder private func dismissButtonView(_ reader: GeometryProxy) -> some View {
         if let button = dismissButton {
             let buttonAction = {
                 animate(isShown: false) {
@@ -230,9 +224,9 @@ struct GameAlert: View {
                 }
             }
             if button.type == .custom {
-                GameButton(title: button.title, action: buttonAction)
+                GameButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
-                GameButton(type: button.type, action: buttonAction)
+                GameButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             }
         }
     }
@@ -288,7 +282,7 @@ struct GameAlert_Previews: PreviewProvider {
         let primaryButton   = GameButton(title: "Ok")
         let secondaryButton = GameButton(title: "Cancel")
 
-        let dismissButton2   = GameButton(type: .ok)
+        let dismissButton2   = GameButton(type: .dismiss)
         let primaryButton2   = GameButton(type: .delete)
         let secondaryButton2 = GameButton(type: .secondaryOk)
 
@@ -305,7 +299,7 @@ struct GameAlert_Previews: PreviewProvider {
 
         return VStack {
             if showType {
-                GameAlert(title: title, message: message, dismissButton: secondaryButton2, primaryButton: nil,            secondaryButton: nil)
+                GameAlert(title: title, message: message, dismissButton: dismissButton2, primaryButton: nil,            secondaryButton: nil)
                 GameAlert(title: title, message: message2, dismissButton: nil,           primaryButton: secondaryButton2, secondaryButton: primaryButton2)
             } else {
                 GameAlert(title: title, message: message, dismissButton: nil,           primaryButton: nil,           secondaryButton: nil)

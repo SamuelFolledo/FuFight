@@ -13,33 +13,28 @@ struct UpdatePasswordView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 0) {
-                navigationView
+            GeometryReader { reader in
+                VStack(spacing: 0) {
+                    VStack(spacing: 12) {
+                        currentPasswordField
 
-                VStack(spacing: 12) {
-                    currentPasswordField
+                        passwordField
 
-                    passwordField
+                        confirmPasswordField
 
-                    confirmPasswordField
+                        Spacer()
 
-                    Spacer()
+                        updatePasswordButton(reader)
+                    }
+                    .padding(.horizontal, horizontalPadding)
                 }
-                .padding(.horizontal, horizontalPadding)
+                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                .padding(.top, homeNavBarHeight + 6)
+                .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
             }
-            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-            .padding(.top, homeNavBarHeight + 6)
-            .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
         }
         .overlay {
             LoadingView(message: vm.loadingMessage)
-        }
-        .overlay {
-            VStack {
-                Spacer()
-
-                updatePasswordButton
-            }
         }
         .onAppear {
             vm.onAppear()
@@ -55,6 +50,9 @@ struct UpdatePasswordView: View {
             AnimatingBackgroundView(animate: true, leadingPadding: -900)
         }
         .navigationBarHidden(true)
+        .safeAreaInset(edge: .bottom) {
+            navigationView
+        }
     }
 
     var currentPasswordField: some View {
@@ -93,28 +91,23 @@ struct UpdatePasswordView: View {
             vm.updatePasswordButtonTapped()
         }
     }
-    var updatePasswordButton: some View {
-        Button(action: vm.updatePasswordButtonTapped) {
-            Text(Str.updatePasswordTitle)
-                .frame(maxWidth: .infinity)
+    var backButton: some View {
+        GameButton(title: "Back", type: .delete, maxWidth: navBarButtonMaxWidth) {
+            vm.didBack.send(vm)
         }
-        .appButton(.primary)
-        .disabled(!vm.isUpdatePasswordButtonEnabled)
-        .padding(.horizontal, horizontalPadding)
-        .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
+    }
+    @ViewBuilder private func updatePasswordButton(_ reader: GeometryProxy) -> some View {
+        GameButton(title: Str.updatePasswordTitle, maxWidth: reader.size.width * 0.4, action: vm.updatePasswordButtonTapped)
     }
     var navigationView: some View {
         HStack(alignment: .center) {
-            Button(action: {
-                vm.didBack.send(vm)
-            }, label: {
-                backButtonImage
-                    .padding(.leading, smallerHorizontalPadding)
-                    .frame(width: 104, height: 30)
-            })
+            backButton
 
             Spacer()
         }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset)
+        .padding(.horizontal, smallerHorizontalPadding)
     }
 }
 
