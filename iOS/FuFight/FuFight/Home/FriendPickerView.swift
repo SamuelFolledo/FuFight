@@ -16,11 +16,11 @@ struct FriendPickerView: View {
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $selectedTab) {
-                Text("Following")
+                AppText("Following", type: .titleSmall)
                     .tag(0)
-                Text("Recent")
+                AppText("Recent", type: .titleSmall)
                     .tag(1)
-                Text("Club")
+                AppText("Club", type: .titleSmall)
                     .tag(2)
             }
             .pickerStyle(SegmentedPickerStyle())
@@ -66,18 +66,14 @@ struct FriendListView: View {
                                 }
 
                             VStack(alignment: .leading) {
-                                Text(friend.username)
-                                    .font(characterDetailFont)
-                                    .foregroundStyle(Color.white)
+                                AppText(friend.username, type: .textSmall)
 
                                 switch friend.status {
                                 case .offline:
-                                    Text(friend.description)
-                                        .font(characterDetailFont)
+                                    AppText(friend.description, type: .textSmall)
                                         .foregroundStyle(Color.systemGray)
                                 case .online:
-                                    Text(friend.description)
-                                        .font(characterDetailFont)
+                                    AppText(friend.description, type: .textSmall)
                                         .foregroundStyle(friend.statusDetail.isEmpty ? Color.green : Color.orange)
                                 }
                             }

@@ -92,10 +92,7 @@ struct AuthenticationView: View {
                         .renderingMode(.template)
                         .foregroundColor(.label)
 
-                    Text(Str.rememberMe)
-                        .background(.clear)
-                        .foregroundColor(Color.label)
-                        .font(buttonFont)
+                    AppText(Str.rememberMe, type: .buttonSmall)
                 }
             }
             .padding(.vertical)
@@ -107,10 +104,7 @@ struct AuthenticationView: View {
             Button(action: {
                 vm.showForgotPassword = true
             }) {
-                Text(Str.forgotPasswordTitleQuestion)
-                    .background(.clear)
-                    .foregroundColor(systemColor)
-                    .font(buttonFont)
+                AppText(Str.forgotPasswordTitleQuestion, type: .buttonSmall)
             }
             .padding(.vertical)
         }

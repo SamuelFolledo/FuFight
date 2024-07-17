@@ -49,9 +49,9 @@ class HomeRouter: ObservableObject {
         // Changes the color for the selected item
         UISegmentedControl.appearance().selectedSegmentTintColor = .systemYellow
         // Changes the text color for the selected item
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white, .font: friendListFont], for: .selected)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.white, .font: UIFont(name: CustomFontWeight.bold.rawValue, size: defaultFontSize)!], for: .selected)
         // Changes the text color for the unselected item
-        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.lightGray, .font: friendListFont], for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes([.foregroundColor: UIColor.lightGray, .font: UIFont(name: CustomFontWeight.bold.rawValue, size: defaultFontSize)!], for: .normal)
 
         //Change TabView background color
         UITabBar.appearance().backgroundColor = UIColor.clear

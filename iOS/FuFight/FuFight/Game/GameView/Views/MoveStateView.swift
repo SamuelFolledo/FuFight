@@ -16,9 +16,7 @@ struct MoveStateView: View {
         Group {
             switch state {
             case .cooldown:
-                Text("\(cooldown)")
-                    .font(playerType.font)
-                    .foregroundStyle(.white)
+                AppText("\(cooldown)", type: playerType.textType)
             case .selected:
                 Circle()
                     .stroke(.green, lineWidth: playerType.shouldFlip ? 2 : 4)

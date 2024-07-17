@@ -47,9 +47,7 @@ struct UsernameView: View {
     }
 
     var usernameLabel: some View {
-        Text("\(Account.current?.displayName ?? "username")")
-            .font(usernameFont)
-            .foregroundStyle(.white)
+        AppText("\(Account.current?.displayName ?? "username")", type: .navMedium)
             .padding(.leading)
     }
 }

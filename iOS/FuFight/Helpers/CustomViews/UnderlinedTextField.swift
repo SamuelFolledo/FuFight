@@ -171,8 +171,7 @@ struct UnderlinedTextField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             if showTitle {
-                Text(type.title)
-                    .font(boldedTextFont)
+                AppText(type.title, type: .textMedium)
             }
 
             HStack {
@@ -191,6 +190,7 @@ struct UnderlinedTextField: View {
                 .focused($isFocused)
                 .textContentType(type.contentType)
                 .submitLabel(type.submitLabel)
+                .font(Font.customFont(TextType.textLarge.fontWeight, TextType.textMedium.fontSize))
                 
                 accessories
             }

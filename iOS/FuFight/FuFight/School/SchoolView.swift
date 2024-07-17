@@ -49,9 +49,7 @@ struct SchoolView: View {
                 .padding(.top, homeNavBarHeight + 6)
                 .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
                 .overlay {
-                    Text("School games coming soon")
-                        .font(mediumTitleFont)
-                        .foregroundStyle(.white)
+                    AppText("School games coming soon", type: .titleLarge)
                         .frame(alignment: .center)
                         .padding(.horizontal)
                 }

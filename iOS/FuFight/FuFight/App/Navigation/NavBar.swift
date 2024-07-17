@@ -54,11 +54,11 @@ struct NavBar: View {
         }, label: {
             HStack(spacing: 2) {
                 coinImage
+                    .padding(.leading, -8)
                     .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
 
-                Text("812999")
-                    .font(navBarFont)
-                    .foregroundStyle(Color.white)
+                AppText("812999", type: .navSmall)
+                    .padding(.leading, -4)
 
                 Spacer()
             }
@@ -74,12 +74,11 @@ struct NavBar: View {
         }, label: {
             HStack(spacing: 2) {
                 diamondImage
-                    .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
+                    .padding(.leading, -16)
+                    .frame(width: navBarIconSize, height: navBarIconSize)
 
-                Text("209")
-                    .font(navBarFont)
-                    .foregroundStyle(Color.white)
-                    .frame(alignment: .center)
+                AppText("209", type: .navSmall)
+                    .padding(.leading, -4)
 
                 Spacer()
             }

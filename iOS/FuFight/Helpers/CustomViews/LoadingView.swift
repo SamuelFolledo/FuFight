@@ -13,9 +13,7 @@ struct LoadingView: View {
     var body: some View {
         if let message {
             VStack(alignment: .center) {
-                Text("\(message)")
-                    .font(mediumTextFont)
-                    .foregroundColor(Color.systemBackground)
+                AppText("\(message)", type: .textLarge)
 
                 LoadingIndicator()
             }

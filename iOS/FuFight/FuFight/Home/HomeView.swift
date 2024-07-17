@@ -23,9 +23,7 @@ struct HomeView: View {
                         Spacer()
 
                         VStack {
-                            Text("\(vm.selectedGameType.title)")
-                                .font(mediumTitleFont)
-                                .foregroundStyle(.white)
+                            AppText("\(vm.selectedGameType.title)", type: .titleMedium)
 
                             Spacer()
 
@@ -39,7 +37,7 @@ struct HomeView: View {
 
                     Spacer()
 
-                    playButtons
+                    playButtons(reader)
                 }
                 .frame(maxWidth: .infinity)
             }
@@ -112,11 +110,8 @@ struct HomeView: View {
     var onlineFriendsCountLabel: some View {
         Color.green
             .overlay {
-                Text("\(fakeFriends.compactMap { $0.status == .online }.count)")
-                    .font(characterDetailFont)
-                    .foregroundStyle(Color.white)
-                    .padding(1.5)
-                    .minimumScaleFactor(0.6)
+                AppText("\(fakeFriends.compactMap { $0.status == .online }.count)", type: .textSmall)
+                    .padding(0.5)
                     .lineLimit(1)
             }
             .clipShape(Circle())
@@ -131,58 +126,37 @@ struct HomeView: View {
             )
     }
 
-    @ViewBuilder var playButtons: some View {
-        VStack {
+    @ViewBuilder private func playButtons(_ reader: GeometryProxy) -> some View {
+        VStack(spacing: 50) {
             if vm.isOffline {
-                practiceButton
+                practiceButton(reader)
 
-                offlinePlayButton
+                offlinePlayButton(reader)
             } else {
-                playButton
+                playButton(reader)
             }
         }
+        .fixedSize(horizontal: true, vertical: false)
         .padding(.bottom, 60)
+        .padding(.top)
     }
 
-    var playButton: some View {
-        Button {
+    @ViewBuilder private func playButton(_ reader: GeometryProxy) -> some View {
+        GameButton(title: "Play", minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToLoading.send(vm)
-        } label: {
-            Image("playButton")
-                .frame(width: 150)
         }
     }
 
-    var offlinePlayButton: some View {
-        Button {
+    @ViewBuilder private func offlinePlayButton(_ reader: GeometryProxy) -> some View {
+        GameButton(title: "Offline", type: .greenCustom, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToOffline.send(vm)
-        } label: {
-            Text("Offline")
-                .padding(6)
-                .frame(width: 120)
-                .foregroundStyle(Color(uiColor: .systemBackground))
-                .font(boldedButtonFont)
-                .background(Color(uiColor: .label))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .padding(.horizontal)
-        .padding(.bottom, 4)
     }
 
-    var practiceButton: some View {
-        Button {
+    @ViewBuilder private func practiceButton(_ reader: GeometryProxy) -> some View {
+        GameButton(title: "Practice", type: .tertiaryCustom, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToPractice.send(vm)
-        } label: {
-            Text("Practice")
-                .padding(6)
-                .frame(width: 120)
-                .foregroundStyle(Color(uiColor: .label))
-                .font(buttonFont)
-                .background(Color(uiColor: .systemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .padding(.horizontal)
-        .padding(.bottom, 4)
     }
 }
 

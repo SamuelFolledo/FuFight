@@ -47,11 +47,9 @@ struct GameLoadingView: View {
         Button {
             vm.cancelButtonTapped()
         } label: {
-            Text("Cancel")
+            AppText("Cancel", type: .buttonMedium)
                 .padding(6)
                 .frame(maxWidth: .infinity)
-                .foregroundStyle(Color(uiColor: .systemBackground))
-                .font(.title)
                 .background(Color(uiColor: .systemRed))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }

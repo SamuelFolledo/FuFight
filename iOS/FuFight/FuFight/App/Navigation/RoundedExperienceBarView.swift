@@ -27,11 +27,8 @@ struct RoundedExperienceBarView: View {
                                 Circle().fill(.black)
                             }
                             .overlay {
-                                Text("24")
-                                    .font(usernameFont)
-                                    .foregroundStyle(Color.white)
+                                AppText("24", type: .navSmall)
                                     .padding(3.5)
-                                    .minimumScaleFactor(0.2)
                                     .lineLimit(1)
                             }
                             .frame(width: reader.size.width / 2.5)

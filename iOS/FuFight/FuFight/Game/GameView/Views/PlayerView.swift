@@ -62,10 +62,8 @@ struct PlayerView<DamagesListView: View>: View {
                         .foregroundColor(self.calculateBarColor())
                 }
                 .overlay(
-                    Text("\(player.hpText) / \(Int(player.maxHp))")
-                        .font(mediumTextFont)
-                        .foregroundStyle(.white)
-                        .padding()
+                    AppText("\(player.hpText) / \(Int(player.maxHp))", type: .navSmall)
+                        .padding(2)
                 )
             }
             .frame(height: 20)
@@ -103,9 +101,7 @@ struct PlayerView<DamagesListView: View>: View {
                 }
             }
 
-            Text(player.username)
-                .font(mediumTextFont)
-                .foregroundStyle(.white)
+            AppText(player.username, type: .navSmall)
 
             if !player.isEnemy {
                 if player.state.hasSpeedBoost {
