@@ -90,9 +90,7 @@ struct MainAlert: View {
     @ViewBuilder
     private var titleView: some View {
         if !title.isEmpty {
-            Text(title)
-                .font(smallTitleFont)
-                .foregroundColor(Color.label)
+            AppText(title, type: .titleSmall)
                 .lineSpacing(24 - UIFont.systemFont(ofSize: 18, weight: .bold).lineHeight)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -107,8 +105,7 @@ struct MainAlert: View {
                     primaryButtonAction()
                 }
         } else if !message.isEmpty {
-            Text(message)
-                .font(.system(size: title.isEmpty ? 18 : 16))
+            AppText(message, type: .textMedium)
                 .foregroundColor(title.isEmpty ? primaryColor : disabledColor)
                 .lineSpacing(24 - UIFont.systemFont(ofSize: title.isEmpty ? 18 : 16).lineHeight)
                 .multilineTextAlignment(.leading)

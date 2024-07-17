@@ -306,8 +306,7 @@ private extension ContentView {
                         .frame(width: 35, height: 35)
 
                     if tab == currentTab {
-                        Text(currentTab.title)
-                            .font(tabFont)
+                        AppText(currentTab.title, type: .navSmall)
                     }
 
                     Spacer()

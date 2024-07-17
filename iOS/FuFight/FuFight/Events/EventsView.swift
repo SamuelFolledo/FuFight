@@ -49,9 +49,7 @@ struct EventsView: View {
                 .padding(.top, homeNavBarHeight + 6)
                 .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
                 .overlay {
-                    Text("Other games coming soon")
-                        .font(mediumTitleFont)
-                        .foregroundStyle(.white)
+                    AppText("Other games coming soon", type: .titleLarge)
                         .frame(alignment: .center)
                         .padding(.horizontal)
                 }

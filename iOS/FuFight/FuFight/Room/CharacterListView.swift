@@ -80,9 +80,7 @@ struct CharacterObjectCell: View {
                     }
                 }
 
-                Text(character.fighterType.name)
-                    .font(characterFont)
-                    .foregroundStyle(.white)
+                AppText(character.fighterType.name, type: .textSmall)
                     .padding(.bottom, 4)
             }
             .background(Color.black)
@@ -102,10 +100,8 @@ struct CharacterObjectCell: View {
                 coinImage
                     .frame(width: 15, height: 15, alignment: .center)
 
-                Text("6999")
-                    .font(characterDetailFont)
+                AppText("6999", type: .textSmall)
                     .padding(.vertical, 4)
-                    .foregroundStyle(Color.white)
             }
             .frame(maxWidth: .infinity)
         })
@@ -119,8 +115,7 @@ struct CharacterObjectCell: View {
                 diamondImage
                     .frame(width: 15, height: 15, alignment: .center)
 
-                Text("750")
-                    .font(characterDetailFont)
+                AppText("750", type: .textSmall)
                     .padding(.vertical, 4)
             }
             .frame(maxWidth: .infinity)
@@ -128,16 +123,13 @@ struct CharacterObjectCell: View {
     }
 
     var fighterRankLabel: some View {
-        Text("Rank: 2")
-            .font(characterFont)
-            .foregroundStyle(Color.gray)
+        AppText("Rank: 2", type: .textSmall)
             .padding(.vertical, 4)
             .padding(.leading, 4)
     }
 
     var fighterRatingLabel: some View {
-        Text("SS")
-            .font(characterFont)
+        AppText("SS", type: .textSmall)
             .foregroundStyle(Color.red)
             .padding(.vertical, 4)
             .padding(.trailing, 4)

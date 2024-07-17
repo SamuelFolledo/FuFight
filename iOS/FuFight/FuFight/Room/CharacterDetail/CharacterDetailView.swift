@@ -61,9 +61,7 @@ struct CharacterDetailView: View {
             HStack {
                 Spacer()
 
-                    Text("\(vm.selectedFighterType?.name ?? "")")
-                        .font(mediumTitleFont)
-                        .foregroundStyle(.white)
+                AppText("\(vm.selectedFighterType?.name ?? "")", type: .titleMedium)
                 Spacer()
             }
         }

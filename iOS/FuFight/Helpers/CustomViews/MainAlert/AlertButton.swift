@@ -87,10 +87,7 @@ struct AlertButton: View {
         Button {
             action?()
         } label: {
-            Text(title)
-                .font(mediumTextFont)
-                .foregroundColor(Color(uiColor: textColor))
-                .contentShape(Rectangle())
+            AppText(title, type: .navSmall)
                 .frame(maxWidth: .infinity, minHeight: 50)
         }
         .background(

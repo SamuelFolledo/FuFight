@@ -9,11 +9,10 @@ import SwiftUI
 
 struct UpdatePasswordView: View {
     @StateObject var vm = UpdatePasswordViewModel()
-//    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
-        ScrollView {
-            GeometryReader { reader in
+        GeometryReader { reader in
+            ScrollView {
                 VStack(spacing: 0) {
                     VStack(spacing: 12) {
                         currentPasswordField

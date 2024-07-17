@@ -10,6 +10,7 @@ import SwiftUI
 struct DamagesListView: View {
     var enemyRounds: [Round]
     var isPlayerDead: Bool
+    private let textType: TextType = .textSmall
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -18,17 +19,16 @@ struct DamagesListView: View {
                 ForEach(Array(zip(rounds.indices, rounds)), id: \.1) { index, round in
                     Group {
                         HStack(spacing: 2) {
-                            Text("Round \(rounds[index].round):")
+                            AppText("Round \(rounds[index].round):", type: textType)
 
-                            Text("\(rounds[index].resultValue)")
+                            AppText("\(rounds[index].resultValue)", type: textType)
 
                             if round.round != 1 {
-                                Text(",")
+                                AppText(",", type: textType)
                             }
                         }
                         .foregroundStyle(rounds[index].attackResult?.damageTextColor ?? Color.white)
                     }
-                    .font(mediumTextFont)
                 }
             }
         }

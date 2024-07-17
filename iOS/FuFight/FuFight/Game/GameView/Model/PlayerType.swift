@@ -13,14 +13,15 @@ enum PlayerType {
     ///Enemy's MovesView which is mini and mirrored at the top
     case enemy
 
-    var font: Font {
+    var textType: TextType {
         switch self {
         case .user:
-            largeTitleFont
+            TextType.titleLarge
         case .enemy:
-            smallTitleFont
+            TextType.buttonMedium
         }
     }
+
     var angle: Angle {
         switch self {
         case .user:

@@ -119,9 +119,7 @@ struct GameAlert: View {
     @ViewBuilder
     private var titleView: some View {
         if !title.isEmpty {
-            Text(title)
-                .font(smallTitleFont)
-                .foregroundColor(Color.white)
+            AppText(title, type: .titleSmall)
 //                .lineSpacing(24 - UIFont.systemFont(ofSize: 18, weight: .bold).lineHeight)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
@@ -148,9 +146,7 @@ struct GameAlert: View {
     }
 
     @ViewBuilder private var messageLabel: some View {
-        Text(message)
-            .font(textFont)
-            .foregroundColor(Color.white)
+        AppText(message, type: .textMedium)
         //            .lineSpacing(24 - UIFont.systemFont(ofSize: title.isEmpty ? 18 : 16).lineHeight)
             .multilineTextAlignment(.center)
             .minimumScaleFactor(0.3)

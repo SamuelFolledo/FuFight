@@ -8,7 +8,16 @@
 import SwiftUI
 
 enum GameButtonType {
-    case cancel, secondaryCancel, ok, secondaryOk, custom, secondaryCustom, delete, dismiss
+    case cancel
+    case secondaryCancel
+    case ok
+    case secondaryOk
+    case custom
+    case secondaryCustom
+    case tertiaryCustom
+    case greenCustom
+    case delete
+    case dismiss
 
     var title: String {
         switch self {
@@ -18,7 +27,7 @@ enum GameButtonType {
             "Delete"
         case .ok, .secondaryOk:
             "Ok"
-        case .custom, .secondaryCustom:
+        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
             ""
         case .dismiss:
             "Dismiss"
@@ -39,6 +48,11 @@ enum GameButtonType {
             yellowButtonImage
         case .secondaryCustom:
             blueButtonImage
+        case .tertiaryCustom:
+            redButtonImage
+                .saturation(0.0) //make the image black and white
+        case .greenCustom:
+            greenButtonImage
         case .delete:
             redButtonImage
         case .dismiss:
@@ -54,7 +68,7 @@ enum GameButtonType {
             destructiveUiColor
         case .ok, .secondaryOk:
             backgroundUiColor
-        case .custom, .secondaryCustom:
+        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
             backgroundUiColor
         case .dismiss:
             backgroundUiColor
@@ -72,25 +86,28 @@ struct GameButton: View {
     let title: String
     let textColor: UIColor
     let bgColor: UIColor
+    let minWidth: CGFloat?
     let maxWidth: CGFloat
     var action: (() -> Void)? = nil
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
         self.bgColor = .systemBackground
         self.action = action
         self.type = type
+        self.minWidth = minWidth
         self.maxWidth = maxWidth
     }
 
-    init(type: GameButtonType, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(type: GameButtonType, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.type = type
         self.title = type.title
         self.textColor = type.textColor
         self.bgColor = type.bgColor
         self.action = action
+        self.minWidth = minWidth
         self.maxWidth = maxWidth
     }
 
@@ -100,10 +117,8 @@ struct GameButton: View {
         Button {
             action?()
         } label: {
-            Text(title)
-                .font(mediumTextFont)
-                .foregroundColor(Color(uiColor: textColor))
-                .frame(maxWidth: maxWidth)
+            AppText(title, type: .buttonMedium)
+                .frame(minWidth: minWidth, maxWidth: maxWidth)
                 .padding(.horizontal, 25)
         }
         .background(

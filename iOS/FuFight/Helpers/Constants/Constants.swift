@@ -48,26 +48,13 @@ let charactersBottomButtonsHeight: CGFloat = 40
 let homeNavBarHeight: CGFloat = 120
 let navBarIconSize: CGFloat = 25
 let navBarButtonMaxWidth: CGFloat = 50
+let buttonMinWidthMultiplier: CGFloat = 0.4
+let buttonMaxWidthMultiplier: CGFloat = 0.65
 
 var animationToTest: AnimationType = .punchHeadRightHard
 
 //Fonts
-let defaultFontSize: CGFloat = 16
-let tabFont = Font.system(size: 12, weight: .semibold)
-let smallTitleFont = Font.system(size: defaultFontSize + 4, weight: .bold)
-let textFont = Font.system(size: defaultFontSize, weight: .regular)
-let characterFont = Font.system(size: 14, weight: .semibold)
-let characterDetailFont = Font.system(size: 12, weight: .medium)
-let mediumTextFont = textFont.weight(.medium)
-let boldedTextFont = textFont.weight(.bold)
-let buttonFont = Font.system(size: defaultFontSize, weight: .semibold)
-let boldedButtonFont = buttonFont.weight(.bold)
-let mediumTitleFont = Font.system(size: defaultFontSize * 2, weight: .bold)
-let largeTitleFont = Font.system(size: defaultFontSize * 4, weight: .bold)
-let extraLargeTitleFont = Font.system(size: defaultFontSize * 8, weight: .bold)
-let navBarFont = Font.system(size: 13, weight: .semibold)
-let usernameFont = Font.system(size: 18, weight: .semibold)
-let friendListFont = UIFont.systemFont(ofSize: defaultFontSize, weight: .semibold)
+let defaultFontSize: CGFloat = 18
 
 //Colors
 let systemUiColor = UIColor.label

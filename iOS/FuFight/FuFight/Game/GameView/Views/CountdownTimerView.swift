@@ -20,14 +20,10 @@ struct CountdownTimerView: View {
             )
             .overlay(
                 VStack(spacing: 4) {
-//                    Text("\(String(format: "%.1f", timeRemaining))")
-                    Text("\(timeRemaining)")
-                        .font(largeTitleFont)
-                        .foregroundStyle(.white)
+//                    AppText("\(String(format: "%.1f", timeRemaining))")
+                    AppText("\(timeRemaining)", type: .titleLarge)
 
-                    Text("Round \(round)")
-                        .font(mediumTitleFont)
-                        .foregroundStyle(.white)
+                    AppText("Round \(round)", type: .textLarge)
                 }
                     .padding(.top, 30)
             )
