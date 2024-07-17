@@ -91,12 +91,12 @@ struct UpdatePasswordView: View {
         }
     }
     var backButton: some View {
-        GameButton(title: "Back", type: .delete, maxWidth: navBarButtonMaxWidth) {
+        AppButton(title: "Back", type: .delete, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
             vm.didBack.send(vm)
         }
     }
     @ViewBuilder private func updatePasswordButton(_ reader: GeometryProxy) -> some View {
-        GameButton(title: Str.updatePasswordTitle, maxWidth: reader.size.width * 0.4, action: vm.updatePasswordButtonTapped)
+        AppButton(title: Str.updatePasswordTitle, maxWidth: reader.size.width * 0.4, action: vm.updatePasswordButtonTapped)
     }
     var navigationView: some View {
         HStack(alignment: .center) {

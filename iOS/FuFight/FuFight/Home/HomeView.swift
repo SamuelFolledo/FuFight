@@ -142,19 +142,19 @@ struct HomeView: View {
     }
 
     @ViewBuilder private func playButton(_ reader: GeometryProxy) -> some View {
-        GameButton(title: "Play", minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
+        AppButton(title: "Play", textType: .buttonLarge, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToLoading.send(vm)
         }
     }
 
     @ViewBuilder private func offlinePlayButton(_ reader: GeometryProxy) -> some View {
-        GameButton(title: "Offline", type: .greenCustom, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
+        AppButton(title: "Offline", type: .greenCustom, textType: .buttonLarge, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToOffline.send(vm)
         }
     }
 
     @ViewBuilder private func practiceButton(_ reader: GeometryProxy) -> some View {
-        GameButton(title: "Practice", type: .tertiaryCustom, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
+        AppButton(title: "Practice", type: .tertiaryCustom, textType: .buttonLarge, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToPractice.send(vm)
         }
     }

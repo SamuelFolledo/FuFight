@@ -38,13 +38,13 @@ struct AccountView: View {
                    message: vm.alertMessage,
                    isPresented: $vm.isAlertPresented)
             .alert(title: Str.deleteAccountQuestion,
-                   primaryButton: GameButton(type: .delete, action: vm.deleteAccount), 
-                   secondaryButton: GameButton(type: .secondaryCancel), 
+                   primaryButton: AppButton(type: .delete, action: vm.deleteAccount), 
+                   secondaryButton: AppButton(type: .secondaryCancel), 
                    isPresented: $vm.isDeleteAccountAlertPresented)
             .alert(withText: $vm.password,
                    fieldType: .password(.current),
                    title: Str.recentReauthenticationIsRequiredToMakeChanges,
-                   primaryButton: GameButton(title: Str.logInTitle, action: vm.reauthenticate),
+                   primaryButton: AppButton(title: Str.logInTitle, action: vm.reauthenticate),
                    isPresented: $vm.isReauthenticationAlertPresented)
             .padding(.top, homeNavBarHeight + 6)
             .padding(.bottom, UserDefaults.bottomSafeAreaInset + 6)
@@ -72,12 +72,12 @@ struct AccountView: View {
     }
 
     var backButton: some View {
-        GameButton(title: "Back", type: .delete, maxWidth: navBarButtonMaxWidth) {
+        AppButton(title: "Back", type: .delete, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
             vm.didBack.send(vm)
         }
     }
     var editSaveButton: some View {
-        GameButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, maxWidth: navBarButtonMaxWidth, action: vm.editSaveButtonTapped)
+        AppButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth, action: vm.editSaveButtonTapped)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -104,17 +104,17 @@ struct AccountView: View {
             isDisabled: .constant(true))
     }
     var changePasswordButton: some View {
-        GameButton(title: Str.changePasswordTitle) {
+        AppButton(title: Str.changePasswordTitle) {
             vm.changePasswordButtonTapped()
         }
     }
     var deleteAccountButton: some View {
-        GameButton(title: Str.deleteTitle, type: .delete) {
+        AppButton(title: Str.deleteTitle, type: .delete) {
             vm.deleteButtonTapped()
         }
     }
     var logOutButton: some View {
-        GameButton(title: Str.logOutTitle, type: .delete) {
+        AppButton(title: Str.logOutTitle, type: .delete) {
             vm.logOut()
         }
     }
