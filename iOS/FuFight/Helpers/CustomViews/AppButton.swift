@@ -1,5 +1,5 @@
 //
-//  GameButton.swift
+//  AppButton.swift
 //  FuFight
 //
 //  Created by Samuel Folledo on 7/16/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum GameButtonType {
+enum AppButtonType {
     case cancel
     case secondaryCancel
     case ok
@@ -80,10 +80,11 @@ enum GameButtonType {
     }
 }
 
-struct GameButton: View {
+struct AppButton: View {
     // MARK: Public
-    var type: GameButtonType
+    var type: AppButtonType
     let title: String
+    let textType: TextType
     let textColor: UIColor
     let bgColor: UIColor
     let minWidth: CGFloat?
@@ -91,7 +92,7 @@ struct GameButton: View {
     var action: (() -> Void)? = nil
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .white, type: GameButtonType = .custom, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(title: String, textColor: UIColor = .white, type: AppButtonType = .custom, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
         self.bgColor = .systemBackground
@@ -99,9 +100,10 @@ struct GameButton: View {
         self.type = type
         self.minWidth = minWidth
         self.maxWidth = maxWidth
+        self.textType = textType
     }
 
-    init(type: GameButtonType, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(type: AppButtonType, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.type = type
         self.title = type.title
         self.textColor = type.textColor
@@ -109,6 +111,7 @@ struct GameButton: View {
         self.action = action
         self.minWidth = minWidth
         self.maxWidth = maxWidth
+        self.textType = textType
     }
 
     // MARK: - View
@@ -117,7 +120,7 @@ struct GameButton: View {
         Button {
             action?()
         } label: {
-            AppText(title, type: .buttonMedium)
+            AppText(title, type: textType)
                 .frame(minWidth: minWidth, maxWidth: maxWidth)
                 .padding(.horizontal, 25)
         }
@@ -127,16 +130,16 @@ struct GameButton: View {
     }
 }
 
-struct GameButton_Previews: PreviewProvider {
+struct AppButton_Previews: PreviewProvider {
 
     static var previews: some View {
-        let dismissButton   = GameButton(title: "Ok")
-        let primaryButton   = GameButton(title: "Ok")
-        let secondaryButton = GameButton(title: "Cancel")
+        let dismissButton   = AppButton(title: "Ok")
+        let primaryButton   = AppButton(title: "Ok")
+        let secondaryButton = AppButton(title: "Cancel")
 
-        let dismissButton2   = GameButton(type: .cancel)
-        let primaryButton2   = GameButton(type: .delete)
-        let secondaryButton2 = GameButton(type: .ok)
+        let dismissButton2   = AppButton(type: .cancel)
+        let primaryButton2   = AppButton(type: .delete)
+        let secondaryButton2 = AppButton(type: .ok)
 
         return VStack(spacing: 100) {
             dismissButton

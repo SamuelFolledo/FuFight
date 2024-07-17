@@ -15,9 +15,9 @@ struct GameAlert: View {
     // MARK: Public
     let title: String
     let message: String
-    let dismissButton: GameButton?
-    let primaryButton: GameButton?
-    let secondaryButton: GameButton?
+    let dismissButton: AppButton?
+    let primaryButton: AppButton?
+    let secondaryButton: AppButton?
     ///Show a TextField if this is not nil
 //    let fieldType: FieldType?
 //    @Binding var text: String
@@ -38,7 +38,7 @@ struct GameAlert: View {
     @Environment(\.dismiss) private var dismiss
 
     ///Default initializer
-    init(title: String, message: String, dismissButton: GameButton?, primaryButton: GameButton?, secondaryButton: GameButton?) {
+    init(title: String, message: String, dismissButton: AppButton?, primaryButton: AppButton?, secondaryButton: AppButton?) {
         self.title = title
         self.message = message
         self.dismissButton = dismissButton
@@ -49,7 +49,7 @@ struct GameAlert: View {
     }
 
     ///Initializer for alerts with a TextField
-    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: GameButton?, secondaryButton: GameButton?) {
+    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AppButton?, secondaryButton: AppButton?) {
 //        self.fieldType = fieldType
         self.title = title
         self.primaryButton = primaryButton
@@ -182,9 +182,9 @@ struct GameAlert: View {
     @ViewBuilder private func primaryButtonView(_ reader: GeometryProxy) -> some View {
         if let primaryButton {
             if primaryButton.type == .custom {
-                GameButton(title: primaryButton.title, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
+                AppButton(title: primaryButton.title, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             } else {
-                GameButton(type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
+                AppButton(type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             }
         }
     }
@@ -201,9 +201,9 @@ struct GameAlert: View {
                 }
             }
             if button.type == .custom {
-                GameButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
+                AppButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
-                GameButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
+                AppButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             }
         }
     }
@@ -220,9 +220,9 @@ struct GameAlert: View {
                 }
             }
             if button.type == .custom {
-                GameButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
+                AppButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
-                GameButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
+                AppButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             }
         }
     }
@@ -274,13 +274,13 @@ struct GameAlert_Previews: PreviewProvider {
     static var previews: some View {
         let showType: Bool = true
 
-        let dismissButton   = GameButton(title: "Ok")
-        let primaryButton   = GameButton(title: "Ok")
-        let secondaryButton = GameButton(title: "Cancel")
+        let dismissButton   = AppButton(title: "Ok")
+        let primaryButton   = AppButton(title: "Ok")
+        let secondaryButton = AppButton(title: "Cancel")
 
-        let dismissButton2   = GameButton(type: .dismiss)
-        let primaryButton2   = GameButton(type: .delete)
-        let secondaryButton2 = GameButton(type: .secondaryOk)
+        let dismissButton2   = AppButton(type: .dismiss)
+        let primaryButton2   = AppButton(type: .delete)
+        let secondaryButton2 = AppButton(type: .secondaryOk)
 
         let title = "Error connecting game to the server"
         let message = """

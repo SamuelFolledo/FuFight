@@ -149,14 +149,14 @@ struct AuthenticationView: View {
     }
 
     var topButton: some View {
-        GameButton(title: vm.step.topButtonTitle, action: vm.topButtonTapped)
+        AppButton(title: vm.step.topButtonTitle, action: vm.topButtonTapped)
         .disabled(!vm.topButtonIsEnabled)
     }
 
     @ViewBuilder var bottomButton: some View {
         switch vm.step {
         case .logIn, .signUp:
-            GameButton(title: vm.step.bottomButtonTitle, type: .secondaryCustom, action: vm.bottomButtonTapped)
+            AppButton(title: vm.step.bottomButtonTitle, type: .secondaryCustom, action: vm.bottomButtonTapped)
         case .phone, .phoneVerification, .onboard:
             EmptyView()
         }

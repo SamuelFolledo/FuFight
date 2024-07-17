@@ -16,9 +16,9 @@ struct MainAlertModifier {
     // MARK: Private
     private let title: String
     private let message: String
-    private let dismissButton: GameButton?
-    private let primaryButton: GameButton?
-    private let secondaryButton: GameButton?
+    private let dismissButton: AppButton?
+    private let primaryButton: AppButton?
+    private let secondaryButton: AppButton?
     ///Show a TextField if this is not nil
     var fieldType: FieldType? = nil
     @Binding var text: String
@@ -44,7 +44,7 @@ extension MainAlertModifier: ViewModifier {
 
 extension MainAlertModifier {
 
-    init(title: String = "", message: String = "", dismissButton: GameButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", dismissButton: AppButton, isPresented: Binding<Bool>) {
         self.title         = title
         self.message       = message
         self.dismissButton = dismissButton
@@ -54,7 +54,7 @@ extension MainAlertModifier {
         _text = .constant("")
     }
 
-    init(title: String = "", message: String = "", primaryButton: GameButton, secondaryButton: GameButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", primaryButton: AppButton, secondaryButton: AppButton, isPresented: Binding<Bool>) {
         self.title           = title
         self.message         = message
         self.primaryButton   = primaryButton
@@ -65,7 +65,7 @@ extension MainAlertModifier {
     }
 
     ///Initializer for primary button only alert
-    init(title: String = "", message: String = "", primaryButton: GameButton, isPresented: Binding<Bool>) {
+    init(title: String = "", message: String = "", primaryButton: AppButton, isPresented: Binding<Bool>) {
         self.title         = title
         self.message       = message
         self.dismissButton = nil
@@ -76,7 +76,7 @@ extension MainAlertModifier {
     }
 
     ///Initializer for alerts with a TextField
-    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: GameButton?, secondaryButton: GameButton?, isPresented: Binding<Bool>) {
+    init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AppButton?, secondaryButton: AppButton?, isPresented: Binding<Bool>) {
         self.fieldType = fieldType
         self.primaryButton = primaryButton
         self.secondaryButton = secondaryButton
