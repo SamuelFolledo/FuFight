@@ -49,7 +49,7 @@ final class HomeViewModel: BaseAccountViewModel {
         switch buttonType {
         case .leading1, .leading2, .leading3:
             LOG("Tapped leading button \(buttonType.rawValue)")
-        case .trailing1, .trailing2:
+        case .accountDetail, .trailing2:
             LOG("Tapped trailing button \(buttonType.rawValue)")
         case .friendPicker:
             break

@@ -35,7 +35,7 @@ enum HomeButtonType: String, CaseIterable {
     case leading1
     case leading2
     case leading3
-    case trailing1
+    case accountDetail
     case trailing2
     case friendPicker
 
@@ -43,7 +43,9 @@ enum HomeButtonType: String, CaseIterable {
         switch self {
         case .leading1, .leading2, .leading3:
             "coin"
-        case .trailing1, .trailing2:
+        case .accountDetail:
+            "person.fill"
+        case .trailing2:
             "diamond"
         case .friendPicker:
             "person.2.fill"
@@ -53,10 +55,15 @@ enum HomeButtonType: String, CaseIterable {
     var image: some View {
         Group {
             switch self {
-            case .leading1, .leading2, .leading3, .trailing1, .trailing2:
+            case .leading1, .leading2, .leading3, .trailing2:
                 Image(imageName)
                     .defaultImageModifier()
                     .frame(width: 40, height: 50)
+            case .accountDetail:
+                Image(systemName: imageName)
+                    .defaultImageModifier()
+                    .frame(width: 30, height: 40)
+                    .padding(.horizontal, 5)
             case .friendPicker:
                 Image(systemName: imageName)
                     .defaultImageModifier()
@@ -71,7 +78,7 @@ enum HomeButtonType: String, CaseIterable {
         switch self {
         case .leading1, .leading2, .leading3:
                 .leading
-        case .trailing1, .trailing2, .friendPicker:
+        case .accountDetail, .trailing2, .friendPicker:
                 .trailing
         }
     }
