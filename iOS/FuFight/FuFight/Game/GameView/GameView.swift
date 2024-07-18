@@ -39,7 +39,7 @@ struct GameView: View {
                isPresented: $vm.isAlertPresented)
         .alert(title: vm.player.isDead ? "You lost" : "You won!",
                primaryButton: AppButton(title: "Rematch", action: vm.rematch),
-               secondaryButton: AppButton(title: "Go home", action: vm.exitGame),
+               secondaryButton: AppButton(title: "Go home", type: AppButtonType.delete, action: vm.exitGame),
                isPresented: .constant(vm.player.isDead || vm.enemy.isDead))
         .alert(title: "You won!",
                message: "Congrats! Enemy rage quitted",
@@ -47,7 +47,7 @@ struct GameView: View {
                isPresented: $vm.enemyExited)
         .alert(title: "Game is paused",
                primaryButton: AppButton(title: "Resume", action: {}),
-               secondaryButton: AppButton(title: "Exit", action: vm.exitGame),
+               secondaryButton: AppButton(title: "Exit", type: AppButtonType.delete, action: vm.exitGame),
                isPresented: $vm.isGamePaused)
         .overlay {
             timerView

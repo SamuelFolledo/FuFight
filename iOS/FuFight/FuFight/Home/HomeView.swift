@@ -148,7 +148,7 @@ struct HomeView: View {
     }
 
     @ViewBuilder private func offlinePlayButton(_ reader: GeometryProxy) -> some View {
-        AppButton(title: "Offline", type: .greenCustom, textType: .buttonLarge, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
+        AppButton(title: "Offline", type: .secondaryCancel, textType: .buttonLarge, minWidth: reader.size.width * buttonMinWidthMultiplier, maxWidth: reader.size.width * buttonMaxWidthMultiplier) {
             vm.transitionToOffline.send(vm)
         }
     }

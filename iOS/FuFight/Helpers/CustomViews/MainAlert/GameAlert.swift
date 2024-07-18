@@ -19,9 +19,9 @@ struct GameAlert: View {
     let primaryButton: AppButton?
     let secondaryButton: AppButton?
     ///Show a TextField if this is not nil
-//    let fieldType: FieldType?
-//    @Binding var text: String
-//    @State var isFieldSecure: Bool = false
+    let fieldType: FieldType?
+    @Binding var text: String
+    @State var isFieldSecure: Bool = false
 
     // MARK: Private
     @State private var opacity: CGFloat           = 0
@@ -44,19 +44,19 @@ struct GameAlert: View {
         self.dismissButton = dismissButton
         self.primaryButton = primaryButton
         self.secondaryButton = secondaryButton
-//        fieldType = nil
-//        _text = .constant("")
+        fieldType = nil
+        _text = .constant("")
     }
 
     ///Initializer for alerts with a TextField
     init(withText text: Binding<String>, fieldType: FieldType, title: String, primaryButton: AppButton?, secondaryButton: AppButton?) {
-//        self.fieldType = fieldType
+        self.fieldType = fieldType
         self.title = title
         self.primaryButton = primaryButton
         self.secondaryButton = secondaryButton
-//        _text = text
         self.message = ""
         self.dismissButton = nil
+        _text = text
     }
 
     // MARK: - View
@@ -74,11 +74,11 @@ struct GameAlert: View {
                 animate(isShown: true)
             }
         }
-//        .onAppear {
-//            if let fieldType {
-//                isFieldSecure = fieldType.isSensitive
-//            }
-//        }
+        .onAppear {
+            if let fieldType {
+                isFieldSecure = fieldType.isSensitive
+            }
+        }
     }
 
     // MARK: Private
@@ -128,13 +128,12 @@ struct GameAlert: View {
     }
 
     @ViewBuilder private var messageView: some View {
-//        if let fieldType {
-//            UnderlinedTextField(type: .constant(fieldType), text: $text, isSecure: $isFieldSecure, showTitle: false)
-//                .onSubmit {
-//                    primaryButtonAction()
-//                }
-//        } else
-        if !message.isEmpty {
+        if let fieldType {
+            UnderlinedTextField(type: .constant(fieldType), text: $text, isSecure: $isFieldSecure, showTitle: false)
+                .onSubmit {
+                    primaryButtonAction()
+                }
+        } else if !message.isEmpty {
             if isManyText {
                 ScrollView(.vertical, showsIndicators: false) {
                     messageLabel
@@ -181,8 +180,9 @@ struct GameAlert: View {
 
     @ViewBuilder private func primaryButtonView(_ reader: GeometryProxy) -> some View {
         if let primaryButton {
-            if primaryButton.type == .custom {
-                AppButton(title: primaryButton.title, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
+            if primaryButton.type.isCustom {
+                //if type is a custom type, then show the title
+                AppButton(title: primaryButton.title, type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             } else {
                 AppButton(type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             }
@@ -200,7 +200,7 @@ struct GameAlert: View {
                     button.action?()
                 }
             }
-            if button.type == .custom {
+            if button.type.isCustom {
                 AppButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
                 AppButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
@@ -219,7 +219,7 @@ struct GameAlert: View {
                     button.action?()
                 }
             }
-            if button.type == .custom {
+            if button.type.isCustom {
                 AppButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
                 AppButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)

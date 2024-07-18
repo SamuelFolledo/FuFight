@@ -66,8 +66,10 @@ final class AccountViewModel: BaseAccountViewModel {
         Task {
             let currentUserId = account.id ?? Account.current?.userId ?? account.userId
             do {
-                updateLoadingMessage(to: Str.deletingStoredPhoto)
-                try await AccountNetworkManager.deleteStoredPhoto(currentUserId)
+                if Account.current?.photoUrl != nil {
+                    updateLoadingMessage(to: Str.deletingStoredPhoto)
+                    try await AccountNetworkManager.deleteStoredPhoto(currentUserId)
+                }
                 updateLoadingMessage(to: Str.deletingData)
                 try await AccountNetworkManager.deleteData(currentUserId)
                 try await AccountNetworkManager.deleteAuthData(userId: currentUserId)

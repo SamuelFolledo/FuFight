@@ -63,6 +63,18 @@ struct ContentView: View {
     @Namespace var namespace
     @Environment(\.scenePhase) var scenePhase
 
+    init() {
+        UINavigationBar.appearance().largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font : UIFont(name: CustomFontWeight.black.rawValue, size: defaultFontSize * 2)!
+        ]
+        UINavigationBar.appearance().titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font : UIFont(name: CustomFontWeight.black.rawValue, size: defaultFontSize * 1.2)!
+        ]
+        UINavigationBar.appearance().setBackgroundImage(UIImage(), for: UIBarMetrics.default) //make the nav bar's background clear
+    }
+
     //MARK: - Views
     var body: some View {
         GeometryReader { reader in

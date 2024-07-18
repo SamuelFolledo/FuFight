@@ -13,41 +13,43 @@ struct AuthenticationView: View {
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 0) {
-                    profilePicture
+            GeometryReader { reader in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        profilePicture
 
-                    VStack(spacing: 12) {
-                        fields
+                        VStack(spacing: 12) {
+                            fields
 
-                        HStack {
-                            rememberMeButton
+                            HStack {
+                                rememberMeButton
 
-                            Spacer()
+                                Spacer()
 
-                            forgetPasswordButton
+                                forgetPasswordButton
+                            }
+
+                            authButtons(reader)
                         }
-
-                        authButtons
                     }
+                    .padding(.horizontal, horizontalPadding)
+                    .allowsHitTesting(vm.loadingMessage == nil)
                 }
-                .padding(.horizontal, horizontalPadding)
-                .allowsHitTesting(vm.loadingMessage == nil)
+                .navigationBarTitle(vm.step.title, displayMode: .large)
+                .overlay {
+                    LoadingView(message: vm.loadingMessage)
+                }
+                .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
+                .alert(withText: $vm.topFieldText,
+                       fieldType: .emailOrUsername,
+                       title: Str.putEmailOrUsernameToResetPassword,
+                       primaryButton: AppButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
+                       isPresented: $vm.showForgotPassword)
+                .background(
+                    backgroundImage
+                        .padding(.trailing, 400)
+                )
             }
-            .navigationBarTitle(vm.step.title, displayMode: .large)
-            .overlay {
-                LoadingView(message: vm.loadingMessage)
-            }
-            .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
-//            .alert(withText: $vm.topFieldText,
-//                   fieldType: .emailOrUsername,
-//                   title: Str.putEmailOrUsernameToResetPassword,
-//                   primaryButton: AlertButton(title: Str.sendLinkTitle, action: vm.requestPasswordReset),
-//                   isPresented: $vm.showForgotPassword)
-            .background(
-                backgroundImage
-                    .padding(.trailing, 400)
-            )
         }
         .onAppear {
             vm.onAppear()
@@ -88,9 +90,11 @@ struct AuthenticationView: View {
                 vm.rememberMe = !vm.rememberMe
             }) {
                 HStack {
-                    Image(uiImage: vm.rememberMe ? checkedImage : uncheckedImage)
-                        .renderingMode(.template)
-                        .foregroundColor(.label)
+                    if vm.rememberMe {
+                        checkedImage
+                    } else {
+                        uncheckedImage
+                    }
 
                     AppText(Str.rememberMe, type: .buttonSmall)
                 }
@@ -110,11 +114,11 @@ struct AuthenticationView: View {
         }
     }
 
-    var authButtons: some View {
+    @ViewBuilder private func authButtons(_ reader: GeometryProxy) -> some View {
         VStack(spacing: 80) {
-            topButton
+            topButton(reader)
 
-            bottomButton
+            bottomButton(reader)
         }
         .fixedSize(horizontal: true, vertical: false)
         .padding(.top)
@@ -148,15 +152,23 @@ struct AuthenticationView: View {
         }
     }
 
-    var topButton: some View {
-        AppButton(title: vm.step.topButtonTitle, action: vm.topButtonTapped)
-        .disabled(!vm.topButtonIsEnabled)
+    @ViewBuilder private func topButton(_ reader: GeometryProxy) -> some View {
+        AppButton(title: vm.step.topButtonTitle, 
+                  type: .cancel,
+                  minWidth: reader.size.width * buttonMinWidthMultiplier,
+                  maxWidth: reader.size.width * buttonMaxWidthMultiplier,
+                  action: vm.topButtonTapped)
+            .disabled(!vm.topButtonIsEnabled)
     }
 
-    @ViewBuilder var bottomButton: some View {
+    @ViewBuilder private func bottomButton(_ reader: GeometryProxy) -> some View {
         switch vm.step {
         case .logIn, .signUp:
-            AppButton(title: vm.step.bottomButtonTitle, type: .secondaryCustom, action: vm.bottomButtonTapped)
+            AppButton(title: vm.step.bottomButtonTitle, 
+                      type: .secondaryCustom,
+                      minWidth: reader.size.width * buttonMinWidthMultiplier,
+                      maxWidth: reader.size.width * buttonMaxWidthMultiplier,
+                      action: vm.bottomButtonTapped)
         case .phone, .phoneVerification, .onboard:
             EmptyView()
         }

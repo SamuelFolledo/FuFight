@@ -36,7 +36,7 @@ struct Str {
     static let enterPhoneSixDigitCode = "Enter 6 digit code"
     static let rememberMe = "Remember me"
     static let forgotPasswordTitleQuestion = "Forgot Password?"
-    static let putEmailOrUsernameToResetPassword = "Put your email or username to reset your password"
+    static let putEmailOrUsernameToResetPassword = "Enter email or username to reset"
     static let changePasswordTitle = "Change Password"
     static let updatePasswordTitle = "Update Password"
     static let createAccountTitle = "Create Account"
@@ -58,7 +58,7 @@ struct Str {
     static let dontHaveAnAccount = "Don't have an account? Sign up."
     static let alreadyHaveAnAccount = "Already have an account? Log in."
     static let enterYourEmail = "Enter your email"
-    static let recentReauthenticationIsRequiredToMakeChanges = "Recent reauthentication is required to make account changes"
+    static let recentReauthenticationIsRequiredToMakeChanges = "Log in again to make changes"
     static let sendingEmail = "Sending an email"
 
     //MARK: - Logs

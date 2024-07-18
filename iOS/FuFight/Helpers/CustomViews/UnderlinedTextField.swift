@@ -157,6 +157,10 @@ struct UnderlinedTextField: View {
 
     @FocusState private var isFocused: Bool
 
+    private var currentColor: Color {
+        isDisabled ? Color.lightText : Color.white
+    }
+
     init(type: Binding<FieldType>, text: Binding<String>, isSecure: Binding<Bool> = .constant(false), hasError: Binding<Bool> = .constant(false), isActive: Binding<Bool> = .constant(false), isDisabled: Binding<Bool> = .constant(false), showTitle: Bool = true, _ trailingButtonAction: (() -> Void)? = nil) {
         self._type = type
         self._text = text
@@ -178,10 +182,12 @@ struct UnderlinedTextField: View {
                 Group {
                     if isSecure {
                         SecureField(type.placeholder, text: $text)
-                            .foregroundStyle(isDisabled ? .secondary : .primary)
+                            .foregroundStyle(currentColor)
+                            .placeholder(type.placeholder, when: text.isEmpty)
                     } else {
                         TextField(type.placeholder, text: $text)
-                            .foregroundStyle(isDisabled ? .secondary : .primary)
+                            .foregroundStyle(currentColor)
+                            .placeholder(type.placeholder, when: text.isEmpty)
                     }
                 }
                 .textFieldStyle(PlainTextFieldStyle())
@@ -191,7 +197,7 @@ struct UnderlinedTextField: View {
                 .textContentType(type.contentType)
                 .submitLabel(type.submitLabel)
                 .font(Font.customFont(TextType.textLarge.fontWeight, TextType.textMedium.fontSize))
-                
+
                 accessories
             }
         }
@@ -210,7 +216,7 @@ struct UnderlinedTextField: View {
 
             Rectangle()
                 .frame(height: 1.5)
-                .foregroundStyle(hasError ? destructiveColor : (isDisabled ? disabledColor : primaryColor))
+                .foregroundStyle(hasError ? destructiveColor : currentColor)
         }
     }
 
