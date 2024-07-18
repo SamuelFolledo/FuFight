@@ -37,7 +37,7 @@ enum AppButtonType {
     @ViewBuilder var background: some View {
         switch self {
         case .cancel:
-            yellowButtonImage
+            redButtonImage
         case .secondaryCancel:
             blueButtonImage
         case .ok:
@@ -77,6 +77,15 @@ enum AppButtonType {
 
     var textColor: UIColor {
         .white
+    }
+
+    var isCustom: Bool {
+        switch self {
+        case .cancel, .secondaryCancel, .ok, .secondaryOk, .delete, .dismiss:
+            false
+        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
+            true
+        }
     }
 }
 

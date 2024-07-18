@@ -255,9 +255,11 @@ private extension AuthenticationViewModel {
                     transitionToHomeView()
                 } else {
                     ///Finish onboarding
-                    updateError(nil)
-                    updateStep(to: .onboard)
-                    topFieldIsActive = true
+                    DispatchQueue.main.async {
+                        self.updateError(nil)
+                        self.updateStep(to: .onboard)
+                        self.topFieldIsActive = true
+                    }
                 }
             } catch {
                 updateError(MainError(type: .logIn, message: error.localizedDescription))

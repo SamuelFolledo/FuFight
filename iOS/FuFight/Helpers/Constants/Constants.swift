@@ -112,12 +112,14 @@ let yellowRingImage: some View = Image("yellowRing").containerImageModifier()
 
 //System Images
 let defaultProfilePhoto: UIImage = UIImage(systemName: "person.crop.circle")!
-let checkedImage: UIImage = UIImage(systemName: "checkmark.square.fill")!
-let uncheckedImage: UIImage = UIImage(systemName: "square")!
+let checkedImage: some View = Image(systemName: "checkmark.square.fill")
+    .foregroundColor(Color.white)
+let uncheckedImage: some View = Image(systemName: "square")
+    .foregroundColor(Color.white)
 let securedImage: some View = Image(systemName: "eye")
-    .foregroundColor(.label)
+    .foregroundColor(Color.white)
 let nonSecuredImage: some View = Image(systemName: "eye.slash")
-    .foregroundColor(.label)
+    .foregroundColor(Color.white)
 let invalidImage: some View = Image(systemName: "xmark.circle.fill")
     .foregroundColor(Color.systemRed)
 let validImage: some View = Image(systemName: "checkmark.circle.fill")
