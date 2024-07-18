@@ -26,8 +26,6 @@ struct HomeView: View {
                             AppText("\(vm.selectedGameType.title)", type: .titleMedium)
 
                             Spacer()
-
-                            Spacer()
                         }
 
                         Spacer()
@@ -86,10 +84,17 @@ struct HomeView: View {
             VStack {
                 ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
                     switch buttonType {
-                        case .leading1, .leading2, .leading3, .trailing1, .trailing2:
-                            PopoverButton(type: buttonType, popOverContent: {
-                                EmptyView()
-                            })
+                        case .leading1, .leading2, .leading3, .accountDetail, .trailing2:
+                        Button {
+                            switch buttonType {
+                            case .leading1, .leading2, .leading3, .trailing2, .friendPicker:
+                                break
+                            case .accountDetail:
+                                vm.transitionToAccount.send(vm)
+                            }
+                        } label: {
+                            buttonType.image
+                        }
                         case .friendPicker:
                             PopoverButton(type: buttonType, showPopover: $vm.showFriendPicker, popOverContent: {
                                 friendPickerView(reader)
