@@ -153,8 +153,7 @@ struct AuthenticationView: View {
     }
 
     @ViewBuilder private func topButton(_ reader: GeometryProxy) -> some View {
-        AppButton(title: vm.step.topButtonTitle, 
-                  type: .cancel,
+        AppButton(title: vm.step.topButtonTitle,
                   minWidth: reader.size.width * buttonMinWidthMultiplier,
                   maxWidth: reader.size.width * buttonMaxWidthMultiplier,
                   action: vm.topButtonTapped)
@@ -165,7 +164,7 @@ struct AuthenticationView: View {
         switch vm.step {
         case .logIn, .signUp:
             AppButton(title: vm.step.bottomButtonTitle, 
-                      type: .secondaryCustom,
+                      color: .main2,
                       minWidth: reader.size.width * buttonMinWidthMultiplier,
                       maxWidth: reader.size.width * buttonMaxWidthMultiplier,
                       action: vm.bottomButtonTapped)

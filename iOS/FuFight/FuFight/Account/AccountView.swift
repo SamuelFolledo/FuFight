@@ -72,12 +72,12 @@ struct AccountView: View {
     }
 
     var backButton: some View {
-        AppButton(title: "Back", type: .delete, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
+        AppButton(title: "Back", color: ColorType.destructive, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
             vm.didBack.send(vm)
         }
     }
     var editSaveButton: some View {
-        AppButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, type: .custom, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth, action: vm.editSaveButtonTapped)
+        AppButton(title: vm.isViewingMode ? Str.editTitle : Str.saveTitle, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth, action: vm.editSaveButtonTapped)
     }
     var profilePicture: some View {
         AccountImagePicker(selectedImage: $vm.selectedImage, url: $vm.account.photoUrl)
@@ -109,12 +109,12 @@ struct AccountView: View {
         }
     }
     var deleteAccountButton: some View {
-        AppButton(title: Str.deleteTitle, type: .delete) {
+        AppButton(title: Str.deleteTitle, color: ColorType.destructive) {
             vm.deleteButtonTapped()
         }
     }
     var logOutButton: some View {
-        AppButton(title: Str.logOutTitle, type: .delete) {
+        AppButton(title: Str.logOutTitle, color: ColorType.destructive) {
             vm.logOut()
         }
     }
