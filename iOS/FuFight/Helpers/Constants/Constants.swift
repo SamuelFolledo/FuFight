@@ -88,6 +88,7 @@ let navBarContainerImage: some View = Image("navBarContainer").containerImageMod
 let alertBodyBackgroundImage: some View = Image("alertBodyBackground").containerImageModifier()
 let alertTitleBackgroundImage_Shadowed: some View = Image("alertTitleBackground-shadowed").containerImageModifier()
 let alertTitleBackgroundImage: some View = Image("alertTitleBackground").containerImageModifier()
+let dimViewBackground: some View = Color.gray.opacity(0.55)
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()

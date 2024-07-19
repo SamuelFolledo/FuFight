@@ -56,6 +56,7 @@ struct ContentView: View {
     @StateObject var account: Account = Account.current ?? Account()
     @State var showTab: Bool = true
     @State var showNav: Bool = true
+    @State var showPlayerAlert: Bool = false
     @State var tab: Tab = .home
     private let tabs: [Tab] = Tab.allCases
     var subscriptions = Set<AnyCancellable>()
@@ -112,6 +113,15 @@ struct ContentView: View {
                         }
                     }
                 }
+                .overlay {
+                    if showPlayerAlert {
+                        PopupView(isShowing: $showPlayerAlert,
+                                  content: PlayerDetailView(isShowing: $showPlayerAlert)
+                            .frame(width: reader.size.width * 0.9)
+                            .frame(maxHeight: .infinity)
+                        )
+                    }
+                }
                 .onAppear {
                     UserDefaults.topSafeAreaInset = reader.safeAreaInsets.top
                     UserDefaults.bottomSafeAreaInset = reader.safeAreaInsets.bottom
@@ -132,6 +142,9 @@ struct ContentView: View {
         if showNav {
             NavBar {
                 //TODO: Show popup PlayerDetailView
+                withAnimation {
+                    showPlayerAlert = true
+                }
             }
         }
     }
