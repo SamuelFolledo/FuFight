@@ -182,7 +182,7 @@ struct GameAlert: View {
         if let primaryButton {
             if primaryButton.type.isCustom {
                 //if type is a custom type, then show the title
-                AppButton(title: primaryButton.title, type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
+                AppButton(title: primaryButton.title, color: primaryButton.color, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             } else {
                 AppButton(type: primaryButton.type, maxWidth: reader.size.width * buttonMultiplier, action: primaryButtonAction)
             }

@@ -91,7 +91,7 @@ struct UpdatePasswordView: View {
         }
     }
     var backButton: some View {
-        AppButton(title: "Back", type: .delete, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
+        AppButton(title: "Back", color: ColorType.destructive, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
             vm.didBack.send(vm)
         }
     }

@@ -7,15 +7,39 @@
 
 import SwiftUI
 
+enum ColorType {
+    case main
+    case main2
+    case main3
+    case system
+    case system2
+    case destructive
+
+    @ViewBuilder var background: some View {
+        switch self {
+        case .main:
+            yellowButtonImage
+        case .main2:
+            blueButtonImage
+        case .main3:
+            blueButtonImage
+                .saturation(0) //make the image black and white
+        case .system:
+            blueButtonImage
+        case .system2:
+            greenButtonImage
+        case .destructive:
+            redButtonImage
+        }
+    }
+}
+
 enum AppButtonType {
     case cancel
     case secondaryCancel
     case ok
     case secondaryOk
     case custom
-    case secondaryCustom
-    case tertiaryCustom
-    case greenCustom
     case delete
     case dismiss
 
@@ -27,51 +51,29 @@ enum AppButtonType {
             "Delete"
         case .ok, .secondaryOk:
             "Ok"
-        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
+        case .custom:
             ""
         case .dismiss:
             "Dismiss"
         }
     }
 
-    @ViewBuilder var background: some View {
+    var color: ColorType {
         switch self {
         case .cancel:
-            redButtonImage
+            .destructive
         case .secondaryCancel:
-            blueButtonImage
+            .system
         case .ok:
-            yellowButtonImage
+            .main
         case .secondaryOk:
-            blueButtonImage
+            .system
         case .custom:
-            yellowButtonImage
-        case .secondaryCustom:
-            blueButtonImage
-        case .tertiaryCustom:
-            redButtonImage
-                .saturation(0.0) //make the image black and white
-        case .greenCustom:
-            greenButtonImage
+            .main
         case .delete:
-            redButtonImage
+            .destructive
         case .dismiss:
-            blueButtonImage
-        }
-    }
-
-    var bgColor: UIColor {
-        switch self {
-        case .cancel, .secondaryCancel:
-            backgroundUiColor
-        case .delete:
-            destructiveUiColor
-        case .ok, .secondaryOk:
-            backgroundUiColor
-        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
-            backgroundUiColor
-        case .dismiss:
-            backgroundUiColor
+            .main2
         }
     }
 
@@ -83,7 +85,7 @@ enum AppButtonType {
         switch self {
         case .cancel, .secondaryCancel, .ok, .secondaryOk, .delete, .dismiss:
             false
-        case .custom, .secondaryCustom, .tertiaryCustom, .greenCustom:
+        case .custom:
             true
         }
     }
@@ -91,32 +93,33 @@ enum AppButtonType {
 
 struct AppButton: View {
     // MARK: Public
-    var type: AppButtonType
     let title: String
+    var type: AppButtonType
     let textType: TextType
+    var color: ColorType
     let textColor: UIColor
-    let bgColor: UIColor
     let minWidth: CGFloat?
     let maxWidth: CGFloat
     var action: (() -> Void)? = nil
+    
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, textColor: UIColor = .white, type: AppButtonType = .custom, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(title: String, color: ColorType = .main, textColor: UIColor = .white, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.title = title
         self.textColor = textColor
-        self.bgColor = .systemBackground
         self.action = action
-        self.type = type
+        self.type = .custom
         self.minWidth = minWidth
         self.maxWidth = maxWidth
         self.textType = textType
+        self.color = color
     }
 
     init(type: AppButtonType, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.type = type
+        self.color = type.color
         self.title = type.title
         self.textColor = type.textColor
-        self.bgColor = type.bgColor
         self.action = action
         self.minWidth = minWidth
         self.maxWidth = maxWidth
@@ -134,7 +137,7 @@ struct AppButton: View {
                 .padding(.horizontal, 25)
         }
         .background(
-            type.background
+            color.background
         )
     }
 }
