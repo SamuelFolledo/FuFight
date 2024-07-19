@@ -131,9 +131,7 @@ struct ContentView: View {
     @ViewBuilder func navBarView() -> some View {
         if showNav {
             NavBar {
-                //TODO: Change this to one of the HomeButtonType
-                homeRouter.transitionToAccount(vm: homeRouter.makeHomeViewModel(account: account))
-                showNav = false
+                //TODO: Show popup PlayerDetailView
             }
         }
     }

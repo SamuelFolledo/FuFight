@@ -10,7 +10,13 @@ import SwiftUI
 import SceneKit
 
 final class RoomViewModel: BaseAccountViewModel {
-    @Published var selectedFighterType: FighterType? = nil
+    @Published var selectedFighterType: FighterType? = Room.current?.player.fighterType {
+        didSet {
+            let room = Room.current
+            room?.player.fighterType = selectedFighterType!
+            RoomManager.saveCurrent(room!)
+        }
+    }
 
     let playerType: PlayerType = .user
 
