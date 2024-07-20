@@ -115,11 +115,9 @@ struct ContentView: View {
                 }
                 .overlay {
                     if showPlayerAlert {
-                        PopupView(isShowing: $showPlayerAlert,
-                                  content: PlayerDetailView(isShowing: $showPlayerAlert)
-                            .frame(width: reader.size.width * 0.9)
-                            .frame(maxHeight: .infinity)
-                        )
+                        PopupView(isShowing: $showPlayerAlert, title: "Player's Detail",
+                                  bodyContent: PlayerDetailView(isShowing: $showPlayerAlert))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
                 .onAppear {

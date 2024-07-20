@@ -16,6 +16,13 @@ final class HomeViewModel: BaseAccountViewModel {
     @Published var selectedGameType: GameType = .casual
     @Published var isOffline: Bool = false
     @Published var showFriendPicker: Bool = false
+    @Published var showRewards: Bool = false
+    @Published var showInbox: Bool = false
+    @Published var showSettings: Bool = false
+    @Published var showPromotions: Bool = false
+    @Published var showTasks: Bool = false
+    @Published var showChests: Bool = false
+    @Published var showLeaderboards: Bool = false
 
     let gameTypes: [GameType] = GameType.allCases
     let availableButtonTypes: [HomeButtonType] = HomeButtonType.allCases
@@ -47,10 +54,22 @@ final class HomeViewModel: BaseAccountViewModel {
 
     func homeButtonTapped(_ buttonType: HomeButtonType) {
         switch buttonType {
-        case .leading1, .leading2, .leading3:
-            LOG("Tapped leading button \(buttonType.rawValue)")
-        case .accountDetail, .trailing2:
-            LOG("Tapped trailing button \(buttonType.rawValue)")
+        case .rewards:
+            showRewards.toggle()
+        case .inbox:
+            showInbox.toggle()
+        case .profile:
+            transitionToAccount.send(self)
+        case .settings:
+            showSettings.toggle()
+        case .promotions:
+            showPromotions.toggle()
+        case .tasks:
+            showTasks.toggle()
+        case .chests:
+            showChests.toggle()
+        case .leaderboards:
+            showLeaderboards.toggle()
         case .friendPicker:
             break
         }
