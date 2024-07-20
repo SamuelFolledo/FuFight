@@ -89,6 +89,7 @@ let alertBodyBackgroundImage: some View = Image("alertBodyBackground").container
 let alertTitleBackgroundImage_Shadowed: some View = Image("alertTitleBackground-shadowed").containerImageModifier()
 let alertTitleBackgroundImage: some View = Image("alertTitleBackground").containerImageModifier()
 let dimViewBackground: some View = Color.gray.opacity(0.55)
+let roundedButtonBackgroundImage: some View = Image("borderedCircle").containerImageModifier()
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()

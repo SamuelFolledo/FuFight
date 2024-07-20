@@ -32,21 +32,30 @@ struct PopoverButton<PopOverContent: View>: View {
 }
 
 enum HomeButtonType: String, CaseIterable {
-    case leading1
-    case leading2
-    case leading3
-    case accountDetail
-    case trailing2
-    case friendPicker
+    case rewards, inbox, profile, settings
+    case promotions, tasks, chests
+    case leaderboards, friendPicker
 
     var imageName: String {
         switch self {
-        case .leading1, .leading2, .leading3:
-            "coin"
-        case .accountDetail:
-            "person.fill"
-        case .trailing2:
-            "diamond"
+        case .rewards:
+            "gift.circle"
+        case .inbox:
+            "message.circle"
+        case .profile:
+            "person.circle"
+        case .settings:
+            "gearshape.circle"
+        case .promotions:
+            //TODO: Turn into promo
+            "hourglass.badge.plus"
+        case .tasks:
+            "list.clipboard.fill"
+        case .chests:
+            //TODO: Turn into chest
+            "app.gift.fill"
+        case .leaderboards:
+            "list.bullet.rectangle.portrait.fill"
         case .friendPicker:
             "person.2.fill"
         }
@@ -55,30 +64,31 @@ enum HomeButtonType: String, CaseIterable {
     var image: some View {
         Group {
             switch self {
-            case .leading1, .leading2, .leading3, .trailing2:
-                Image(imageName)
-                    .defaultImageModifier()
-                    .frame(width: 40, height: 50)
-            case .accountDetail:
+            case .rewards, .inbox, .profile, .settings:
                 Image(systemName: imageName)
                     .defaultImageModifier()
-                    .frame(width: 30, height: 40)
-                    .padding(.horizontal, 5)
+            case .promotions, .tasks, .chests:
+                Image(systemName: imageName)
+                    .defaultImageModifier()
+            case .leaderboards:
+                Image(systemName: imageName)
+                    .defaultImageModifier()
             case .friendPicker:
                 Image(systemName: imageName)
                     .defaultImageModifier()
-                    .frame(width: 40, height: 40)
             }
         }
-        .foregroundStyle(Color.white)
-        .padding(4)
+        .foregroundStyle(position == .topTrailing ? Color.white : Color.black)
+        .padding(position == .topTrailing ? 4 : 16)
     }
 
     var position: Position {
         switch self {
-        case .leading1, .leading2, .leading3:
+        case .rewards, .inbox, .profile, .settings:
+                .topTrailing
+        case .promotions, .tasks, .chests:
                 .leading
-        case .accountDetail, .trailing2, .friendPicker:
+        case .leaderboards, .friendPicker:
                 .trailing
         }
     }
@@ -100,6 +110,7 @@ extension HomeButtonType {
     enum Position {
         case leading
         case trailing
+        case topTrailing
 
         var edge: Edge {
             switch self {
@@ -107,6 +118,8 @@ extension HomeButtonType {
                     .leading
             case .trailing:
                     .trailing
+            case .topTrailing:
+                    .top
             }
         }
         var edgeSet: Edge.Set {
@@ -115,6 +128,8 @@ extension HomeButtonType {
                     .leading
             case .trailing:
                     .trailing
+            case .topTrailing:
+                    .top
             }
         }
     }

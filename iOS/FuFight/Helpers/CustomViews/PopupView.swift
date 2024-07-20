@@ -7,21 +7,59 @@
 
 import SwiftUI
 
-struct PopupView<Content: View>: View {
+struct PopupView<BodyContent: View>: View {
     @Binding var isShowing: Bool
-    let content: Content
+    let title: String?
+    let bodyContent: BodyContent?
+
+    private let alertWidth: CGFloat = 360
+    private let verticalPadding: CGFloat = 4
+    private let horizontalPadding: CGFloat = 12
 
     var body: some View {
+        GeometryReader { reader in
             ZStack {
-                content
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
                 dimViewBackground
                     .onTapGesture {
                         shouldShow(false)
                     }
+
+                VStack(spacing: 0) {
+                    alertTitleBackgroundImage
+                        .overlay {
+                            if let title {
+                                AppText(title, type: .navMedium)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                    .padding(.horizontal, horizontalPadding)
+                                    .padding(.vertical, verticalPadding)
+                            }
+                        }
+
+                    alertBodyBackgroundImage
+                        .overlay {
+                            ScrollView(.vertical, showsIndicators: false) {
+                                bodyContent
+                                    .padding(.top, verticalPadding * 2.5)
+                                    .padding(.bottom, 50)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            }
+                            .overlay(alignment: .bottom) {
+                                okayButton
+                            }
+                        }
+                }
+                .frame(width: reader.size.width * 0.9)
             }
+        }
+    }
+
+    @ViewBuilder private var okayButton: some View {
+        AppButton(title: "Okay", color: .main, maxWidth: navBarButtonMaxWidth * 1.5) {
+            shouldShow(false)
+        }
+        .padding(.bottom)
     }
 
     private func shouldShow(_ show: Bool) {
@@ -32,7 +70,28 @@ struct PopupView<Content: View>: View {
 }
 
 #Preview {
+    let titleContent =  AppText("Player's Detail", type: .navMedium)
+        .multilineTextAlignment(.center)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 10)
+    let bodyContent = VStack(spacing: 4) {
+        AppText("Username: \(Room.current?.player.username ?? "")", type: .textMedium)
+
+        Spacer()
+            .frame(height: 20)
+
+        AppText("Experience: TODO/TODO", type: .textMedium)
+
+        AppText("Ratings: TODO", type: .textMedium)
+
+        AppText("Game Stats: TODO", type: .textMedium)
+
+        AppText("Game History: TODO", type: .textMedium)
+    }
+
     return VStack(spacing: 20) {
-        PopupView(isShowing: .constant(true), content: Color.black)
+        PopupView(isShowing: .constant(true), title: "Text popup", bodyContent: bodyContent)
     }
 }
