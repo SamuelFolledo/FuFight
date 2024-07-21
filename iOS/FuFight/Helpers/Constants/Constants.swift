@@ -43,6 +43,7 @@ let characterItemSpacing: CGFloat = 2
 let characterItemBorderWidth: CGFloat = 5
 let homeSelectedTabItemHeight: CGFloat = 63
 let homeTabBarHeight: CGFloat = 77
+let homeTabBarHeightPadded: CGFloat = homeTabBarHeight + 30
 let homeBottomViewHeight: CGFloat = 120
 let charactersBottomButtonsHeight: CGFloat = 40
 let homeNavBarHeight: CGFloat = 120
@@ -90,6 +91,7 @@ let alertTitleBackgroundImage_Shadowed: some View = Image("alertTitleBackground-
 let alertTitleBackgroundImage: some View = Image("alertTitleBackground").containerImageModifier()
 let dimViewBackground: some View = Color.gray.opacity(0.55)
 let roundedButtonBackgroundImage: some View = Image("borderedCircle").containerImageModifier()
+let containerBackgroundImage: some View = Image("containerOverlay").containerImageModifier()
 
 //Buttons Folder
 let backButtonImage: some View = Image("backButton").buttonImageModifier()
@@ -154,6 +156,12 @@ let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.co
 let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
 let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0) }
+let fakeNews: [News] = [
+    News(title: "New char 1", type: .newCharacter),
+    News(title: "New char 2", type: .newCharacter),
+    News(title: "New char 3", type: .newCharacter),
+    News(title: "New char 4", type: .newCharacter),
+]
 
 //MARK: - Constant Methods
 ///Run action after a delayed time in seconds
