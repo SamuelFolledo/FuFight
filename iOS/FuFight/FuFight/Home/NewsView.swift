@@ -51,14 +51,20 @@ struct NewsView: View {
             TabView(selection: $selectedIndex) {
                 ForEach(0..<news.count, id: \.self) { index in
                     ZStack(alignment: .topLeading) {
-                        AppText(news[index].title, type: .textMedium)
+                        VStack {
+                            AppText(news[index].title, type: .navSmall)
+                            AppText("TODO", type: .textSmall)
+                        }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .tag(index)
                     .shadow(radius: 20)
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .ignoresSafeArea()
+            .padding(.horizontal, 4)
+            .padding(.top, 4)
+            .padding(.bottom, 10)
 
             // Step 12: Navigation Dots
             HStack {

@@ -83,20 +83,23 @@ struct HomeView: View {
         .allowsHitTesting(vm.loadingMessage == nil)
     }
 
-    var newsView: some View {
-        GeometryReader { reader in
-            VStack {
-                Spacer()
-
-                HStack {
-                    NewsView()
-                        .frame(width: reader.size.width * 0.45, height: reader.size.width * 0.18)
-                        .padding(.leading, smallerHorizontalPadding)
-                        .padding(.bottom, homeTabBarHeightPadded)
-
+    @ViewBuilder var newsView: some View {
+        if !vm.isOffline {
+            GeometryReader { reader in
+                VStack {
                     Spacer()
+
+                    HStack {
+                        NewsView()
+                            .frame(width: reader.size.width * 0.45, height: reader.size.width * 0.18)
+                            .padding(.leading, smallerHorizontalPadding)
+                            .padding(.bottom, homeTabBarHeightPadded)
+
+                        Spacer()
+                    }
                 }
             }
+            .transition(.move(edge: .bottom))
         }
     }
 
