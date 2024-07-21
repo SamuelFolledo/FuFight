@@ -54,6 +54,9 @@ struct HomeView: View {
                 homeButtonAlerts(reader)
             }
         }
+        .overlay {
+            newsView
+        }
         .background {
             GeometryReader { reader in
                 VerticalTabView(selectedGameType: $vm.selectedGameType, proxy: reader) {
@@ -78,6 +81,23 @@ struct HomeView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+    }
+
+    var newsView: some View {
+        GeometryReader { reader in
+            VStack {
+                Spacer()
+
+                HStack {
+                    NewsView()
+                        .frame(width: reader.size.width * 0.45, height: reader.size.width * 0.18)
+                        .padding(.leading, smallerHorizontalPadding)
+                        .padding(.bottom, homeTabBarHeightPadded)
+
+                    Spacer()
+                }
+            }
+        }
     }
 
     @ViewBuilder func homeButtonAlerts(_ reader: GeometryProxy) -> some View {
@@ -229,7 +249,7 @@ struct HomeView: View {
             }
         }
         .fixedSize(horizontal: true, vertical: false)
-        .padding(.bottom, 60)
+        .padding(.bottom, homeTabBarHeight * 2)
         .padding(.top)
     }
 

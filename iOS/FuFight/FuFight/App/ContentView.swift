@@ -108,7 +108,6 @@ struct ContentView: View {
                                     }
                                 }
                                 .transition(.move(edge: .bottom))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
                         }
                     }
