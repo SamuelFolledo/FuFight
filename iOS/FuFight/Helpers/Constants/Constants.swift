@@ -157,10 +157,11 @@ let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, 
 
 let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0) }
 let fakeNews: [News] = [
-    News(title: "New char 1", type: .newCharacter),
-    News(title: "New char 2", type: .newCharacter),
-    News(title: "New char 3", type: .newCharacter),
-    News(title: "New char 4", type: .newCharacter),
+    News(title: "TODO: News", type: .announcement),
+    News(title: "TODO: New Character1", type: .newCharacter),
+    News(title: "TODO: New Character2", type: .newCharacter),
+    News(title: "TODO: Other news", type: .other),
+    News(title: "TODO: Other old news", type: .other),
 ]
 
 //MARK: - Constant Methods
