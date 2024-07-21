@@ -24,7 +24,7 @@ struct RoundedExperienceBarView: View {
                         Circle()
                             .strokeBorder(Color.white.opacity(0.6), lineWidth: levelBorderWidth)
                             .background {
-                                Circle().fill(.black)
+                                Circle().fill(.blackLight)
                             }
                             .overlay {
                                 AppText("24", type: .navSmall)

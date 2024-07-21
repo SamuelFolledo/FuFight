@@ -17,7 +17,12 @@ struct HomeView: View {
                 //            fighterView
 
                 VStack(spacing: 0) {
-                    homeButtonsView(position: .topTrailing, reader: reader)
+                    if !vm.isOffline {
+                        homeButtonsView(position: .topTrailing, reader: reader)
+                    } else {
+                        Spacer()
+                            .frame(height: homeTopTrailingButtonTypeHeight)
+                    }
 
                     HStack(alignment: .top) {
                         homeButtonsView(position: .leading, reader: reader)
@@ -25,6 +30,11 @@ struct HomeView: View {
                         Spacer()
 
                         VStack {
+                            SeasonView()
+                                .frame(width: reader.size.width * 0.5, height: reader.size.height * 0.1)
+
+                            Spacer()
+
                             AppText("\(vm.selectedGameType.title)", type: .titleMedium)
 
                             Spacer()
@@ -182,7 +192,7 @@ struct HomeView: View {
                         }
                     }
                 }
-                .frame(height: 35)
+                .frame(height: homeTopTrailingButtonTypeHeight)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.trailing, smallerHorizontalPadding - 4)
                 .transition(.move(edge: .trailing))
@@ -237,7 +247,7 @@ struct HomeView: View {
         FriendPickerView()
             .frame(height: abs(reader.size.height - homeNavBarHeight) / 2.5)
             .presentationBackground(
-                Color.black.opacity(0.7)
+                Color.blackLight.opacity(0.7)
             )
     }
 
@@ -248,6 +258,9 @@ struct HomeView: View {
 
                 offlinePlayButton(reader)
             } else {
+                practiceButton(reader)
+                    .opacity(0)
+
                 playButton(reader)
             }
         }

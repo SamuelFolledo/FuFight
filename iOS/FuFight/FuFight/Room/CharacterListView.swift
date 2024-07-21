@@ -72,7 +72,7 @@ struct CharacterObjectCell: View {
                         VStack {
                             Spacer()
 
-                            Color.black
+                            Color.blackLight
                                 .frame(height: 75)
                                 .frame(maxWidth: .infinity)
                                 .mask(LinearGradient(gradient: Gradient(colors: [.black, .clear, .clear]), startPoint: .bottom, endPoint: .top))
@@ -83,7 +83,7 @@ struct CharacterObjectCell: View {
                 AppText(character.fighterType.name, type: .textSmall)
                     .padding(.bottom, 4)
             }
-            .background(Color.black)
+            .background(Color.blackLight)
             .padding(characterItemBorderWidth)
             .border(.yellow, width: isSelected ? characterItemBorderWidth : 0)
             .minimumScaleFactor(0.3)

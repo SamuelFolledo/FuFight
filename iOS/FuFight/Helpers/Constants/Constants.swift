@@ -51,6 +51,8 @@ let navBarIconSize: CGFloat = 25
 let navBarButtonMaxWidth: CGFloat = 50
 let buttonMinWidthMultiplier: CGFloat = 0.4
 let buttonMaxWidthMultiplier: CGFloat = 0.65
+let rectangleCornerRadius: CGFloat = 8
+let homeTopTrailingButtonTypeHeight: CGFloat = 35
 
 var animationToTest: AnimationType = .punchHeadRightHard
 
@@ -71,7 +73,6 @@ let disabledColor = Color(uiColor: disabledUiColor)
 let destructiveUiColor = UIColor.systemRed
 let destructiveColor = Color(uiColor: destructiveUiColor)
 let unselectedTabColor: Color = Color(uiColor: .lightGray)
-let blackColor = Color.black
 
 //MARK: - Constant Assets
 //Backgrounds
@@ -94,16 +95,8 @@ let roundedButtonBackgroundImage: some View = Image("borderedCircle").containerI
 let containerBackgroundImage: some View = Image("containerOverlay").containerImageModifier()
 
 //Buttons Folder
-let backButtonImage: some View = Image("backButton").buttonImageModifier()
-let homeButtonImage: some View = Image("homeButton").buttonImageModifier()
-let homeButtonSelectedImage: some View = Image("homeButtonSelected").buttonImageModifier()
-let noButtonImage: some View = Image("noButton").buttonImageModifier()
-let playButtonImage: some View = Image("playButton").buttonImageModifier()
 let plusImage: some View = Image("plus").defaultImageModifier()
 let plusButtonImage: some View = Image("plusButton").defaultImageModifier()
-let restartButtonImage: some View = Image("restartButton").buttonImageModifier()
-let resumeButtonImage: some View = Image("resumeButton").buttonImageModifier()
-let yesButtonButtonImage: some View = Image("yesButton").buttonImageModifier()
 let blueButtonImage: some View = Image("blueButton").buttonImageModifier()
 let greenButtonImage: some View = Image("greenButton").buttonImageModifier()
 let redButtonImage: some View = Image("redButton").buttonImageModifier()
