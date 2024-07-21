@@ -23,7 +23,7 @@ struct StoreView: View {
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             .background {
-                Color.black
+                Color.blackLight
             }
         }
         .overlay {

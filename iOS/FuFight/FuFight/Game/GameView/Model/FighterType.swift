@@ -124,7 +124,7 @@ private extension FighterType {
         switch skeletonType {
         case .samuelGlassesLens:
             //Make samuel's glasses black
-            return isBlackGlasses ? UIColor.black : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
+            return isBlackGlasses ? UIColor.blackLight : UIColor(red: 0, green: 0, blue: 0, alpha: 0.27)
         default:
             if let url = Bundle.main.url(forResource: "\(assetsPath)\(skeletonType.diffuseImageName)", withExtension: "png"),
                let data = try? Data(contentsOf: url) {
@@ -141,7 +141,7 @@ private extension FighterType {
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }
-        return UIColor.black
+        return UIColor.blackLight
     }
 
     func transparentMaterial(for skeletonType: SkeletonType) -> Any? {
@@ -150,6 +150,6 @@ private extension FighterType {
            let data = try? Data(contentsOf: url) {
             return UIImage(data: data)
         }
-        return UIColor.black
+        return UIColor.blackLight
     }
 }

@@ -55,6 +55,6 @@ struct UsernameView: View {
 #Preview {
     UsernameView(photoUrl: fakePhotoUrl, onImageTap: nil)
         .frame(height: 100)
-        .background { Color.black }
+        .background { Color.blackLight }
 }
 

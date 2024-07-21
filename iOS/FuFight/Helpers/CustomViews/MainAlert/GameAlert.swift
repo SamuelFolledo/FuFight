@@ -111,7 +111,7 @@ struct GameAlert: View {
         .frame(width: alertWidth)
         .frame(maxHeight: .infinity)
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.4), radius: 16, x: 0, y: 12)
+        .shadow(color: Color.blackLight.opacity(0.4), radius: 16, x: 0, y: 12)
         .scaleEffect(scale)
         .opacity(opacity)
     }

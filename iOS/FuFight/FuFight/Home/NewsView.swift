@@ -41,9 +41,9 @@ struct NewsView: View {
     var body: some View {
         ZStack {
             //Background
-            Color.black
+            Color.blackLight
                 .opacity(0.8)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: rectangleCornerRadius))
                 .ignoresSafeArea()
                 .mask(LinearGradient(gradient: Gradient(colors: [.black, .black, .black.opacity(0.2)]), startPoint: .leading, endPoint: .trailing))
 
@@ -66,7 +66,7 @@ struct NewsView: View {
             .padding(.top, 4)
             .padding(.bottom, 10)
 
-            // Step 12: Navigation Dots
+            // Navigation Dots
             HStack {
                 ForEach(0..<news.count, id: \.self) { index in
                     Capsule()

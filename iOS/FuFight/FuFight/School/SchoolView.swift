@@ -23,7 +23,7 @@ struct SchoolView: View {
             }
             .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
             .background {
-                Color.black
+                Color.blackLight
             }
         }
         .overlay {
@@ -44,7 +44,7 @@ struct SchoolView: View {
         }
         .allowsHitTesting(vm.loadingMessage == nil)
         .overlay {
-            Color.black
+            Color.blackLight
                 .opacity(0.6)
                 .padding(.top, homeNavBarHeight + 6)
                 .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)

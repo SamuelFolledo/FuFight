@@ -78,7 +78,7 @@ enum HomeButtonType: String, CaseIterable {
                     .defaultImageModifier()
             }
         }
-        .foregroundStyle(position == .topTrailing ? Color.white : Color.black)
+        .foregroundStyle(position == .topTrailing ? Color.white : Color.blackLight)
         .padding(position == .topTrailing ? 4 : 16)
     }
 

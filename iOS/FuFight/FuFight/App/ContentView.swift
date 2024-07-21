@@ -347,7 +347,7 @@ private extension ContentView {
                     }
                 )
             }
-            .foregroundColor(tab == currentTab ? blackColor : unselectedTabColor)
+            .foregroundColor(tab == currentTab ? .blackLight : unselectedTabColor)
             .background(
                 Rectangle()
                     .foregroundColor(unselectedColor)

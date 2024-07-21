@@ -27,7 +27,7 @@ struct AppText: View {
 
     var body: some View {
         Text(text)
-            .stroke(color: .black, width: strokeWidth)
+            .stroke(color: .blackLight, width: strokeWidth)
             .font(font)
             .foregroundStyle(color)
             .minimumScaleFactor(0.4)

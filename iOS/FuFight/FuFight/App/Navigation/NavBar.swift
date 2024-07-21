@@ -42,7 +42,7 @@ struct NavBar: View {
     }
 
     var statusBarView: some View {
-        Color.black
+        Color.darkBlue
             .frame(height: UserDefaults.topSafeAreaInset)
             .frame(maxWidth: .infinity)
             .mask(LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .bottom, endPoint: .top))
@@ -92,6 +92,5 @@ struct NavBar: View {
 #Preview {
     NavBar()
         .frame(height: 100)
-        .background { Color.black }
 }
 
