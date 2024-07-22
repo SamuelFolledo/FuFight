@@ -327,6 +327,7 @@ private extension ContentView {
 
                     if tab == currentTab {
                         AppText(currentTab.title, type: .navSmall)
+                            .lineLimit(1)
                     }
 
                     Spacer()

@@ -65,23 +65,29 @@ struct FriendListView: View {
                                     RoundedExperienceBarView()
                                 }
 
-                            VStack(alignment: .leading) {
-                                AppText(friend.username, type: .textSmall)
-                                
-                                AppText(friend.statusDescription, color: friend.status.color)
-                            }
-                            .minimumScaleFactor(0.4)
+                            VStack(spacing: 0) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        AppText(friend.username, type: .textSmall)
 
-                            Spacer()
+                                        AppText(friend.statusDescription, color: friend.status.color)
+                                    }
+                                    .minimumScaleFactor(0.4)
 
-                            Button {
-                                TODO("Implement challenging \(friend.username)")
-                            } label: {
-                                Image(systemName: "hand.wave")
-                                    .padding(4)
+                                    Spacer()
+
+                                    Button {
+                                        TODO("Implement challenging \(friend.username)")
+                                    } label: {
+                                        Image(systemName: "hand.wave")
+                                            .padding(4)
+                                    }
+                                }
+
+                                Divider()
+                                    .foregroundStyle(Color.gray)
                             }
                         }
-
                     }
                     .frame(height: 2.0.squareRoot() * imageHeight)
                     .padding(.leading, 8)

@@ -141,7 +141,7 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              username: "Enemy",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
-                             fighter: Fighter(type: FighterType.allCases.randomElement()!, isEnemy: true),
+                             fighter: Fighter(type: [FighterType.samuel, FighterType.clara].randomElement()!, isEnemy: true),//Fighter(type: FighterType.allCases.randomElement()!, isEnemy: true),
                              state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 

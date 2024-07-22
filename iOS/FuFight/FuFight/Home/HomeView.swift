@@ -35,6 +35,7 @@ struct HomeView: View {
                             Spacer()
 
                             AppText("\(vm.selectedGameType.title)", type: .titleMedium)
+                                .lineLimit(1)
 
                             Spacer()
                         }
@@ -245,7 +246,8 @@ struct HomeView: View {
                     .lineLimit(1)
             }
             .clipShape(Circle())
-            .frame(width: 16, height: 16)
+            .frame(width: 24, height: 24)
+            .stroke(color: .blackLight, width: 0.25)
     }
 
     @ViewBuilder func friendPickerView(_ reader: GeometryProxy) -> some View {
