@@ -43,6 +43,17 @@ struct StoreView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .overlay {
+            Color.blackLight
+                .opacity(0.6)
+                .padding(.top, homeNavBarHeight)
+                .padding(.bottom, UserDefaults.bottomSafeAreaInset + 50)
+                .overlay {
+                    AppText("Store items coming soon", type: .titleLarge, alignment: .center)
+                        .frame(alignment: .center)
+                        .padding(.horizontal)
+                }
+        }
     }
 }
 

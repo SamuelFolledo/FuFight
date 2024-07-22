@@ -201,7 +201,7 @@ struct GameAlert: View {
                 }
             }
             if button.type.isCustom {
-                AppButton(title: button.title, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
+                AppButton(title: button.title, color: button.color, textColor: button.textColor, textType: button.textType, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             } else {
                 AppButton(type: button.type, maxWidth: reader.size.width * buttonMultiplier, action: buttonAction)
             }

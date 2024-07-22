@@ -12,16 +12,22 @@ struct AppText: View {
     let strokeWidth: CGFloat
     let font: Font
     let color: Color
+    let alignment: TextAlignment
 
-    init(_ text: String, type: TextType) {
-        self.init(text, fontSize: type.fontSize, fontWeight: type.fontWeight)
+    init(_ text: String, type: TextType, alignment: TextAlignment = .leading) {
+        self.init(text, fontSize: type.fontSize, fontWeight: type.fontWeight, alignment: alignment)
     }
 
-    private init(_ text: String, fontSize: CGFloat = 24, fontWeight: CustomFontWeight = .medium, strokeWidth: CGFloat = 0.25, color: Color = .white) {
+    init(_ coloredText: String, fontSize: CGFloat = defaultFontSize, color: Color, alignment: TextAlignment = .leading) {
+        self.init(coloredText, fontSize: fontSize, strokeWidth: fontSize / 80, color: color, alignment: alignment)
+    }
+
+    private init(_ text: String, fontSize: CGFloat = defaultFontSize, fontWeight: CustomFontWeight = .medium, strokeWidth: CGFloat = 0.25, color: Color = .white, alignment: TextAlignment = .leading) {
         self.text = text
         self.strokeWidth = strokeWidth
         self.font = Font.customFont(fontWeight, fontSize)
         self.color = color
+        self.alignment = alignment
     }
 
 
@@ -31,5 +37,6 @@ struct AppText: View {
             .font(font)
             .foregroundStyle(color)
             .minimumScaleFactor(0.4)
+            .multilineTextAlignment(alignment)
     }
 }

@@ -27,7 +27,6 @@ struct UsernameView: View {
 
     var userImage: some View {
         Button {
-            TODO("Go to user's profile")
             onImageTap?()
         } label: {
             accountBackgroundImage

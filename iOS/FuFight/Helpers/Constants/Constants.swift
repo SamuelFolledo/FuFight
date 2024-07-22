@@ -57,7 +57,7 @@ let homeTopTrailingButtonTypeHeight: CGFloat = 35
 var animationToTest: AnimationType = .punchHeadRightHard
 
 //Fonts
-let defaultFontSize: CGFloat = 18
+let defaultFontSize: CGFloat = 22
 
 //Colors
 let systemUiColor = UIColor.label
@@ -141,7 +141,7 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
                              username: "Enemy",
                              hp: defaultEnemyHp,
                              maxHp: defaultEnemyHp,
-                             fighter: Fighter(type: FighterType.allCases.randomElement()!, isEnemy: true),
+                             fighter: Fighter(type: [FighterType.samuel, FighterType.clara].randomElement()!, isEnemy: true),//Fighter(type: FighterType.allCases.randomElement()!, isEnemy: true),
                              state: PlayerState(boostLevel: .none, initiallyHasSpeedBoost: false),
                              moves: Moves(attacks: defaultAllPunchAttacks, defenses: defaultAllDashDefenses))
 
@@ -155,6 +155,16 @@ let fakeNews: [News] = [
     News(title: "TODO: New Character2", type: .newCharacter),
     News(title: "TODO: Other news", type: .other),
     News(title: "TODO: Other old news", type: .other),
+]
+
+let fakeFriends: [Friend] = [.init(username: "fakeUsername0", status: .online, lastOnlineDescription: "", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername1", status: .online, lastOnlineDescription: "In-Game", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername2", status: .queue, lastOnlineDescription: "", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername3", status: .gaming, lastOnlineDescription: "In-Game", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername4", status: .offline, lastOnlineDescription: "7 minute(s)", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername5", status: .offline, lastOnlineDescription: "11 hour(s)", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername6", status: .offline, lastOnlineDescription: "2 day(s)", photoUrl: fakePhotoUrl),
+                             .init(username: "fakeUsername7", status: .offline, lastOnlineDescription: "7+ days", photoUrl: fakePhotoUrl),
 ]
 
 //MARK: - Constant Methods

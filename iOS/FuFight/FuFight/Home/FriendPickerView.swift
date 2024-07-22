@@ -65,30 +65,29 @@ struct FriendListView: View {
                                     RoundedExperienceBarView()
                                 }
 
-                            VStack(alignment: .leading) {
-                                AppText(friend.username, type: .textSmall)
+                            VStack(spacing: 0) {
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        AppText(friend.username, type: .textSmall)
 
-                                switch friend.status {
-                                case .offline:
-                                    AppText(friend.description, type: .textSmall)
-                                        .foregroundStyle(Color.systemGray)
-                                case .online:
-                                    AppText(friend.description, type: .textSmall)
-                                        .foregroundStyle(friend.statusDetail.isEmpty ? Color.green : Color.orange)
+                                        AppText(friend.statusDescription, color: friend.status.color)
+                                    }
+                                    .minimumScaleFactor(0.4)
+
+                                    Spacer()
+
+                                    Button {
+                                        TODO("Implement challenging \(friend.username)")
+                                    } label: {
+                                        Image(systemName: "hand.wave")
+                                            .padding(4)
+                                    }
                                 }
-                            }
-                            .minimumScaleFactor(0.4)
 
-                            Spacer()
-
-                            Button {
-                                TODO("Implement challenging \(friend.username)")
-                            } label: {
-                                Image(systemName: "hand.wave")
-                                    .padding(4)
+                                Divider()
+                                    .foregroundStyle(Color.gray)
                             }
                         }
-
                     }
                     .frame(height: 2.0.squareRoot() * imageHeight)
                     .padding(.leading, 8)
