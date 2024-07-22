@@ -30,8 +30,7 @@ struct HomeView: View {
                         Spacer()
 
                         VStack {
-                            SeasonView()
-                                .frame(width: reader.size.width * 0.5, height: reader.size.height * 0.1)
+                            seasonView(reader)
 
                             Spacer()
 
@@ -232,10 +231,16 @@ struct HomeView: View {
         }
     }
 
+    @ViewBuilder func seasonView(_ reader: GeometryProxy) -> some View {
+        SeasonView()
+            .frame(width: reader.size.width * 0.6)
+            .opacity(vm.isOffline ? 0 : 1)
+    }
+
     var onlineFriendsCountLabel: some View {
         Color.green
             .overlay {
-                AppText("\(fakeFriends.compactMap { $0.status == .online }.count)", type: .textSmall)
+                AppText("\(fakeFriends.compactMap { $0.status != .offline ? $0 : nil }.count)", type: .tabMedium)
                     .padding(0.5)
                     .lineLimit(1)
             }
@@ -246,9 +251,6 @@ struct HomeView: View {
     @ViewBuilder func friendPickerView(_ reader: GeometryProxy) -> some View {
         FriendPickerView()
             .frame(height: abs(reader.size.height - homeNavBarHeight) / 2.5)
-            .presentationBackground(
-                Color.blackLight.opacity(0.7)
-            )
     }
 
     @ViewBuilder private func playButtons(_ reader: GeometryProxy) -> some View {

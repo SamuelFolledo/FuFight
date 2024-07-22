@@ -67,15 +67,8 @@ struct FriendListView: View {
 
                             VStack(alignment: .leading) {
                                 AppText(friend.username, type: .textSmall)
-
-                                switch friend.status {
-                                case .offline:
-                                    AppText(friend.description, type: .textSmall)
-                                        .foregroundStyle(Color.systemGray)
-                                case .online:
-                                    AppText(friend.description, type: .textSmall)
-                                        .foregroundStyle(friend.statusDetail.isEmpty ? Color.green : Color.orange)
-                                }
+                                
+                                AppText(friend.statusDescription, color: friend.status.color)
                             }
                             .minimumScaleFactor(0.4)
 
