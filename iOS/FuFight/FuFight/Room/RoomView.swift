@@ -35,7 +35,9 @@ struct RoomView: View {
             LoadingView(message: vm.loadingMessage)
         }
         .overlay {
-            bottomButtonsView
+            GeometryReader { reader in
+                bottomButtonsView(reader)
+            }
         }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
@@ -51,19 +53,15 @@ struct RoomView: View {
         .allowsHitTesting(vm.loadingMessage == nil)
     }
 
-    var bottomButtonsView: some View {
+    @ViewBuilder func bottomButtonsView(_ reader: GeometryProxy) -> some View {
         VStack {
             Spacer()
 
-            Color.white
-                .padding(.horizontal, smallerHorizontalPadding)
+            DropDownUp(options: vm.roomBottomButtons.compactMap { $0.text }, selectedOptionIndex: $vm.selectedBottomButtonIndex, showDropdown: $vm.showBottomButtonDropDown)
                 .frame(height: charactersBottomButtonsHeight)
-                .frame(maxWidth: .infinity)
-
-            Spacer()
-                .frame(height: UserDefaults.bottomSafeAreaInset + charactersBottomButtonsHeight + bottomOffsetPadding)
+                .padding(.horizontal, smallerHorizontalPadding)
+                .padding(.bottom, homeTabBarHeightPadded + 5)
         }
-        .allowsHitTesting(false)
     }
 }
 

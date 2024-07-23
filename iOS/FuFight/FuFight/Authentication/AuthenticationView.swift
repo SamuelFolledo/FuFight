@@ -92,8 +92,10 @@ struct AuthenticationView: View {
                 HStack {
                     if vm.rememberMe {
                         checkedImage
+                            .frame(width: 20, height: 20)
                     } else {
                         uncheckedImage
+                            .frame(width: 20, height: 20)
                     }
 
                     AppText(Str.rememberMe, type: .buttonSmall)

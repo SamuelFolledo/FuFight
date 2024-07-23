@@ -17,8 +17,11 @@ final class RoomViewModel: BaseAccountViewModel {
             RoomManager.saveCurrent(room!)
         }
     }
+    @Published var selectedBottomButtonIndex: Int = 0
+    @Published var showBottomButtonDropDown: Bool = false
 
     let playerType: PlayerType = .user
+    let roomBottomButtons: [RoomButtonType] = RoomButtonType.allCases
 
     //MARK: - Override Methods
     override func onAppear() {
