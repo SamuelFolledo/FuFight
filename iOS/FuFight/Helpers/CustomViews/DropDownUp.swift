@@ -75,7 +75,8 @@ struct DropDownUp: View {
                     HStack(spacing: nil) {
                         AppText(options[selectedOptionIndex], type: .tabSmall)
                         Spacer()
-                        Image(systemName: "chevron.up")
+                        Image(systemName: "triangleshape.fill")
+                            .padding(.vertical, 8)
                             .rotationEffect(.degrees((showDropdown ?  -180 : 0)))
                     }
                 })

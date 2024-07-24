@@ -27,7 +27,7 @@ struct RoomView: View {
                     }
                     .alert(title: vm.alertTitle, message: vm.alertMessage, isPresented: $vm.isAlertPresented)
                     .padding(.top, homeNavBarHeight + 6)
-                    .padding(.bottom, UserDefaults.bottomSafeAreaInset - charactersBottomButtonsHeight + bottomOffsetPadding)
+                    .padding(.bottom, UserDefaults.bottomSafeAreaInset - charactersBottomButtonsHeight + bottomOffsetPadding + charactersBottomButtonsHeight)
                 }
             }
         }
@@ -58,6 +58,7 @@ struct RoomView: View {
             Spacer()
 
             DropDownUp(options: vm.roomBottomButtons.compactMap { $0.text }, selectedOptionIndex: $vm.selectedBottomButtonIndex, showDropdown: $vm.showBottomButtonDropDown)
+                .frame(maxWidth: .infinity)
                 .frame(height: charactersBottomButtonsHeight)
                 .padding(.horizontal, smallerHorizontalPadding)
                 .padding(.bottom, homeTabBarHeightPadded + 5)
