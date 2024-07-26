@@ -121,6 +121,8 @@ let invalidImage: some View = Image(systemName: "xmark.circle.fill")
     .foregroundColor(Color.systemRed)
 let validImage: some View = Image(systemName: "checkmark.circle.fill")
     .foregroundColor(Color.systemGreen)
+let lockImage: some View = Image(systemName: "lock.fill")
+    .foregroundColor(Color.white)
 
 let defaultAllPunchAttacks: [Attack] = Punch.allCases.compactMap { Attack($0) }
 let defaultAllDashDefenses: [Defense] = Dash.allCases.compactMap { Defense($0) }
@@ -148,7 +150,8 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
 let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
 let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
-let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0) }
+let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0, status: [.locked, .unlocked, .upcoming].randomElement()!) }
+    .sorted(by: { $0 < $1 })
 let fakeNews: [News] = [
     News(title: "TODO: News", type: .announcement),
     News(title: "TODO: New Character1", type: .newCharacter),

@@ -15,8 +15,16 @@ struct CharacterListView: View {
         LazyVGrid(columns: columns, spacing: characterItemSpacing) {
             ForEach(characters, id: \.self) { character in
                 CharacterObjectCell(character: character, isSelected: character.id == selectedFighterType?.id) {
-                    LOGD("CHARACTER SELECTED \(character.fighterType.name)")
-                    selectedFighterType = character.fighterType
+                    switch character.status {
+                    case .upcoming:
+                        TODO("Upcoming \(character.fighterType.name)")
+                    case .locked:
+                        TODO("Buy \(character.fighterType.name)")
+                    case .unlocked:
+                        selectedFighterType = character.fighterType
+                    case .selected:
+                        break
+                    }
                 }
             }
         }
@@ -49,21 +57,25 @@ struct CharacterObjectCell: View {
                     VStack {
                         Spacer()
 
-                        if isSelected {
-                            HStack {
-                                fighterRankLabel
+                        switch character.status {
+                        case .upcoming:
+                            EmptyView()
 
-                                Spacer()
-
-                                fighterRatingLabel
-                            }
-                        } else {
+                        case .locked:
                             HStack {
                                 coinButton
 
                                 Spacer()
 
                                 diamondButton
+                            }
+                        case .unlocked, .selected:
+                            HStack {
+                                fighterRankLabel
+
+                                Spacer()
+
+                                fighterRatingLabel
                             }
                         }
                     }
@@ -83,6 +95,22 @@ struct CharacterObjectCell: View {
                 AppText(character.fighterType.name, type: .textSmall)
                     .padding(.bottom, 4)
             }
+            .overlay {
+                switch character.status {
+                case .upcoming:
+                    Color.black.opacity(0.6)
+                        .overlay {
+                            lockOverlay(isUpcoming: true)
+                        }
+                case .locked:
+                    lockOverlay(isUpcoming: false)
+
+                case .unlocked:
+                    EmptyView()
+                case .selected:
+                    EmptyView()
+                }
+            }
             .background(Color.blackLight)
             .padding(characterItemBorderWidth)
             .border(.yellow, width: isSelected ? characterItemBorderWidth : 0)
@@ -90,6 +118,27 @@ struct CharacterObjectCell: View {
             .lineLimit(1)
         })
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+    }
+
+    @ViewBuilder func lockOverlay(isUpcoming: Bool) -> some View {
+        VStack {
+            HStack {
+                Spacer()
+
+                lockImage
+                    .frame(width: 30)
+                    .padding(.top, characterItemBorderWidth)
+            }
+
+            Spacer()
+
+            if isUpcoming {
+                AppText("Coming soon", type: .buttonSmall)
+
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     var coinButton: some View {
