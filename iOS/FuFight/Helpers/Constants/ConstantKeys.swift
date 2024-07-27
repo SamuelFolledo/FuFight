@@ -40,6 +40,7 @@ public let kCHALLENGERS: String = "challengers"
 public let kPLAYERID: String = "playerId"
 public let kPLAYERINITIALLYHASSPEEDBOOST: String = "playerInitiallyHasSpeedBoost"
 public let kSTATUS: String = "status"
+public let kUNLOCKEDFIGHTERIDS: String = "unlockedFighterIds"
 
 //Selected Move Keys
 public let kSELECTEDMOVES: String = "selectedMoves"

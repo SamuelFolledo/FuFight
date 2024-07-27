@@ -94,6 +94,7 @@ enum AppButtonType {
 struct AppButton: View {
     // MARK: Public
     let title: String
+    let imageName: String?
     var type: AppButtonType
     let textType: TextType
     var color: ColorType
@@ -104,8 +105,9 @@ struct AppButton: View {
     
     private let cornerRadius: CGFloat = 25
 
-    init(title: String, color: ColorType = .main, textColor: UIColor = .white, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
+    init(title: String, imageName: String? = nil, color: ColorType = .main, textColor: UIColor = .white, textType: TextType = .buttonMedium, minWidth: CGFloat? = nil, maxWidth: CGFloat = .infinity, action: (() -> Void)? = nil) {
         self.title = title
+        self.imageName = imageName
         self.textColor = textColor
         self.action = action
         self.type = .custom
@@ -124,6 +126,7 @@ struct AppButton: View {
         self.minWidth = minWidth
         self.maxWidth = maxWidth
         self.textType = textType
+        self.imageName = nil
     }
 
     // MARK: - View
@@ -132,9 +135,20 @@ struct AppButton: View {
         Button {
             action?()
         } label: {
-            AppText(title, type: textType)
-                .frame(minWidth: minWidth, maxWidth: maxWidth)
-                .padding(.horizontal, 25)
+            HStack(spacing: 0) {
+                if let imageName {
+                    Image(imageName)
+                        .buttonImageModifier()
+                        .padding(.vertical, -4)
+                        .padding(.leading, -4)
+                        .frame(width: navBarIconSize, height: navBarIconSize)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                AppText(title, type: textType)
+                    .frame(minWidth: minWidth, maxWidth: maxWidth)
+            }
+            .padding(.horizontal, imageName == nil ? 25 : 8)
         }
         .background(
             color.background

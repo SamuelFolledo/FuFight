@@ -27,10 +27,21 @@ enum PurchaseStatus: Int {
     }
 }
 
-struct CharacterObject: Identifiable, Hashable, Comparable {
+struct CharacterObject {
     var fighterType: FighterType
     var status: PurchaseStatus
 
+    init(fighterType: FighterType) {
+        self.fighterType = fighterType
+        if !fighterType.isReleased {
+            self.status = .upcoming
+        } else {
+            self.status = RoomManager.isPurchased(fighterType) ? .unlocked : .locked
+        }
+    }
+}
+
+extension CharacterObject: Identifiable, Hashable, Comparable {
     var id: String { fighterType.rawValue }
 
     public func hash(into hasher: inout Hasher) {

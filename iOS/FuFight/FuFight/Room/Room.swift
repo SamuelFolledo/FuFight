@@ -15,6 +15,7 @@ class Room: Identifiable, Equatable, Codable {
     var currentGame: FetchedGame?
     var challengers: [FetchedPlayer] = []
     var status: Status = .online
+    var unlockedFighterIds: [String] = []
 
     ///Returns the currently signed in account's room
     static var current: Room? {
@@ -33,6 +34,7 @@ class Room: Identifiable, Equatable, Codable {
         case challengers = "challengers"
         case playerId = "playerId"
         case status = "status"
+        case unlockedFighterIds = "unlockedFighterIds"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -48,6 +50,7 @@ class Room: Identifiable, Equatable, Codable {
         if let currentGame {
             try container.encode(currentGame, forKey: .currentGame)
         }
+        try container.encode(unlockedFighterIds, forKey: .unlockedFighterIds)
     }
 
     required init(from decoder: Decoder) throws {
@@ -58,6 +61,7 @@ class Room: Identifiable, Equatable, Codable {
         self.challengers = try values.decodeIfPresent(Array<FetchedPlayer>.self, forKey: .challengers) ?? []
         self.documentId = try values.decodeIfPresent(String.self, forKey: .playerId)!
         self.currentGame = try values.decodeIfPresent(FetchedGame.self, forKey: .currentGame)
+        self.unlockedFighterIds = try values.decodeIfPresent(Array<String>.self, forKey: .unlockedFighterIds) ?? []
     }
     
     //MARK: Equatable and Identifiable requirements

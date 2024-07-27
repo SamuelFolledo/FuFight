@@ -150,8 +150,7 @@ let fakeEnemyPlayer = Player(userId: "fakeEnemyPlayer",
 let allAnimations: [AnimationType] = otherAnimations + defaultAllPunchAttacks.compactMap{ $0.animationType } + defaultAllDashDefenses.compactMap{ $0.animationType }
 let otherAnimations: [AnimationType] = [.idleFight, .idleStand, .dodgeHeadLeft, .dodgeHeadRight, .hitHeadRightLight, .hitHeadLeftLight, .hitHeadStraightLight, .hitHeadRightMedium, .hitHeadLeftMedium, .hitHeadStraightMedium, .hitHeadRightHard, .hitHeadLeftHard, .hitHeadStraightHard, .killHeadRightLight, .killHeadLeftLight, .killHeadRightMedium, .killHeadLeftMedium, .killHeadRightHard, .killHeadLeftHard]
 
-let characters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0, status: [.locked, .unlocked, .upcoming].randomElement()!) }
-    .sorted(by: { $0 < $1 })
+let fakeAllFighters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0) }
 let fakeNews: [News] = [
     News(title: "TODO: News", type: .announcement),
     News(title: "TODO: New Character1", type: .newCharacter),
