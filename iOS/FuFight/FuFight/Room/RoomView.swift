@@ -20,7 +20,7 @@ struct RoomView: View {
                         Spacer()
 
                         VStack {
-                            CharacterListView(selectedFighterType: $vm.selectedFighterType)
+                            CharacterListView(selectedFighterType: $vm.selectedFighterType, fighters: vm.fighters, buyAction: vm.buyFighter(_:))
                                 .padding(.horizontal, smallerHorizontalPadding)
                         }
                         .padding(.bottom, homeBottomViewHeight)
@@ -39,6 +39,11 @@ struct RoomView: View {
                 bottomButtonsView(reader)
             }
         }
+        .overlay {
+            GeometryReader { reader in
+                alertViews(reader)
+            }
+        }
         .navigationBarHidden(true)
         .frame(maxWidth: .infinity)
         .background {
@@ -51,6 +56,9 @@ struct RoomView: View {
             vm.onDisappear()
         }
         .allowsHitTesting(vm.loadingMessage == nil)
+        .task {
+            vm.loadFighters()
+        }
     }
 
     @ViewBuilder func bottomButtonsView(_ reader: GeometryProxy) -> some View {
@@ -62,6 +70,16 @@ struct RoomView: View {
                 .frame(height: charactersBottomButtonsHeight)
                 .padding(.horizontal, smallerHorizontalPadding)
                 .padding(.bottom, homeTabBarHeightPadded + 5)
+        }
+    }
+
+    @ViewBuilder func alertViews(_ reader: GeometryProxy) -> some View {
+        if vm.showBuyFighterAlert,
+           let fighterToBuy = vm.fighterToBuy {
+            PopupView(isShowing: $vm.showBuyFighterAlert,
+                      title: "Unlock fighter?",
+                      showOkayButton: false,
+                      bodyContent: UnlockFighterView(fighterType: fighterToBuy))
         }
     }
 }

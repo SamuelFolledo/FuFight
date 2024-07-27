@@ -111,3 +111,10 @@ class RoomManager {
         saveCurrent(room)
     }
 }
+
+//MARK: Purchases extension
+extension RoomManager {
+    static func isPurchased(_ fighterType: FighterType) -> Bool {
+        return Room.current?.unlockedFighterIds.contains(fighterType.id) ?? false
+    }
+}

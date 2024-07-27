@@ -104,6 +104,33 @@ enum FighterType: String, CaseIterable, Identifiable {
         "\(assetsPath)\(rawValue)"
     }
 
+    var isReleased: Bool {
+        switch self {
+        case .samuel:
+            true
+        case .clara:
+            true
+        case .kim:
+            false
+        case .deeJay:
+            false
+        case .jad:
+            false
+        case .ruby:
+            false
+        case .cain:
+            false
+        case .andrew:
+            false
+        case .corey:
+            false
+        case .alexis:
+            false
+        case .neverRight:
+            false
+        }
+    }
+
     //MARK: - Public Methods
     func animationPath(_ animationType: AnimationType) -> String {
         "\(path)/\(animationType.animationPath)"

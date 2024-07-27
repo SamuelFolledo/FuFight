@@ -10,9 +10,10 @@ import SwiftUI
 struct PopupView<BodyContent: View>: View {
     @Binding var isShowing: Bool
     let title: String?
+    var showOkayButton = true
     let bodyContent: BodyContent?
 
-    private let alertWidth: CGFloat = 360
+    private let widthMultiplier: CGFloat = 0.9
     private let verticalPadding: CGFloat = 4
     private let horizontalPadding: CGFloat = 12
 
@@ -39,18 +40,27 @@ struct PopupView<BodyContent: View>: View {
 
                     alertBodyBackgroundImage
                         .overlay {
-                            ScrollView(.vertical, showsIndicators: false) {
+                            if showOkayButton {
+                                ScrollView(.vertical, showsIndicators: false) {
+                                    bodyContent
+                                        .padding(.top, verticalPadding * 2.5)
+                                        .padding(.bottom, 50)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                }
+                            } else {
                                 bodyContent
                                     .padding(.top, verticalPadding * 2.5)
-                                    .padding(.bottom, 50)
+                                    .padding(.bottom, 16)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
-                            .overlay(alignment: .bottom) {
+                        }
+                        .overlay(alignment: .bottom) {
+                            if showOkayButton {
                                 okayButton
                             }
                         }
                 }
-                .frame(width: reader.size.width * 0.9)
+                .frame(width: reader.size.width * widthMultiplier)
             }
         }
     }

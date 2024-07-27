@@ -9,17 +9,20 @@ import SwiftUI
 
 struct CharacterListView: View {
     @Binding var selectedFighterType: FighterType?
-    let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: characterItemSpacing), count: 3)
+    let fighters: [CharacterObject]
+    let buyAction: ((_ fighterType: FighterType) -> Void)?
+
+    private let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: characterItemSpacing), count: 3)
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: characterItemSpacing) {
-            ForEach(characters, id: \.self) { character in
+            ForEach(fighters, id: \.self) { character in
                 CharacterObjectCell(character: character, isSelected: character.id == selectedFighterType?.id) {
                     switch character.status {
                     case .upcoming:
                         TODO("Upcoming \(character.fighterType.name)")
                     case .locked:
-                        TODO("Buy \(character.fighterType.name)")
+                        buyAction?(character.fighterType)
                     case .unlocked:
                         selectedFighterType = character.fighterType
                     case .selected:
@@ -186,5 +189,5 @@ struct CharacterObjectCell: View {
 }
 
 #Preview {
-    CharacterListView(selectedFighterType: .constant(.clara))
+    CharacterListView(selectedFighterType: .constant(.clara), fighters: fakeAllFighters, buyAction: nil)
 }
