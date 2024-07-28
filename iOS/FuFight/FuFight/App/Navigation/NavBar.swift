@@ -57,7 +57,7 @@ struct NavBar: View {
                     .padding(.leading, -8)
                     .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
 
-                AppText("812999", type: .navSmall)
+                AppText("\(Account.current?.coins ?? 0)", type: .navSmall)
                     .padding(.leading, -4)
 
                 Spacer()
@@ -77,7 +77,7 @@ struct NavBar: View {
                     .padding(.leading, -16)
                     .frame(width: navBarIconSize, height: navBarIconSize)
 
-                AppText("209", type: .navSmall)
+                AppText("\(Account.current?.diamonds ?? 0)", type: .navSmall)
                     .padding(.leading, -4)
 
                 Spacer()

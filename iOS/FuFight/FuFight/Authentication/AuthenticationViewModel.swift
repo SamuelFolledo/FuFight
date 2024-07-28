@@ -273,13 +273,13 @@ private extension AuthenticationViewModel {
         onlineAccount.status = .loggedIn
         Task {
             do {
-                try await AccountNetworkManager.setData(account: onlineAccount)
                 try await AccountManager.saveCurrent(onlineAccount)
 
                 if isLogIn {
                     let room = try await RoomNetworkManager.fetchRoom(onlineAccount)
                     try await RoomManager.saveCurrent(room)
                 } else {
+                    try await AccountNetworkManager.setData(account: onlineAccount)
                     TODO("Set account's Room with default values")
                     let room = Room(onlineAccount)
                     try await RoomNetworkManager.createRoom(room)
