@@ -116,7 +116,6 @@ class HomeRouter: ObservableObject {
         return vm
     }
 
-
     func transitionToUpdatePassword(vm: AccountViewModel) {
         navigationPath.append(.account(vm: makeAccountViewModel(account: vm.account)))
     }

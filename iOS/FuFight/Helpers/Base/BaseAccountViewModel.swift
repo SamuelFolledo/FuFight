@@ -39,8 +39,7 @@ private extension BaseAccountViewModel {
                     updatedUser.displayName != account.username ||
                     updatedUser.photoURL != account.photoUrl ||
                     updatedUser.email != account.email ||
-                    updatedUser.phoneNumber != account.phoneNumber ||
-                    updatedUser.metadata.creationDate != account.createdAt {
+                    updatedUser.phoneNumber != account.phoneNumber {
                     let updatedAccount = Account(updatedUser)
                     LOGD("Auth ACCOUNT changes handler for \(updatedUser.displayName ?? "")", from: BaseAccountViewModel.self)
                     self.account.update(with: updatedAccount)
