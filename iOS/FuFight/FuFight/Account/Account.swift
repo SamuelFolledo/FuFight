@@ -19,6 +19,8 @@ class Account: ObservableObject, Codable {
     @Published private(set) var createdAt: Date?
     @Published var photoUrl: URL?
     @Published var status: Account.Status = .loggedOut
+    @Published var coins: Int = 0
+    @Published var diamonds: Int = 0
 
     var userId: String {
         return id!
@@ -70,7 +72,7 @@ class Account: ObservableObject, Codable {
 
     //MARK: - Codable overrides
     private enum CodingKeys : String, CodingKey {
-        case id, username, photoUrl, email, phoneNumber, createdAt, status
+        case id, username, photoUrl, email, phoneNumber, createdAt, status, coins, diamonds
     }
 
     func encode(to encoder: Encoder) throws {
@@ -86,6 +88,8 @@ class Account: ObservableObject, Codable {
             try container.encode(phoneNumber, forKey: .phoneNumber)
         }
         try container.encode(status.rawValue, forKey: .status)
+        try container.encode(coins, forKey: .coins)
+        try container.encode(diamonds, forKey: .diamonds)
     }
 
     required init(from decoder: Decoder) throws {
@@ -98,6 +102,8 @@ class Account: ObservableObject, Codable {
         self.createdAt = try values.decodeIfPresent(Date.self, forKey: .createdAt)!
         let statusRawValue = try values.decodeIfPresent(String.self, forKey: .status)!
         self.status = Status(rawValue: statusRawValue) ?? .unfinished
+        self.coins = try values.decodeIfPresent(Int.self, forKey: .coins) ?? 0
+        self.diamonds = try values.decodeIfPresent(Int.self, forKey: .diamonds) ?? 0
     }
 
     //MARK: Public Methods
@@ -133,6 +139,8 @@ class Account: ObservableObject, Codable {
         if let createdAt = user.createdAt {
             self.createdAt = createdAt
         }
+        self.coins = user.coins
+        self.diamonds = user.diamonds
     }
 
     func reset() {

@@ -10,7 +10,7 @@ import SwiftUI
 struct CharacterListView: View {
     @Binding var selectedFighterType: FighterType?
     let fighters: [CharacterObject]
-    let buyAction: ((_ fighterType: FighterType) -> Void)?
+    let buyAction: ((_ fighterType: FighterType, _ isDiamond: Bool) -> Void)?
 
     private let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: characterItemSpacing), count: 3)
 
@@ -21,13 +21,13 @@ struct CharacterListView: View {
                     switch character.status {
                     case .upcoming:
                         TODO("Upcoming \(character.fighterType.name)")
-                    case .locked:
-                        buyAction?(character.fighterType)
+                    case .locked, .selected:
+                        TODO("Show details")
                     case .unlocked:
                         selectedFighterType = character.fighterType
-                    case .selected:
-                        break
                     }
+                } buyAction: { isDiamond in
+                    buyAction?(character.fighterType, isDiamond)
                 }
             }
         }
@@ -38,12 +38,14 @@ struct CharacterObjectCell: View {
     var character: CharacterObject
     var isSelected: Bool
     var action: () -> Void
+    var buyAction: ((_ isDiamond: Bool) -> Void)?
 
-    init(character: CharacterObject, isSelected: Bool, action: @escaping () -> Void) {
+    init(character: CharacterObject, isSelected: Bool, action: @escaping () -> Void, buyAction: ((_ isDiamond: Bool) -> Void)?) {
         UITableViewCell.appearance().backgroundColor = .clear
         self.character = character
         self.isSelected = isSelected
         self.action = action
+        self.buyAction = buyAction
     }
 
     var body: some View {
@@ -147,12 +149,13 @@ struct CharacterObjectCell: View {
     var coinButton: some View {
         Button(action: {
             TODO("Buy fighter \(character.fighterType.name) with COIN \(character.fighterType.name)")
+            buyAction?(false)
         }, label: {
             HStack(spacing: 2) {
                 coinImage
                     .frame(width: 15, height: 15, alignment: .center)
 
-                AppText("6999", type: .textSmall)
+                AppText("\(character.fighterType.coinCost)", type: .textSmall)
                     .padding(.vertical, 4)
             }
             .frame(maxWidth: .infinity)
@@ -162,12 +165,13 @@ struct CharacterObjectCell: View {
     var diamondButton: some View {
         Button(action: {
             TODO("Buy fighter \(character.fighterType.name) with DIAMOND \(character.fighterType.name)")
+            buyAction?(true)
         }, label: {
             HStack(spacing: 2) {
                 diamondImage
                     .frame(width: 15, height: 15, alignment: .center)
 
-                AppText("750", type: .textSmall)
+                AppText("\(character.fighterType.diamondCost)", type: .textSmall)
                     .padding(.vertical, 4)
             }
             .frame(maxWidth: .infinity)
