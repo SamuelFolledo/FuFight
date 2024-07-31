@@ -20,8 +20,10 @@ struct RoomView: View {
                         Spacer()
 
                         VStack {
-                            CharacterListView(selectedFighterType: $vm.selectedFighterType, fighters: vm.fighters, buyAction: vm.buyFighter(_:))
-                                .padding(.horizontal, smallerHorizontalPadding)
+                            CharacterListView(selectedFighterType: $vm.selectedFighterType, fighters: vm.fighters) { fighterType, isDiamond in
+                                vm.buyFighter(fighterType, isDiamond: isDiamond)
+                            }
+                            .padding(.horizontal, smallerHorizontalPadding)
                         }
                         .padding(.bottom, homeBottomViewHeight)
                     }
@@ -79,7 +81,12 @@ struct RoomView: View {
             PopupView(isShowing: $vm.showBuyFighterAlert,
                       title: "Unlock fighter?",
                       showOkayButton: false,
-                      bodyContent: UnlockFighterView(fighterType: fighterToBuy))
+                      bodyContent: UnlockFighterView(fighterType: fighterToBuy,
+                                                     isShowing: $vm.showBuyFighterAlert,
+                                                     currentCurrency: vm.isPurchasingWithDiamond ? vm.account.diamonds : vm.account.coins,
+                                                     isDiamond: vm.isPurchasingWithDiamond,
+                                                     cost: vm.isPurchasingWithDiamond ? fighterToBuy.diamondCost : fighterToBuy.coinCost,
+                                                     buyAction: vm.unlockFighter))
         }
     }
 }

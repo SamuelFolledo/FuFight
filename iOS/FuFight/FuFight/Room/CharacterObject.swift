@@ -27,7 +27,7 @@ enum PurchaseStatus: Int {
     }
 }
 
-struct CharacterObject {
+class CharacterObject {
     var fighterType: FighterType
     var status: PurchaseStatus
 

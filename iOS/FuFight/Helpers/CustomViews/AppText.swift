@@ -22,7 +22,7 @@ struct AppText: View {
         self.init(coloredText, fontSize: fontSize, strokeWidth: fontSize / 80, color: color, alignment: alignment)
     }
 
-    private init(_ text: String, fontSize: CGFloat = defaultFontSize, fontWeight: CustomFontWeight = .medium, strokeWidth: CGFloat = 0.25, color: Color = .white, alignment: TextAlignment = .leading) {
+    private init(_ text: String, fontSize: CGFloat = defaultFontSize, fontWeight: CustomFontWeight = .bold, strokeWidth: CGFloat = 0.25, color: Color = .white, alignment: TextAlignment = .leading) {
         self.text = text
         self.strokeWidth = strokeWidth
         self.font = Font.customFont(fontWeight, fontSize)
