@@ -27,7 +27,12 @@ struct CharacterListView: View {
                         selectedFighterType = character.fighterType
                     }
                 } buyAction: { isDiamond in
-                    buyAction?(character.fighterType, isDiamond)
+                    switch character.status {
+                    case .upcoming, .unlocked, .selected:
+                        break
+                    case .locked:
+                        buyAction?(character.fighterType, isDiamond)
+                    }
                 }
             }
         }
@@ -123,6 +128,7 @@ struct CharacterObjectCell: View {
             .lineLimit(1)
         })
         .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+        .disabled(!character.fighterType.isReleased)
     }
 
     @ViewBuilder func lockOverlay(isUpcoming: Bool) -> some View {
@@ -148,7 +154,6 @@ struct CharacterObjectCell: View {
 
     var coinButton: some View {
         Button(action: {
-            TODO("Buy fighter \(character.fighterType.name) with COIN \(character.fighterType.name)")
             buyAction?(false)
         }, label: {
             HStack(spacing: 2) {
@@ -164,7 +169,6 @@ struct CharacterObjectCell: View {
 
     var diamondButton: some View {
         Button(action: {
-            TODO("Buy fighter \(character.fighterType.name) with DIAMOND \(character.fighterType.name)")
             buyAction?(true)
         }, label: {
             HStack(spacing: 2) {
