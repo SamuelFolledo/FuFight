@@ -10,10 +10,10 @@ import SwiftUI
 struct UnlockFighterView: View {
     var fighterType: FighterType
     @Binding var isShowing: Bool
-    var currentCurrency: Int
     var isDiamond: Bool
+    var currentCurrency: Int
     var cost: Int
-    var buyAction: (() -> Void)?
+    var unlockAction: (() -> Void)?
 
     var body: some View {
         GeometryReader { reader in
@@ -40,7 +40,7 @@ struct UnlockFighterView: View {
                     }
 
                     AppButton(type: .ok, maxWidth: reader.size.width * 0.3) {
-                        buyAction?()
+                        unlockAction?()
                     }
                 }
             }

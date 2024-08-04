@@ -30,6 +30,8 @@ enum MainErrorType {
     case noOpponentFound
     case updatingAccountOrRoom
     case noDocumentToUpdate
+    case insufficientCoins
+    case insufficientDiamonds
 
     var title: String {
         switch self {
@@ -77,6 +79,10 @@ enum MainErrorType {
             "Error updating account's data"
         case .noDocumentToUpdate:
             "Attempting to update a data that does not exist"
+        case .insufficientCoins:
+            "Need more coins"
+        case .insufficientDiamonds:
+            "Need more diamonds"
         }
     }
 }
