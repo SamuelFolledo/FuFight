@@ -21,7 +21,7 @@ struct RoomView: View {
 
                         VStack {
                             CharacterListView(selectedFighterType: $vm.selectedFighterType, fighters: vm.fighters) { fighterType, isDiamond in
-                                vm.buyFighter(fighterType, isDiamond: isDiamond)
+                                vm.showUnlockFighterAlert(fighterType, isDiamond: isDiamond)
                             }
                             .padding(.horizontal, smallerHorizontalPadding)
                         }
@@ -76,17 +76,30 @@ struct RoomView: View {
     }
 
     @ViewBuilder func alertViews(_ reader: GeometryProxy) -> some View {
-        if vm.showBuyFighterAlert,
-           let fighterToBuy = vm.fighterToBuy {
-            PopupView(isShowing: $vm.showBuyFighterAlert,
-                      title: "Unlock fighter?",
-                      showOkayButton: false,
-                      bodyContent: UnlockFighterView(fighterType: fighterToBuy,
-                                                     isShowing: $vm.showBuyFighterAlert,
-                                                     currentCurrency: vm.isPurchasingWithDiamond ? vm.account.diamonds : vm.account.coins,
-                                                     isDiamond: vm.isPurchasingWithDiamond,
-                                                     cost: vm.isPurchasingWithDiamond ? fighterToBuy.diamondCost : fighterToBuy.coinCost,
-                                                     buyAction: vm.unlockFighter))
+        ZStack {
+            if vm.showUnlockFighterView,
+               let fighterToBuy = vm.fighterToBuy {
+                let isDiamond = vm.isPurchasingWithDiamond
+                PopupView(isShowing: $vm.showUnlockFighterView,
+                          title: "Unlock Fighter?",
+                          showOkayButton: false,
+                          bodyContent: UnlockFighterView(fighterType: fighterToBuy,
+                                                         isShowing: $vm.showUnlockFighterView,
+                                                         isDiamond: isDiamond,
+                                                         currentCurrency: isDiamond ? vm.account.diamonds : vm.account.coins,
+                                                         cost: isDiamond ? fighterToBuy.diamondCost : fighterToBuy.coinCost,
+                                                         unlockAction: vm.unlockFighter))
+            }
+            if vm.showInsufficientCoinsAlert {
+                PopupView(isShowing: $vm.showInsufficientCoinsAlert, title: MainErrorType.insufficientDiamonds.title, bodyContent: VStack {
+                    AppText("Top up to get more coins", type: .alertMedium)
+                })
+            }
+            if vm.showInsufficientDiamondsAlert {
+                PopupView(isShowing: $vm.showInsufficientDiamondsAlert, title: MainErrorType.insufficientDiamonds.title, bodyContent: VStack {
+                    AppText("Top up to get more diamonds", type: .alertMedium)
+                })
+            }
         }
     }
 }

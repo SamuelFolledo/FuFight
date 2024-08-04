@@ -31,12 +31,11 @@ class CharacterObject {
     var fighterType: FighterType
     var status: PurchaseStatus
 
-    init(fighterType: FighterType) {
+    init(fighterType: FighterType, status: PurchaseStatus) {
         self.fighterType = fighterType
+        self.status = status
         if !fighterType.isReleased {
             self.status = .upcoming
-        } else {
-            self.status = RoomManager.isPurchased(fighterType) ? .unlocked : .locked
         }
     }
 }
