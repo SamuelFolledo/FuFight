@@ -75,6 +75,7 @@ final class RoomViewModel: BaseAccountViewModel {
             try await RoomManager.saveCurrent(room)
             loadFighters()
             updateLoadingMessage(to: nil)
+            self.fighterToBuy = nil
             showUnlockFighterView = false
         }
     }

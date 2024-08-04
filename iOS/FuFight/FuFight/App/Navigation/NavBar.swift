@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NavBar: View {
 
+    var account: Account?
     var usernameViewTap: (() -> Void)?
 
     var body: some View {
@@ -57,7 +58,7 @@ struct NavBar: View {
                     .padding(.leading, -8)
                     .frame(width: navBarIconSize, height: navBarIconSize, alignment: .center)
 
-                AppText("\(Account.current?.coins ?? 0)", type: .navSmall)
+                AppText("\(account?.coins ?? 0)", type: .navSmall)
                     .padding(.leading, -4)
 
                 Spacer()
@@ -77,7 +78,7 @@ struct NavBar: View {
                     .padding(.leading, -16)
                     .frame(width: navBarIconSize, height: navBarIconSize)
 
-                AppText("\(Account.current?.diamonds ?? 0)", type: .navSmall)
+                AppText("\(account?.diamonds ?? 0)", type: .navSmall)
                     .padding(.leading, -4)
 
                 Spacer()

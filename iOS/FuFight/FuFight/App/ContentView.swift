@@ -137,7 +137,7 @@ struct ContentView: View {
 
     @ViewBuilder func navBarView() -> some View {
         if showNav {
-            NavBar {
+            NavBar(account: account) {
                 //TODO: Show popup PlayerDetailView
                 withAnimation {
                     showPlayerAlert = true
