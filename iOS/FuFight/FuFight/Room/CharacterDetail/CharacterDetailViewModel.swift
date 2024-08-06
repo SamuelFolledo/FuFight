@@ -18,6 +18,7 @@ final class CharacterDetailViewModel: BaseAccountViewModel {
     var fighterScene: SCNScene?
 
     let playerType: PlayerType = .user
+    let didBack = PassthroughSubject<CharacterDetailViewModel, Never>()
 
     //MARK: - Override Methods
     override func onAppear() {

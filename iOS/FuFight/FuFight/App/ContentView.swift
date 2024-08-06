@@ -154,7 +154,7 @@ struct ContentView: View {
         case .home, .school, .events:
             HStack {
                 Spacer()
-                
+
                 Image(Room.current?.player.fighterType.headShotImageName ?? FighterType.samuel.headShotImageName)
                     .defaultImageModifier()
                     .frame(width: reader.size.width / 4)
@@ -220,6 +220,12 @@ struct ContentView: View {
             if tab == .collections {
                 //Required to trigger onAppear when switching between tabs
                 vm.onAppear()
+            }
+        }
+        .onChange(of: roomRouter.navigationPath) { _, newValue in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.showTab = newValue.isEmpty
+                self.showNav = newValue.isEmpty
             }
         }
     }

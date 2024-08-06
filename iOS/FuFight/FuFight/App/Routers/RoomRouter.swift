@@ -46,11 +46,11 @@ class RoomRouter: Router<RoomRoute> {
     //MARK: - AccountView Methods
     func makeCharacterDetailViewModel(account: Account) -> CharacterDetailViewModel {
         let vm = CharacterDetailViewModel(account: account)
-//        vm.didBack
-//            .sink(receiveValue: { _ in
-//                self.navigateBack()
-//            })
-//            .store(in: &subscriptions)
+        vm.didBack
+            .sink(receiveValue: { _ in
+                self.navigateBack()
+            })
+            .store(in: &subscriptions)
         return vm
     }
 }

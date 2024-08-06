@@ -33,6 +33,9 @@ struct CharacterDetailView: View {
         .overlay {
             LoadingView(message: vm.loadingMessage)
         }
+        .overlay {
+            bottomButtons
+        }
         .background {
             AnimatingBackgroundView(animate: true, leadingPadding: -500)
         }
@@ -66,6 +69,23 @@ struct CharacterDetailView: View {
             }
         }
         .padding(.horizontal, smallerHorizontalPadding)
+    }
+
+    var bottomButtons: some View {
+        VStack {
+            Spacer()
+
+            HStack {
+                AppButton(title: "Back", color: ColorType.destructive, textType: .buttonSmall, maxWidth: navBarButtonMaxWidth) {
+                    vm.didBack.send(vm)
+                }
+
+                Spacer()
+            }
+        }
+        .padding(.bottom, UserDefaults.bottomSafeAreaInset)
+        .padding(.horizontal, smallerHorizontalPadding)
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder var movesView: some View {
