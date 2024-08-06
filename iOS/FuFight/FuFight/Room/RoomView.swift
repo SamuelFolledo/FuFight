@@ -22,6 +22,8 @@ struct RoomView: View {
                         VStack {
                             CharacterListView(selectedFighterType: $vm.selectedFighterType, fighters: vm.fighters) { fighterType, isDiamond in
                                 vm.showUnlockFighterAlert(fighterType, isDiamond: isDiamond)
+                            } transitionToDetailAction: { fighterType in
+                                vm.transitionToFighterDetail(fighterType)
                             }
                             .padding(.horizontal, smallerHorizontalPadding)
                         }

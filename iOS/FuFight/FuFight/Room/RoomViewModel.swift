@@ -26,6 +26,7 @@ final class RoomViewModel: BaseAccountViewModel {
     @Published var showInsufficientDiamondsAlert: Bool = false
     @Published var showInsufficientCoinsAlert: Bool = false
 
+    let transitionToFighterDetail = PassthroughSubject<RoomViewModel, Never>()
     let playerType: PlayerType = .user
     let roomBottomButtons: [RoomButtonType] = RoomButtonType.allCases
 
@@ -37,7 +38,7 @@ final class RoomViewModel: BaseAccountViewModel {
     //MARK: - Public Methods
     func loadFighters() {
         let unlockedFighters = Room.current?.unlockedFighterIds ?? []
-        fighters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0, status: unlockedFighters.contains($0.id) ? .unlocked : .locked) }
+        fighters = FighterType.allCases.compactMap { CharacterObject(fighterType: $0, status: !unlockedFighters.contains($0.id) ? .locked : selectedFighterType == $0 ? .selected : .unlocked) }
             .sorted(by: { $0 < $1 })
     }
 
@@ -78,6 +79,11 @@ final class RoomViewModel: BaseAccountViewModel {
             self.fighterToBuy = nil
             showUnlockFighterView = false
         }
+    }
+
+    func transitionToFighterDetail(_ fighterType: FighterType) {
+        TODO("Transition to detail for \(fighterType.name)")
+        transitionToFighterDetail.send(self)
     }
 }
 
