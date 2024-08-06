@@ -53,6 +53,7 @@ enum Tab: String, CaseIterable, Identifiable {
 ///Source: https://betterprogramming.pub/flow-navigation-with-swiftui-4-e006882c5efa
 struct ContentView: View {
     @StateObject var homeRouter: HomeRouter = HomeRouter()
+    @StateObject var roomRouter: RoomRouter = RoomRouter()
     @StateObject var account: Account = Account.current ?? Account()
     @State var showTab: Bool = true
     @State var showNav: Bool = true
@@ -204,9 +205,15 @@ struct ContentView: View {
     }
 
     var roomView: some View {
-        let vm = RoomViewModel(account: account)
-        return NavigationStack {
+        let vm = roomRouter.makeRoomViewModel(account: account)
+        return NavigationStack(path: $roomRouter.navigationPath) {
             RoomView(vm: vm)
+                .navigationDestination(for: RoomRoute.self) { screen in
+                    switch screen {
+                    case .characterDetail(vm: let vm):
+                        CharacterDetailView(vm: vm)
+                    }
+                }
         }
         .tag(Tab.collections)
         .onAppear {

@@ -11,6 +11,7 @@ struct CharacterListView: View {
     @Binding var selectedFighterType: FighterType?
     let fighters: [CharacterObject]
     let buyAction: ((_ fighterType: FighterType, _ isDiamond: Bool) -> Void)?
+    let transitionToDetailAction: ((_ fighterType: FighterType) -> Void)?
 
     private let columns = Array(repeating: GridItem(.adaptive(minimum: 160), spacing: characterItemSpacing), count: 3)
 
@@ -22,7 +23,7 @@ struct CharacterListView: View {
                     case .upcoming:
                         TODO("Upcoming \(character.fighterType.name)")
                     case .locked, .selected:
-                        TODO("Show details")
+                        transitionToDetailAction?(character.fighterType)
                     case .unlocked:
                         selectedFighterType = character.fighterType
                     }
@@ -197,5 +198,5 @@ struct CharacterObjectCell: View {
 }
 
 #Preview {
-    CharacterListView(selectedFighterType: .constant(.clara), fighters: fakeAllFighters, buyAction: nil)
+    CharacterListView(selectedFighterType: .constant(.clara), fighters: fakeAllFighters, buyAction: nil, transitionToDetailAction: nil)
 }
