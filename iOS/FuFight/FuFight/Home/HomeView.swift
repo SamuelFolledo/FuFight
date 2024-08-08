@@ -128,14 +128,6 @@ struct HomeView: View {
 
                 AppText("TODO:::", type: .textMedium)
             })
-        } else if vm.showSettings {
-            PopupView(isShowing: $vm.showSettings,
-                      title: "TODO: Settings",
-                      bodyContent: VStack {
-                AppText("TODO:::", type: .textMedium)
-
-                AppText("TODO:::", type: .textMedium)
-            })
         } else if vm.showPromotions {
             PopupView(isShowing: $vm.showPromotions,
                       title: "TODO: Promotions",
@@ -201,7 +193,7 @@ struct HomeView: View {
                 VStack(alignment: .center, spacing: 16) {
                     ForEach(vm.availableButtonTypes.compactMap { $0.position == position ? $0 : nil }, id: \.id) { buttonType in
                         switch buttonType {
-                        case .promotions, .tasks, .chests, .leaderboards, .rewards, .inbox, .profile, .settings:
+                        case .promotions, .tasks, .chests, .leaderboards, .rewards, .inbox, .profile:
                             Button {
                                 vm.homeButtonTapped(buttonType)
                             } label: {
@@ -216,6 +208,15 @@ struct HomeView: View {
                             })
                             .overlay(alignment: .bottomLeading) {
                                 onlineFriendsCountLabel
+                            }
+                            .background {
+                                roundedButtonBackgroundImage
+                            }
+                        case .settings:
+                            Button {
+                                vm.transitionToRootSettings.send(vm)
+                            } label: {
+                                buttonType.image
                             }
                             .background {
                                 roundedButtonBackgroundImage

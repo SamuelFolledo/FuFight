@@ -18,7 +18,6 @@ final class HomeViewModel: BaseAccountViewModel {
     @Published var showFriendPicker: Bool = false
     @Published var showRewards: Bool = false
     @Published var showInbox: Bool = false
-    @Published var showSettings: Bool = false
     @Published var showPromotions: Bool = false
     @Published var showTasks: Bool = false
     @Published var showChests: Bool = false
@@ -31,6 +30,7 @@ final class HomeViewModel: BaseAccountViewModel {
     let transitionToOffline = PassthroughSubject<HomeViewModel, Never>()
     let transitionToPractice = PassthroughSubject<HomeViewModel, Never>()
     let transitionToAccount = PassthroughSubject<HomeViewModel, Never>()
+    let transitionToRootSettings = PassthroughSubject<HomeViewModel, Never>()
 
     override init(account: Account) {
         super.init(account: account)
@@ -61,7 +61,7 @@ final class HomeViewModel: BaseAccountViewModel {
         case .profile:
             transitionToAccount.send(self)
         case .settings:
-            showSettings.toggle()
+            transitionToRootSettings.send(self)
         case .promotions:
             showPromotions.toggle()
         case .tasks:
