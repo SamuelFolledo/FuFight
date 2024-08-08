@@ -13,6 +13,7 @@ enum HomeRoute: Hashable, Identifiable {
     case game(vm: GameViewModel)
     case account(vm: AccountViewModel)
     case updatePassword(vm: UpdatePasswordViewModel)
+    case rootSettings(vm: RootSettingsViewModel)
 
     var id: String {
         switch self {
@@ -24,6 +25,8 @@ enum HomeRoute: Hashable, Identifiable {
             "account"
         case .updatePassword(_):
             "updatePassword"
+        case .rootSettings(_):
+            "rootSettings"
         }
     }
 
@@ -81,6 +84,9 @@ class HomeRouter: ObservableObject {
         vm.transitionToAccount
             .sink(receiveValue: transitionToAccount)
             .store(in: &subscriptions)
+        vm.transitionToRootSettings
+            .sink(receiveValue: transitionToRootSettings)
+            .store(in: &subscriptions)
         return vm
     }
 
@@ -97,6 +103,20 @@ class HomeRouter: ObservableObject {
 
     func transitionToAccount(vm: HomeViewModel) {
         navigationPath.append(.account(vm: makeAccountViewModel(account: vm.account)))
+    }
+
+    func transitionToRootSettings(vm: HomeViewModel) {
+        navigationPath.append(.rootSettings(vm: makeRootSettingsViewModel(account: vm.account)))
+    }
+
+    func makeRootSettingsViewModel(account: Account) -> RootSettingsViewModel {
+        let vm = RootSettingsViewModel(account: account)
+        vm.didBack
+            .sink(receiveValue: { _ in
+                self.navigateBack()
+            })
+            .store(in: &subscriptions)
+        return vm
     }
 
     //MARK: - AccountView Methods

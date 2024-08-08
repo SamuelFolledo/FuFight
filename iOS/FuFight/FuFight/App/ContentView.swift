@@ -244,6 +244,8 @@ struct ContentView: View {
                         AccountView(vm: vm)
                     case .updatePassword(vm: let vm):
                         UpdatePasswordView(vm: vm)
+                    case .rootSettings(vm: let vm):
+                        RootSettingsView(vm: vm)
                     }
                 }
         }
